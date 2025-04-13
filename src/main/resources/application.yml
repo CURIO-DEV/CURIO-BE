@@ -11,6 +11,6 @@ springdoc:
     operations-sorter: alpha
     display-request-duration: true
     doc-expansion: none
-    cache:
-      disabled: true
-    model-and-view-allowed: true
+server:
+  servlet:
+    context-path: /curio
