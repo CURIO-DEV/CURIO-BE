@@ -4,8 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team.backend.curio.domain.users;
 import team.backend.curio.dto.UserCreateDto;
+import team.backend.curio.dto.UserDTO.UserInterestResponse;
 import team.backend.curio.dto.UserResponseDto;
 import team.backend.curio.repository.UserRepository;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -38,4 +41,40 @@ public class UserService {
 
         return responseDto;
     }
+
+    public void updateUserInterests(Long userId, List<String> interests) {
+        if (interests.size() != 4) {
+            throw new IllegalArgumentException("관심사는 정확히 4개여야 합니다.");
+        }
+
+        users user = UserRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+
+        user.setInterest1(interests.get(0));
+        user.setInterest2(interests.get(1));
+        user.setInterest3(interests.get(2));
+        user.setInterest4(interests.get(3));
+
+        UserRepository.save(user);
+    }
+
+    public UserInterestResponse getUserInterests(Long userId) {
+        users user = UserRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+
+        if (user.getInterest1() == null || user.getInterest2() == null ||
+                user.getInterest3() == null || user.getInterest4() == null) {
+            return new UserInterestResponse(List.of("사회", "정치", "경제", "연예")); // 기본값
+        }
+
+        return new UserInterestResponse(List.of(
+                user.getInterest1(),
+                user.getInterest2(),
+                user.getInterest3(),
+                user.getInterest4()
+        ));
+    }
+
+
+
 }
