@@ -42,22 +42,6 @@ public class UserService {
         return responseDto;
     }
 
-    public void updateUserInterests(Long userId, List<String> interests) {
-        if (interests.size() != 4) {
-            throw new IllegalArgumentException("관심사는 정확히 4개여야 합니다.");
-        }
-
-        users user = UserRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
-
-        user.setInterest1(interests.get(0));
-        user.setInterest2(interests.get(1));
-        user.setInterest3(interests.get(2));
-        user.setInterest4(interests.get(3));
-
-        UserRepository.save(user);
-    }
-
     public UserInterestResponse getUserInterests(Long userId) {
         users user = UserRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
@@ -73,6 +57,22 @@ public class UserService {
                 user.getInterest3(),
                 user.getInterest4()
         ));
+    }
+
+    // 회원 관심사 수정
+    public UserInterestResponse updateUserInterests(Long userId, List<String> interests) {
+        users user = UserRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 관심사 수정
+        user.setInterest1(interests.get(0));
+        user.setInterest2(interests.get(1));
+        user.setInterest3(interests.get(2));
+        user.setInterest4(interests.get(3));
+
+        UserRepository.save(user);
+
+        return new UserInterestResponse(interests);
     }
 
 
