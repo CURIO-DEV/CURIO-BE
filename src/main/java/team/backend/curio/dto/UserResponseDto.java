@@ -1,11 +1,12 @@
 package team.backend.curio.dto;
 
 import lombok.Getter;
-import lombok.AllArgsConstructor;
+import lombok.Setter;
 
 @Getter
-@AllArgsConstructor
+@Setter
 public class UserResponseDto {
-    private Long userId;
-    private String nickname;
+    private Long userId;  // 유저 ID
+    private String nickname;  // 닉네임
+    private String email;  // 이메일
 }
