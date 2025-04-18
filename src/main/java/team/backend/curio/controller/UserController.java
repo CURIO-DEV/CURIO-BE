@@ -8,14 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/userCreate")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     // 회원 가입
-    @PostMapping
+    @PostMapping("/userCreate")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponseDto createUser(@RequestBody UserCreateDto userCreateDto) {
         return userService.createUser(userCreateDto);
