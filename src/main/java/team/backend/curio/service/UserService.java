@@ -2,11 +2,13 @@ package team.backend.curio.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import team.backend.curio.domain.News;
 import team.backend.curio.domain.users;
 import team.backend.curio.dto.UserCreateDto;
 import team.backend.curio.dto.UserDTO.UserInterestResponse;
 import team.backend.curio.dto.UserResponseDto;
 import team.backend.curio.repository.UserRepository;
+
 
 import java.util.List;
 
@@ -14,10 +16,12 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository UserRepository;
+    private final NewsService NewsService;
 
     @Autowired
-    public UserService(UserRepository UserRepository) {
-        this.UserRepository = UserRepository;
+    public UserService(UserRepository userRepository, NewsService newsService) {
+        this.UserRepository = userRepository;
+        this.NewsService = newsService;
     }
 
     // 회원 가입 처리
@@ -30,10 +34,8 @@ public class UserService {
         // 소셜 타입은 기본값 0 (일반 회원가입)
         newUser.setSocialType(0);
 
-        // 2. DB에 저장
         users savedUser = UserRepository.save(newUser);  // 여기서 userRepository 사용
 
-        // 3. 응답 DTO로 반환 (user_id, nickname, email 반환)
         UserResponseDto responseDto = new UserResponseDto();
         responseDto.setUserId(savedUser.getUserId());  // user_id 반환
         responseDto.setNickname(savedUser.getNickname());
@@ -73,6 +75,30 @@ public class UserService {
         UserRepository.save(user);
 
         return new UserInterestResponse(interests);
+    }
+
+    // 관심사별 뉴스 조회
+    public List<News> getNewsByInterest(Long userId, String interestName) {
+        // 유저의 관심사 목록을 가져옴
+        users user = UserRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        String category = null;
+        if (user.getInterest1().equals(interestName)) {
+            category = interestName;
+        } else if (user.getInterest2().equals(interestName)) {
+            category = interestName;
+        } else if (user.getInterest3().equals(interestName)) {
+            category = interestName;
+        } else if (user.getInterest4().equals(interestName)) {
+            category = interestName;
+        }
+
+        if (category == null) {
+            throw new IllegalArgumentException("Interest not found in user's interests");
+        }
+
+        // NewsService를 사용하여 관심사에 맞는 뉴스 목록을 가져옴
+        return NewsService.getNewsByInterest(category);
     }
 
 
