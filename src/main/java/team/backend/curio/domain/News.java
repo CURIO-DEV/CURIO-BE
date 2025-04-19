@@ -1,11 +1,13 @@
 package team.backend.curio.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "News")
+@Getter
 public class News {
 
     @Id
@@ -39,10 +41,10 @@ public class News {
     @Column(name = "source_url") //원본 기사링크
     private String sourceUrl;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    public Long getNewsId() {
-        return newsId;
-    }
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
 }
