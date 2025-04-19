@@ -1,13 +1,17 @@
 package team.backend.curio.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "News")
 @Getter
+@Setter
 public class News {
 
     @Id
@@ -20,12 +24,15 @@ public class News {
     private String content;
 
     @Column(name = "summary_short")
+    @JsonProperty("summary_short")
     private String summaryShort;
 
     @Column(name = "summary_medium")
+    @JsonProperty("summary_medium")
     private String summaryMedium;
 
     @Column(name = "summary_long")
+    @JsonProperty("summary_long")
     private String summaryLong;
 
     private String category;
@@ -36,14 +43,18 @@ public class News {
     //private String newsKeyword;
 
     @Column(name = "image_url")
+    @JsonProperty("image_url")
     private String imageUrl;
 
-    @Column(name = "source_url") //원본 기사링크
+    @Column(name = "source_url")
+    @JsonProperty("source_url")
     private String sourceUrl;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
