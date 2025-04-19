@@ -27,4 +27,9 @@ public class NewsController {
         return ResponseEntity.ok("크롤링된 뉴스 여러 개 저장 성공!");
     }
 
+    @GetMapping("/list")
+    public List<News> getNewsList() {
+        return newsService.getAllNews();
+    }
+
 }

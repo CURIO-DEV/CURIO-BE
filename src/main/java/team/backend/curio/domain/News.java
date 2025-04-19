@@ -43,11 +43,11 @@ public class News {
     //private String newsKeyword;
 
     @Column(name = "image_url")
-    @JsonProperty("image_url")
+    @JsonProperty("imageUrl")
     private String imageUrl;
 
     @Column(name = "source_url")
-    @JsonProperty("source_url")
+    @JsonProperty("sourceUrl")
     private String sourceUrl;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

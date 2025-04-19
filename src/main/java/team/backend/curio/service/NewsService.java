@@ -30,5 +30,9 @@ public class NewsService {
         NewsRepository.saveAll(newsList);
     }
 
+    // 모든 뉴스 목록을 가져오는 메서드
+    public List<News> getAllNews() {
+        return NewsRepository.findAll();  // 모든 뉴스 반환
+    }
 
 }

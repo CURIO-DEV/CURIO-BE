@@ -101,6 +101,9 @@ public class UserService {
         return NewsService.getNewsByInterest(category);
     }
 
-
+    // 뉴스 목록을 가져오는 메소드
+    public List<News> getAllNews() {
+        return NewsService.getAllNews();
+    }
 
 }
