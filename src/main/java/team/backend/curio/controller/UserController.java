@@ -1,6 +1,7 @@
 package team.backend.curio.controller;
 
 import team.backend.curio.domain.News;
+import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.dto.UserCreateDto;
 import team.backend.curio.dto.UserDTO.UserInterestResponse;
@@ -54,15 +55,22 @@ public class UserController {
     }
 
     @Autowired
-    private NewsService NewsService;
+    private NewsService newsService;
 
-    // 유저의 관심사별 뉴스 목록 GET
+    // 유저의 관심사별 뉴스 목록 GET -> 유저아이디랑 관심사 이름 두개 필요
     @GetMapping("{userId}/interests/{interestName}/news")
     public List<NewsResponseDto> getNewsByInterest(@PathVariable int userId, @PathVariable String interestName) {
-        return NewsService.getNewsByInterest(interestName)
+        return newsService.getNewsByInterest(interestName)
                 .stream()
-                .map(news -> new NewsResponseDto(news))
+                .map(NewsResponseDto::new)
                 .collect(Collectors.toList());
+    }
+
+    // 유저의 관심사별 뉴스 목록 GET -> 유저아이디만 있으므로 4개 다 각각 출력
+    @GetMapping("{userId}/interests/news")
+    public ResponseEntity<List<InterestNewsResponseDto>> getInterestNews(@PathVariable Long userId) {
+        List<InterestNewsResponseDto> response = newsService.getInterestNewsByUserId(userId);
+        return ResponseEntity.ok(response);
     }
 
 }

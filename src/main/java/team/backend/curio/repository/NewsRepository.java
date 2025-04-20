@@ -8,4 +8,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
 
     // 관심사(category)별로 createdAt 내림차순으로 상위 10개의 뉴스 조회
     List<News> findTop10ByCategoryOrderByCreatedAtDesc(String category);
+
+    List<News> findByCategory(String category);
+
 }
