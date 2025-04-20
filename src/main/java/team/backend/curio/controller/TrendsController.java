@@ -3,6 +3,7 @@ package team.backend.curio.controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import team.backend.curio.dto.NewsDTO.NewsWithCountsDto;
+import team.backend.curio.dto.PopularKeywordDto;
 import team.backend.curio.service.TrendsService;
 
 import java.util.List;
@@ -22,6 +23,12 @@ public class TrendsController {
     @GetMapping("/popular-articles")
     public List<NewsWithCountsDto> getPopularArticles() {
         return trendsService.getPopularArticles();
+    }
+
+    // 인기 키워드 8개 조회
+    @GetMapping("/keywords")
+    public List<PopularKeywordDto> getPopularKeywords() {
+        return trendsService.getPopularKeywords();
     }
 }
 
