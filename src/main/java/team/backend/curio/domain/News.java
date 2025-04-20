@@ -40,6 +40,8 @@ public class News {
     @Column(name = "like_count")
     private int likeCount;
 
+    @Column(name = "save_count", nullable = false)
+    private int saveCount;
     //private String newsKeyword;
 
     @Column(name = "image_url")
