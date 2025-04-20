@@ -1,5 +1,6 @@
 package team.backend.curio.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import team.backend.curio.domain.News;
 import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
@@ -24,12 +25,14 @@ public class UserController {
     private UserService userService;
 
     // 회원 가입
+    @Operation(summary = "임시 회원 가입" /*,description = "새로운 유저를 등록합니다."*/)
     @PostMapping("/userCreate")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponseDto createUser(@RequestBody UserCreateDto userCreateDto) {
         return userService.createUser(userCreateDto);
     }
 
+    @Operation(summary = "관심 카테고리 불러오기")
     @GetMapping("/{userId}/interests")
     public ResponseEntity<UserInterestResponse> getInterests(@PathVariable Long userId) {
         try {
@@ -41,6 +44,7 @@ public class UserController {
     }
 
     // 회원 관심사 수정하기
+    @Operation(summary = "관심 카테고리 설정 및 수정")
     @PatchMapping("/{userId}/interests")
     public ResponseEntity<UserInterestResponse> updateInterests(@PathVariable Long userId, @RequestBody List<String> interests) {
         if (interests == null || interests.size() != 4) {
@@ -58,6 +62,7 @@ public class UserController {
     private NewsService newsService;
 
     // 유저의 관심사별 뉴스 목록 GET -> 유저아이디랑 관심사 이름 두개 필요
+    @Operation(summary = "사용자의 특정 관심사 뉴스 목록 불러오기")
     @GetMapping("{userId}/interests/{interestName}/news")
     public List<NewsResponseDto> getNewsByInterest(@PathVariable int userId, @PathVariable String interestName) {
         return newsService.getNewsByInterest(interestName)
@@ -67,6 +72,7 @@ public class UserController {
     }
 
     // 유저의 관심사별 뉴스 목록 GET -> 유저아이디만 있으므로 4개 다 각각 출력
+    @Operation(summary = "사용자별 뉴스 목록 불러오기")
     @GetMapping("{userId}/interests/news")
     public ResponseEntity<List<InterestNewsResponseDto>> getInterestNews(@PathVariable Long userId) {
         List<InterestNewsResponseDto> response = newsService.getInterestNewsByUserId(userId);
