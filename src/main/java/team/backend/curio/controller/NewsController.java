@@ -24,7 +24,7 @@ public class NewsController {
     public ResponseEntity<String> saveNews(@RequestBody List<News> newsList) {
         System.out.println("API 호출됨!");
         newsService.saveAllNews(newsList);
-        return ResponseEntity.ok("크롤링된 뉴스 여러 개 저장 성공!");
+        return ResponseEntity.ok("크롤링 뉴스 저장 성공!");
     }
 
     @GetMapping("/list")

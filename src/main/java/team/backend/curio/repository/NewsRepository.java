@@ -11,4 +11,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
 
     List<News> findByCategory(String category);
 
+    // 좋아요 수로 내림차순 정렬, 같으면 최신순으로 정렬
+    List<News> findTop4ByOrderByLikeCountDescCreatedAtDesc();
+
 }

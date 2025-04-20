@@ -62,5 +62,7 @@ public class NewsService {
     public void saveAllNews(List<News> newsList) {
         newsRepository.saveAll(newsList);  // 여러 개의 뉴스 저장
     }
+
+
 }
 
