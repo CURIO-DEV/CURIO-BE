@@ -13,4 +13,4 @@ springdoc:
     doc-expansion: none
 server:
   servlet:
-    context-path: /curio
+    context-path: /curio/api
