@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import team.backend.curio.service.UserActionService;
 
 @RestController
-@RequestMapping("/api/articles")
+@RequestMapping("/articles")
 @RequiredArgsConstructor
 
 public class UserActionController {
