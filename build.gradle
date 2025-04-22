@@ -42,8 +42,3 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-
-<<<<<<< HEAD
-=======
-def void id(java.lang.String string) {}
->>>>>>> userAciton-api
