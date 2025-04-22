@@ -38,6 +38,6 @@ public class News {
     @Column(name = "createAt", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now(); //생성 시간
 
-    @Column(name = "uadateAt", nullable = false)
+    @Column(name = "updateAt", nullable = false)
     private LocalDateTime updateAt = LocalDateTime.now(); //마지막 수정 시간
 }
