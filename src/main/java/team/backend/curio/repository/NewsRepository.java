@@ -1,5 +1,6 @@
 package team.backend.curio.repository;
 
+<<<<<<< HEAD
 import team.backend.curio.domain.News;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
@@ -14,4 +15,10 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     // 좋아요 수로 내림차순 정렬, 같으면 최신순으로 정렬
     List<News> findTop4ByOrderByLikeCountDescCreatedAtDesc();
 
+=======
+import org.springframework.data.jpa.repository.JpaRepository;
+import team.backend.curio.domain.News;
+
+public interface NewsRepository extends JpaRepository<News, Long>{
+>>>>>>> userAciton-api
 }
