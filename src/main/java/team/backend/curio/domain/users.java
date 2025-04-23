@@ -25,7 +25,7 @@ public class users {
     private String email; //소셜로그인에 사용된 이메일
 
     @Column(name = "social_type")
-    private int socialType; // 카카오, 구글
+    private Integer socialType; // 카카오, 구글
 
     @Column(name = "newsletter_email")
     private String newsletterEmail; //뉴스레터 받을 이메일
