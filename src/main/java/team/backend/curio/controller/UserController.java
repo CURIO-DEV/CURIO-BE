@@ -87,7 +87,7 @@ public class UserController {
         return ResponseEntity.ok(customSettingDto);
     }
 
-    // summaryPreference 값을 short, medium, long으로 매핑하는 함수
+    // summaryPreference 값을 short, medium, long으로 매핑하는 함수 추가
     private String mapSummaryType(int summaryPreference) {
         switch (summaryPreference) {
             case 1:
@@ -97,7 +97,7 @@ public class UserController {
             case 3:
                 return "long";
             default:
-                return "medium";  // 기본값은 "medium"으로 설정
+                return "medium"; // 기본값은 "medium"으로 설정
         }
     }
 }
