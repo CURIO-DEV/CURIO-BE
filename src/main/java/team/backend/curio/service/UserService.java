@@ -3,6 +3,7 @@ package team.backend.curio.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team.backend.curio.domain.users;
+import team.backend.curio.dto.CustomSettingDto;
 import team.backend.curio.dto.UserCreateDto;
 import team.backend.curio.dto.UserDTO.UserInterestResponse;
 import team.backend.curio.dto.UserResponseDto;
@@ -72,6 +73,30 @@ public class UserService {
         userRepository.save(user);
 
         return new UserInterestResponse(interests);
+    }
+
+
+    // 사용자의 커스텀 설정에서 요약 선호도 반환
+    public CustomSettingDto getUserCustomSettings(Long userId) {
+        users user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 사용자가 설정한 요약 선호도 반환
+        return new CustomSettingDto(user.getSummaryPreference());
+    }
+
+    // 사용자의 커스텀 설정에서 요약 선호도 수정
+    public CustomSettingDto updateUserCustomSettings(Long userId, CustomSettingDto customSettingDto) {
+        users user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 요약 선호도 수정
+        user.setSummaryPreference(customSettingDto.getSummaryPreference());
+
+        userRepository.save(user);
+
+        // 수정된 요약 선호도 반환
+        return new CustomSettingDto(user.getSummaryPreference());
     }
 }
 
