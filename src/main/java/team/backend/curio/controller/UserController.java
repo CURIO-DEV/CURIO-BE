@@ -86,5 +86,19 @@ public class UserController {
         CustomSettingDto customSettingDto= userService.getUserCustomSettings(userId); // 유저 서비스 호출하여 데이터 가져오기
         return ResponseEntity.ok(customSettingDto);
     }
+
+    // summaryPreference 값을 short, medium, long으로 매핑하는 함수
+    private String mapSummaryType(int summaryPreference) {
+        switch (summaryPreference) {
+            case 1:
+                return "short";
+            case 2:
+                return "medium";
+            case 3:
+                return "long";
+            default:
+                return "medium";  // 기본값은 "medium"으로 설정
+        }
+    }
 }
 
