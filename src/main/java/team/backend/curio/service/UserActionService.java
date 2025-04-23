@@ -53,6 +53,7 @@ public class UserActionService {
         }
     }
 
+    // 추천 등록
     @Transactional
     public void recommendNews(Long userId, Long newsId) {
         UserAction userAction = userActionRepository.findByUserIdAndNewsId(userId, newsId)
@@ -61,11 +62,18 @@ public class UserActionService {
                         .newsId(newsId)
                         .build());
 
+        // 추천을 클릭할 때 비추천을 취소
+        if (userAction.getVote() == -1) {
+            userAction.setVote(0); // 비추천 취소
+            userActionRepository.save(userAction);
+        }
+
         if (userAction.getVote() != 1) {
             userAction.setVote(1); //추천
             userActionRepository.save(userAction);
         }
     }
+
 
     @Transactional
     public void cancelRecommend(Long userId, Long newsId) {
@@ -78,6 +86,7 @@ public class UserActionService {
                 });
     }
 
+    // 비추천 등록
     @Transactional
     public void notRecommendNews(Long userId, Long newsId){
         UserAction userAction=userActionRepository.findByUserIdAndNewsId(userId,newsId)
@@ -86,12 +95,20 @@ public class UserActionService {
                         .newsId(newsId)
                         .build());
 
+
+        // 비추천을 클릭할 때 추천을 취소
+        if (userAction.getVote() == 1) {
+            userAction.setVote(0); // 추천 취소
+            userActionRepository.save(userAction);
+        }
+
         if (userAction.getVote() != -1){
             userAction.setVote(-1);//비추천
             userActionRepository.save(userAction);
         }
     }
 
+    // 비추천 취소
     @Transactional
     public void cancelNotRecommend(Long userId, Long newsId){
         userActionRepository.findByUserIdAndNewsId(userId,newsId)
