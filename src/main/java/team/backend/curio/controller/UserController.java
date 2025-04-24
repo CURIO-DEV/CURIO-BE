@@ -5,6 +5,7 @@ import team.backend.curio.domain.News;
 import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.dto.UserCreateDto;
+import team.backend.curio.dto.CustomSettingDto;
 import team.backend.curio.dto.UserDTO.UserInterestResponse;
 import team.backend.curio.service.UserService;
 import team.backend.curio.service.NewsService;
@@ -79,5 +80,25 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "사용자의 커스텀 설정 조회 (요약 선호도)")
+    @GetMapping("/{userId}/custom")
+    public ResponseEntity<CustomSettingDto> getUserCustomSettings(@PathVariable Long userId){
+        CustomSettingDto customSettingDto= userService.getUserCustomSettings(userId); // 유저 서비스 호출하여 데이터 가져오기
+        return ResponseEntity.ok(customSettingDto);
+    }
+
+    // summaryPreference 값을 short, medium, long으로 매핑하는 함수 추가
+    private String mapSummaryType(int summaryPreference) {
+        switch (summaryPreference) {
+            case 1:
+                return "short";
+            case 2:
+                return "medium";
+            case 3:
+                return "long";
+            default:
+                return "medium"; // 기본값은 "medium"으로 설정
+        }
+    }
 }
 

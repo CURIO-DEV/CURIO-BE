@@ -20,6 +20,7 @@ public class NewsController {
         this.newsService = newsService;
     }
 
+    /*
     // 뉴스 저장 API
     @Operation(summary = "크롤링 뉴스 데이터 저장")
     @PostMapping("/crawler")
@@ -33,6 +34,6 @@ public class NewsController {
     @GetMapping("/list")
     public List<News> getNewsList() {
         return newsService.getAllNews();
-    }
+    }*/
 
 }

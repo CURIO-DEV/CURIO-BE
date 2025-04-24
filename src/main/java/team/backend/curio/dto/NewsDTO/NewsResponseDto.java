@@ -1,4 +1,5 @@
 package team.backend.curio.dto.NewsDTO;
+
 import lombok.Getter;
 import lombok.Setter;
 import team.backend.curio.domain.News;
@@ -6,6 +7,7 @@ import team.backend.curio.domain.News;
 @Getter
 @Setter
 public class NewsResponseDto {
+
     private String title;
     private String content;
     private String imageUrl;
@@ -17,4 +19,9 @@ public class NewsResponseDto {
         this.imageUrl = news.getImageUrl();  // 이미지 URL 추가
     }
 
+    // 새로운 생성자 (title과 imageUrl을 받는 생성자 추가)
+    public NewsResponseDto(String title, String imageUrl) {
+        this.title = title;
+        this.imageUrl = imageUrl;
+    }
 }

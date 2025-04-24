@@ -1,9 +1,19 @@
 package team.backend.curio.domain;
 
+<<<<<<< HEAD
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+=======
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import jakarta.persistence.*;
+>>>>>>> news-api
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -12,6 +22,9 @@ import java.time.LocalDateTime;
 @Table(name = "News")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class News {
 
     @Id
