@@ -2,6 +2,7 @@ package team.backend.curio.repository;
 
 import team.backend.curio.domain.News;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface NewsRepository extends JpaRepository<News, Long> {
@@ -13,5 +14,15 @@ public interface NewsRepository extends JpaRepository<News, Long> {
 
     // 좋아요 수로 내림차순 정렬, 같으면 최신순으로 정렬
     List<News> findTop4ByOrderByLikeCountDescCreatedAtDesc();
+
+
+    // 특정 뉴스의 카테고리 조회
+    @Query("SELECT n.category FROM News n WHERE n.newsId = :articleId")
+    String findCategoryById(Long articleId);
+
+    // 해당 카테고리로 관련 뉴스 조회
+    @Query("SELECT n FROM News n WHERE n.category = :category")
+    List<News> findRelatedNewsByCategory(String category);
+
 
 }
