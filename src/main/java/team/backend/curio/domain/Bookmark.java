@@ -22,17 +22,20 @@ public class Bookmark {
 
     private String name;
 
+    private String color;
+
     private String collaboratorEmail1;
     private String collaboratorEmail2;
     private String collaboratorEmail3;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private users users;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    private users users;  // 사용자와의 관계
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "news_id", nullable = false)
-    private News news;
+    @ManyToOne
+    @JoinColumn(name = "news_id", referencedColumnName = "news_id", insertable = false, updatable = false)
+    private News news;  // 뉴스와의 관계
+
 
     @CreationTimestamp
     private LocalDateTime createdAt;
