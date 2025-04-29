@@ -11,9 +11,11 @@ import team.backend.curio.domain.News;
 import team.backend.curio.dto.BookmarkDTO.CreateBookmarkDto;
 import team.backend.curio.dto.BookmarkDTO.BookmarkResponseDto;
 import team.backend.curio.dto.BookmarkDTO.NewsAddBookmarkDto;
+import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.service.BookmarkService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/bookmarks")
@@ -55,9 +57,9 @@ public class BookmarkController {
     // 북마크 삭제
     @Operation(summary = "북마크 삭제")
     @DeleteMapping("/{bookmarkId}/delete")
-    public ResponseEntity<Void> deleteBookmark(@PathVariable Long bookmarkId) {
+    public ResponseEntity<String> deleteBookmark(@PathVariable Long bookmarkId) {
         bookmarkService.deleteBookmark(bookmarkId);
-        return ResponseEntity.noContent().build(); // 204 No Content
+        return ResponseEntity.ok("북마크가 삭제되었습니다.");
     }
 
     // 북마크에 뉴스 추가
@@ -100,11 +102,21 @@ public class BookmarkController {
     // 북마크에 뉴스 리스트 출력
     @Operation(summary = "북마크별 뉴스 리스트 출력")
     @GetMapping("/{folderId}/news")
-    public ResponseEntity<List<News>> getNewsByBookmark(@PathVariable Long folderId) {
+    /*public ResponseEntity<List<News>> getNewsByBookmark(@PathVariable Long folderId) {
         Bookmark bookmark = bookmarkService.getBookmarkById(folderId);
         List<News> newsList = bookmark.getNewsList(); // ManyToMany로 매핑된 리스트
         return ResponseEntity.ok(newsList);
+    }*/
+    public List<NewsResponseDto> getNewsByBookmark(@PathVariable("folderId") Long folderId) {
+        Bookmark bookmark = bookmarkService.getBookmarkById(folderId);
+        List<News> newsList = bookmark.getNewsList();
+
+        return newsList.stream()
+                .map(news -> new NewsResponseDto(news.getTitle(), news.getImageUrl()))
+                .collect(Collectors.toList());
     }
+
+
 
 }
 
