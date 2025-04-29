@@ -48,5 +48,13 @@ public class BookmarkController {
         return ResponseEntity.ok(response);
     }
 
+    // 북마크 삭제
+    @DeleteMapping("/{bookmarkId}/delete")
+    public ResponseEntity<Void> deleteBookmark(@PathVariable Long bookmarkId) {
+        bookmarkService.deleteBookmark(bookmarkId);
+        return ResponseEntity.noContent().build(); // 204 No Content
+    }
+
+
 }
 
