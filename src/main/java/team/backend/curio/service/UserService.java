@@ -85,7 +85,8 @@ public class UserService {
         return new CustomSettingDto(user.getSummaryPreference());
     }
 
-    // 사용자의 커스텀 설정에서 요약 선호도 수정
+
+    // 사용자의 커스텀 설정에서 요약 선호도 및 기타 설정값 수정
     public CustomSettingDto updateUserCustomSettings(Long userId, CustomSettingDto customSettingDto) {
         users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -93,10 +94,29 @@ public class UserService {
         // 요약 선호도 수정
         user.setSummaryPreference(customSettingDto.getSummaryPreference());
 
+        // 수신 이메일 저장
+        user.setNewsletterEmail(customSettingDto.getNewsletterEmail());
+
+        // 폰트 크기 저장 (String으로)
+        user.setFontSize(customSettingDto.getFontSize());
+
+        // 카테고리 리스트 → interest1~4에 분배
+        List<String> categories = customSettingDto.getCategories();
+        if (categories != null) {
+            if (categories.size() > 0) user.setInterest1(categories.get(0));
+            if (categories.size() > 1) user.setInterest2(categories.get(1));
+            if (categories.size() > 2) user.setInterest3(categories.get(2));
+            if (categories.size() > 3) user.setInterest4(categories.get(3));
+        }
+
         userRepository.save(user);
 
-        // 수정된 요약 선호도 반환
-        return new CustomSettingDto(user.getSummaryPreference());
+        return new CustomSettingDto(
+                user.getSummaryPreference(),
+                user.getNewsletterEmail(),
+                List.of(user.getInterest1(), user.getInterest2(), user.getInterest3(), user.getInterest4()),
+                user.getFontSize()
+        );
     }
 
     // **사용자의 닉네임과 프로필 사진 URL 반환**
