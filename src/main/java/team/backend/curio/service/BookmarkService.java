@@ -48,5 +48,21 @@ public class BookmarkService {
         );
     }
 
+    // 북마크 수정
+    public Bookmark updateBookmark(Long bookmarkId, CreateBookmarkDto updateDto) {
+        Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
+                .orElseThrow(() -> new RuntimeException("Bookmark not found"));
+
+        bookmark.updateBookmark(
+                updateDto.getName(),
+                updateDto.getColor(),
+                updateDto.getCollaboratorEmail1(),
+                updateDto.getCollaboratorEmail2(),
+                updateDto.getCollaboratorEmail3()
+        );
+
+        return bookmarkRepository.save(bookmark);
+    }
+
 }
 

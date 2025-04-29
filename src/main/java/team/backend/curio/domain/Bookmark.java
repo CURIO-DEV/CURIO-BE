@@ -42,4 +42,15 @@ public class Bookmark {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public void updateBookmark(String name, String color, String email1, String email2, String email3) {
+        this.name = name;
+        this.color = color;
+        this.collaboratorEmail1 = email1;
+        this.collaboratorEmail2 = email2;
+        this.collaboratorEmail3 = email3;
+    }
+
 }
+
+
