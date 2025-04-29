@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import team.backend.curio.domain.Bookmark;
 import team.backend.curio.dto.BookmarkDTO.CreateBookmarkDto;
 import team.backend.curio.dto.BookmarkDTO.BookmarkResponseDto;
 import team.backend.curio.service.BookmarkService;
@@ -30,6 +31,22 @@ public class BookmarkController {
         return new ResponseEntity<>(bookmarkResponseDto, HttpStatus.CREATED);
     }
 
-    // 추가적인 API 엔드포인트는 여기서 작성
+    // 북마크 수정
+    @PatchMapping("/{bookmarkId}/update")
+    public ResponseEntity<BookmarkResponseDto> updateBookmark(
+            @PathVariable Long bookmarkId,
+            @RequestBody CreateBookmarkDto updateDto) {
+
+        Bookmark updatedBookmark = bookmarkService.updateBookmark(bookmarkId, updateDto);
+
+        BookmarkResponseDto response = new BookmarkResponseDto(
+                updatedBookmark.getId(),
+                updatedBookmark.getName(),
+                updatedBookmark.getColor()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
 }
 
