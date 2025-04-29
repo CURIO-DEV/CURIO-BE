@@ -43,5 +43,5 @@ public class users {
     private String interest4;
 
     // **프로필 사진 URL 추가**
-    private String profileImageUrl;  // 프로필 사진 URL 필드 추가
+    private String profile_image_url;  // 프로필 사진 URL 필드 추가
 }
