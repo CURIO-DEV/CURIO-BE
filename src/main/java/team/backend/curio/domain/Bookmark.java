@@ -26,12 +26,17 @@ public class Bookmark {
 
     private String color;
 
+    @Column(name = "collaborator_email_1")
     private String collaboratorEmail1;
+
+    @Column(name = "collaborator_email_2")
     private String collaboratorEmail2;
+
+    @Column(name = "collaborator_email_3")
     private String collaboratorEmail3;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private users users;  // 사용자와의 관계
 
     @ManyToMany
@@ -42,11 +47,12 @@ public class Bookmark {
     )
     private List<News> newsList = new ArrayList<>();
 
-
     @CreationTimestamp
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     public void updateBookmark(String name, String color, String email1, String email2, String email3) {
