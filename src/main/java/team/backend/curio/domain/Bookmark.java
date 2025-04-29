@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "Bookmark")
@@ -32,9 +34,13 @@ public class Bookmark {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
     private users users;  // 사용자와의 관계
 
-    @ManyToOne
-    @JoinColumn(name = "news_id", referencedColumnName = "news_id", insertable = false, updatable = false)
-    private News news;  // 뉴스와의 관계
+    @ManyToMany
+    @JoinTable(
+            name = "bookmark_news",  // 중간 테이블 이름
+            joinColumns = @JoinColumn(name = "bookmark_id"),
+            inverseJoinColumns = @JoinColumn(name = "news_id")
+    )
+    private List<News> newsList = new ArrayList<>();
 
 
     @CreationTimestamp
@@ -51,6 +57,9 @@ public class Bookmark {
         this.collaboratorEmail3 = email3;
     }
 
+
+
 }
+
 
 
