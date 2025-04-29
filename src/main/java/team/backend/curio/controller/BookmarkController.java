@@ -102,11 +102,6 @@ public class BookmarkController {
     // 북마크에 뉴스 리스트 출력
     @Operation(summary = "북마크별 뉴스 리스트 출력")
     @GetMapping("/{folderId}/news")
-    /*public ResponseEntity<List<News>> getNewsByBookmark(@PathVariable Long folderId) {
-        Bookmark bookmark = bookmarkService.getBookmarkById(folderId);
-        List<News> newsList = bookmark.getNewsList(); // ManyToMany로 매핑된 리스트
-        return ResponseEntity.ok(newsList);
-    }*/
     public List<NewsResponseDto> getNewsByBookmark(@PathVariable("folderId") Long folderId) {
         Bookmark bookmark = bookmarkService.getBookmarkById(folderId);
         List<News> newsList = bookmark.getNewsList();
