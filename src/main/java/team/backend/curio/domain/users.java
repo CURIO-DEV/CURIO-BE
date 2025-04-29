@@ -44,4 +44,7 @@ public class users {
 
     // **프로필 사진 URL 추가**
     private String profileImageUrl;  // 프로필 사진 URL 필드 추가
+
+    private String fontSize;
+
 }
