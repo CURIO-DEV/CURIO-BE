@@ -114,7 +114,7 @@ public class UserController {
         // 닉네임과 프로필 이미지 URL을 응답
         return ResponseEntity.ok(new Object() {
             public final String nickname = user.getNickname();
-            public final String profileImageUrl = user.getProfileImageUrl();
+            public final String profile_image_url = user.getProfile_image_url();
         });
     }
 
