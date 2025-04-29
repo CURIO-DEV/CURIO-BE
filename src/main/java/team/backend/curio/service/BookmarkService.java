@@ -13,6 +13,8 @@ import team.backend.curio.repository.BookmarkRepository;
 import team.backend.curio.repository.NewsRepository;
 import team.backend.curio.repository.UserRepository;
 
+import java.util.List;
+
 
 @Service
 public class BookmarkService {
@@ -96,6 +98,16 @@ public class BookmarkService {
 
         bookmark.removeNews(news);
         bookmarkRepository.save(bookmark);
+    }
+
+    // 북마크 리스트
+    public List<Bookmark> getAllBookmarks() {
+        return bookmarkRepository.findAll();
+    }
+
+    public Bookmark getBookmarkById(Long id) {
+        return bookmarkRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Bookmark not found"));
     }
 
 }

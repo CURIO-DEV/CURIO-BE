@@ -6,10 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import team.backend.curio.domain.Bookmark;
+import team.backend.curio.domain.News;
 import team.backend.curio.dto.BookmarkDTO.CreateBookmarkDto;
 import team.backend.curio.dto.BookmarkDTO.BookmarkResponseDto;
 import team.backend.curio.dto.BookmarkDTO.NewsAddBookmarkDto;
 import team.backend.curio.service.BookmarkService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/bookmarks")
@@ -74,6 +77,28 @@ public class BookmarkController {
     ) {
         bookmarkService.removeNewsFromBookmark(folderId, newsId);
         return ResponseEntity.ok("뉴스가 북마크에서 제거되었습니다.");
+    }
+
+    // 북마크 목록 출력
+    @GetMapping("/list")
+    public ResponseEntity<List<BookmarkResponseDto>> getBookmarkList() {
+        List<Bookmark> bookmarks = bookmarkService.getAllBookmarks(); // 또는 로그인한 사용자 기준
+        List<BookmarkResponseDto> result = bookmarks.stream()
+                .map(bookmark -> new BookmarkResponseDto(
+                        bookmark.getId(),
+                        bookmark.getName(),
+                        bookmark.getColor()
+                )).toList();
+
+        return ResponseEntity.ok(result);
+    }
+
+    // 북마크에 뉴스 리스트 출력
+    @GetMapping("/{folderId}/news")
+    public ResponseEntity<List<News>> getNewsByBookmark(@PathVariable Long folderId) {
+        Bookmark bookmark = bookmarkService.getBookmarkById(folderId);
+        List<News> newsList = bookmark.getNewsList(); // ManyToMany로 매핑된 리스트
+        return ResponseEntity.ok(newsList);
     }
 
 }
