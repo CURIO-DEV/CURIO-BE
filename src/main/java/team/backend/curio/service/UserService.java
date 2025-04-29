@@ -98,5 +98,11 @@ public class UserService {
         // 수정된 요약 선호도 반환
         return new CustomSettingDto(user.getSummaryPreference());
     }
+
+    // **사용자의 닉네임과 프로필 사진 URL 반환**
+    public users getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
 }
 

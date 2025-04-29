@@ -1,6 +1,7 @@
 package team.backend.curio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import team.backend.curio.domain.users;
 import team.backend.curio.domain.News;
 import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
@@ -100,5 +101,23 @@ public class UserController {
                 return "medium"; // 기본값은 "medium"으로 설정
         }
     }
+
+    // 사용자 프로필 조회 (닉네임과 프로필 사진)
+    @Operation(summary = "사용자 프로필 조회 (닉네임, 프로필 사진)")
+    @GetMapping("/{userId}/profile")
+    public ResponseEntity<?> getUserProfile(@PathVariable Long userId) {
+        // 사용자 조회
+        users user = userService.getUserById(userId); // userService에서 사용자 정보 조회
+        if (user == null) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+        // 닉네임과 프로필 이미지 URL을 응답
+        return ResponseEntity.ok(new Object() {
+            public final String nickname = user.getNickname();
+            public final String profileImageUrl = user.getProfileImageUrl();
+        });
+    }
+
+
 }
 
