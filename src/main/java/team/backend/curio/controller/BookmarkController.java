@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import team.backend.curio.domain.Bookmark;
 import team.backend.curio.dto.BookmarkDTO.CreateBookmarkDto;
 import team.backend.curio.dto.BookmarkDTO.BookmarkResponseDto;
+import team.backend.curio.dto.BookmarkDTO.NewsAddBookmarkDto;
 import team.backend.curio.service.BookmarkService;
 
 @RestController
@@ -55,6 +56,25 @@ public class BookmarkController {
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 
+    // 북마크에 뉴스 추가
+    @PostMapping("/{folderId}/news/add")
+    public ResponseEntity<?> addNewsToBookmark(
+            @PathVariable Long folderId,
+            @RequestBody NewsAddBookmarkDto requestDto
+    ) {
+        bookmarkService.addNewsToBookmark(folderId, requestDto.getNewsId());
+        return ResponseEntity.ok("뉴스가 북마크에 추가되었습니다.");
+    }
+
+    // 북마크에  뉴스 삭제
+    @DeleteMapping("/{folderId}/news/{newsId}/remove")
+    public ResponseEntity<?> removeNewsFromBookmark(
+            @PathVariable Long folderId,
+            @PathVariable Long newsId
+    ) {
+        bookmarkService.removeNewsFromBookmark(folderId, newsId);
+        return ResponseEntity.ok("뉴스가 북마크에서 제거되었습니다.");
+    }
 
 }
 

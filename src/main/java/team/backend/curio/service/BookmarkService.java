@@ -7,20 +7,26 @@ import org.springframework.stereotype.Service;
 import team.backend.curio.dto.BookmarkDTO.CreateBookmarkDto;
 import team.backend.curio.dto.BookmarkDTO.BookmarkResponseDto;
 import team.backend.curio.domain.Bookmark;
+import team.backend.curio.domain.News;
 import team.backend.curio.domain.users;
 import team.backend.curio.repository.BookmarkRepository;
+import team.backend.curio.repository.NewsRepository;
 import team.backend.curio.repository.UserRepository;
+
 
 @Service
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
+    private final NewsRepository newsRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public BookmarkService(BookmarkRepository bookmarkRepository, UserRepository userRepository) {
+    public BookmarkService(BookmarkRepository bookmarkRepository, UserRepository userRepository,NewsRepository newsRepository) {
         this.bookmarkRepository = bookmarkRepository;
+        this.newsRepository = newsRepository;
         this.userRepository = userRepository;
+
     }
 
     // 북마크 생성
@@ -71,5 +77,26 @@ public class BookmarkService {
                 .orElseThrow(() -> new RuntimeException("Bookmark not found"));
         bookmarkRepository.delete(bookmark);
     }
+
+    public void addNewsToBookmark(Long folderId, Long newsId) {
+        Bookmark bookmark = bookmarkRepository.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("Bookmark not found"));
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new RuntimeException("News not found"));
+
+        bookmark.addNews(news);
+        bookmarkRepository.save(bookmark);
+    }
+
+    public void removeNewsFromBookmark(Long folderId, Long newsId) {
+        Bookmark bookmark = bookmarkRepository.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("Bookmark not found"));
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new RuntimeException("News not found"));
+
+        bookmark.removeNews(news);
+        bookmarkRepository.save(bookmark);
+    }
+
 }
 
