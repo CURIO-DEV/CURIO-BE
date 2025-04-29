@@ -1,5 +1,6 @@
 package team.backend.curio.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,16 +27,15 @@ public class BookmarkController {
     }
 
     // 북마크 폴더 생성
+    @Operation(summary = "북마크 생성")
     @PostMapping("/create")
     public ResponseEntity<BookmarkResponseDto> createBookmark(@RequestBody CreateBookmarkDto createBookmarkDto) {
-        // 북마크 생성
         BookmarkResponseDto bookmarkResponseDto = bookmarkService.createBookmark(createBookmarkDto);
-
-        // 생성된 북마크 반환
         return new ResponseEntity<>(bookmarkResponseDto, HttpStatus.CREATED);
     }
 
     // 북마크 수정
+    @Operation(summary = "북마크 정보 수정")
     @PatchMapping("/{bookmarkId}/update")
     public ResponseEntity<BookmarkResponseDto> updateBookmark(
             @PathVariable Long bookmarkId,
@@ -53,6 +53,7 @@ public class BookmarkController {
     }
 
     // 북마크 삭제
+    @Operation(summary = "북마크 삭제")
     @DeleteMapping("/{bookmarkId}/delete")
     public ResponseEntity<Void> deleteBookmark(@PathVariable Long bookmarkId) {
         bookmarkService.deleteBookmark(bookmarkId);
@@ -60,6 +61,7 @@ public class BookmarkController {
     }
 
     // 북마크에 뉴스 추가
+    @Operation(summary = "북마크에 뉴스 추가하기")
     @PostMapping("/{folderId}/news/add")
     public ResponseEntity<?> addNewsToBookmark(
             @PathVariable Long folderId,
@@ -70,6 +72,7 @@ public class BookmarkController {
     }
 
     // 북마크에  뉴스 삭제
+    @Operation(summary = "북마크에 있는 뉴스 삭제하기")
     @DeleteMapping("/{folderId}/news/{newsId}/remove")
     public ResponseEntity<?> removeNewsFromBookmark(
             @PathVariable Long folderId,
@@ -80,6 +83,7 @@ public class BookmarkController {
     }
 
     // 북마크 목록 출력
+    @Operation(summary = "북마크 목록 출력")
     @GetMapping("/list")
     public ResponseEntity<List<BookmarkResponseDto>> getBookmarkList() {
         List<Bookmark> bookmarks = bookmarkService.getAllBookmarks(); // 또는 로그인한 사용자 기준
@@ -94,6 +98,7 @@ public class BookmarkController {
     }
 
     // 북마크에 뉴스 리스트 출력
+    @Operation(summary = "북마크별 뉴스 리스트 출력")
     @GetMapping("/{folderId}/news")
     public ResponseEntity<List<News>> getNewsByBookmark(@PathVariable Long folderId) {
         Bookmark bookmark = bookmarkService.getBookmarkById(folderId);
