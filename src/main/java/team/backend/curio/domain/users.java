@@ -47,4 +47,7 @@ public class users {
     private String fontSize;
   
     private String profile_image_url;  // 프로필 사진 URL 필드 추가
+
+    @Column(name = "newsletter_status", nullable = false, columnDefinition = "int default 0") // 0이면 구독 안함, 1이면 구독함
+    private int newsletterStatus; // 뉴스레터 구독 상태 (0: 구독 안함, 1: 구독함)
 }
