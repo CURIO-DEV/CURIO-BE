@@ -152,4 +152,16 @@ public class UserService {
         return userRepository.findByNewsletterStatusAndNewsletterEmailNotNull(1); // 1은 뉴스레터 구독 상태
     }
 
+    public String deleteUser(Long userId){
+        //유저가 존재하는지 확인
+        users user=userRepository.findById(userId).orElse(null);
+        if(user ==null){
+            return "User not found"; //유저가 없다면 메시지 반환
+        }
+
+        //유저 삭제
+        userRepository.delete(user);
+
+        return "User가 성공적으로 삭제되었습니다."; //성공 메세지 반환
+    }
 }
