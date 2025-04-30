@@ -15,10 +15,14 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final EmailService emailService;
+    private final NewsService newsService; // NewsService로부터 인기 뉴스 데이터를 가져옵니다.
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, EmailService emailService, NewsService newsService) {
         this.userRepository = userRepository;
+        this.emailService = emailService;
+        this.newsService = newsService;
     }
 
     // 회원 가입 처리
@@ -142,4 +146,10 @@ public class UserService {
         // 변경된 사용자 정보 저장
         save(user);
     }
+
+    // 뉴스레터 수신 설정된 사용자 조회
+    public List<users> getUsersWithNewsletterSubscribed() {
+        return userRepository.findByNewsletterStatusAndNewsletterEmailNotNull(1); // 1은 뉴스레터 구독 상태
+    }
+
 }

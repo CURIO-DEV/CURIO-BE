@@ -5,6 +5,7 @@ import team.backend.curio.domain.News;
 
 @Getter
 public class NewsWithCountsDto {
+    private Long newsId;
     private String title;
     private String content;
     private String imageUrl;
@@ -12,6 +13,7 @@ public class NewsWithCountsDto {
     private int saveCount;
 
     public NewsWithCountsDto(News news) {
+        this.newsId=news.getNewsId();
         this.title = news.getTitle();
         this.content = news.getContent();
         this.imageUrl = news.getImageUrl();

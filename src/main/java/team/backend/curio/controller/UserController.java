@@ -10,6 +10,8 @@ import team.backend.curio.dto.CustomSettingDto;
 import team.backend.curio.dto.UserDTO.UserInterestResponse;
 import team.backend.curio.service.UserService;
 import team.backend.curio.service.NewsService;
+import team.backend.curio.service.EmailService;
+import team.backend.curio.service.TrendsService;
 import team.backend.curio.dto.UserResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -147,6 +149,47 @@ public class UserController {
             return ResponseEntity.ok("뉴스레터 신청 상태가 업데이트되었습니다.");
         } catch (IllegalArgumentException e) {
             // 유저가 존재하지 않으면 404 반환
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+        }
+    }
+
+    @Autowired
+    private TrendsService trendsService; // TrendsService 주입
+
+    @Autowired
+    private EmailService emailService;
+
+    // 최근 트렌드 뉴스 4개 가져오기
+    private List<News> getTrendingNews() {
+        // TrendsService에서 인기 뉴스 4개를 가져오는 메서드 호출
+        return trendsService.getPopularArticles()
+                .stream()
+                .map(newsDto -> new News(newsDto))  // DTO를 News 객체로 변환
+                .collect(Collectors.toList());
+    }
+
+    // 뉴스레터 발송 기능
+    @Operation(summary = "뉴스레터 발송")
+    @PatchMapping("/{userId}/newsletter/send")
+    public ResponseEntity<String> sendNewsletter(@PathVariable Long userId) {
+        try {
+            // 뉴스레터를 신청한 사용자를 가져오기
+            users user = userService.getUserById(userId);
+
+            // 뉴스레터를 구독하는 사용자인지 확인
+            if (user.getNewsletterStatus() != 1) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("뉴스레터를 신청한 사용자만 발송 가능합니다.");
+            }
+
+            // 최신 트렌드 뉴스 4개 가져오기
+            List<News> trendingNews = getTrendingNews(); // 여기서 실제 API로부터 뉴스 데이터를 가져옵니다.
+
+            // 이메일 발송
+            emailService.sendNewsletter(user.getEmail(), trendingNews);
+
+            return ResponseEntity.ok("뉴스레터가 발송되었습니다.");
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
         }
     }
