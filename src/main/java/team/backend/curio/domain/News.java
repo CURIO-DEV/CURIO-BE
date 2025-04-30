@@ -2,6 +2,7 @@ package team.backend.curio.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import team.backend.curio.dto.NewsDTO.NewsWithCountsDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -62,4 +63,9 @@ public class News {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // NewsWithCountsDto를 받는 생성자 추가
+    public News(NewsWithCountsDto dto) {
+        this.newsId = dto.getNewsId();
+        this.title = dto.getTitle();
+    }
 }
