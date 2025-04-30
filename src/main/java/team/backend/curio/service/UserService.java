@@ -119,10 +119,27 @@ public class UserService {
         );
     }
 
-    // **사용자의 닉네임과 프로필 사진 URL 반환**
+    // 사용자의 닉네임과 프로필 사진 URL 반환
     public users getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
-}
 
+    // 사용자 정보 저장
+    public void save(users user) {
+        userRepository.save(user);  // user 객체를 DB에 저장
+    }
+
+    // 뉴스레터 신청 상태 업데이트
+    public void updateNewsletterStatus(Long userId, boolean subscribe) {
+        // 사용자 조회
+        users user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 뉴스레터 상태 업데이트 (1: 신청, 0: 취소)
+        user.setNewsletterStatus(subscribe ? 1 : 0);
+
+        // 변경된 사용자 정보 저장
+        save(user);
+    }
+}
