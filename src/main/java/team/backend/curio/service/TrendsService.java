@@ -1,6 +1,8 @@
 package team.backend.curio.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import team.backend.curio.domain.News;
 import team.backend.curio.dto.NewsDTO.NewsWithCountsDto;
 import team.backend.curio.dto.PopularKeywordDto;
@@ -14,9 +16,12 @@ import java.util.stream.Collectors;
 public class TrendsService {
 
     private final NewsRepository newsRepository;
+    private final RestTemplate restTemplate;
 
-    public TrendsService(NewsRepository newsRepository) {
+    @Autowired
+    public TrendsService(NewsRepository newsRepository,RestTemplate restTemplate) {
         this.newsRepository = newsRepository;
+        this.restTemplate = restTemplate;
     }
 
     public List<NewsWithCountsDto> getPopularArticles() {
@@ -39,6 +44,22 @@ public class TrendsService {
                 new PopularKeywordDto("실트7"),
                 new PopularKeywordDto("실트8")
         );
+    }
+
+    // 인기 게시글 4개 가져오기
+    public List<News> getTrendingNews() {
+        // 내부 API URL
+        String url = "http://localhost:8080/curio/api/trends/popular-articles";  // 실제 API URL로 수정
+
+        // 해당 URL로 API 요청하고 응답 받기
+        News[] trendingNews = restTemplate.getForObject(url, News[].class);
+
+        // null 체크 후 리스트 반환
+        if (trendingNews != null) {
+            return Arrays.asList(trendingNews);
+        } else {
+            return Arrays.asList();  // 빈 리스트 반환
+        }
     }
 }
 
