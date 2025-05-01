@@ -4,13 +4,17 @@ package team.backend.curio.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import team.backend.curio.domain.News;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.dto.NewsDTO.RelatedNewsResponse;
+import team.backend.curio.dto.NewsDTO.NewsSummaryResponseDto;
 import team.backend.curio.service.NewsService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/articles")  // api/articles로 경로 설정
@@ -46,5 +50,24 @@ public class ArticleController {
     @GetMapping("/list")
     public List<News> getNewsList() {
         return newsService.getAllNews();
+    }
+
+    // 뉴스 요약 API
+    @Operation(summary = "요약 정도에 따라 뉴스 요약 반환")
+    @GetMapping("/{articleId}/summary")
+    public ResponseEntity<?> getArticleSummary(
+            @PathVariable Long articleId,
+            @RequestParam String type) {
+
+        try {
+            NewsSummaryResponseDto response = newsService.getSummaryByType(articleId, type);
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
     }
 }
