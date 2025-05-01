@@ -7,6 +7,7 @@ import team.backend.curio.domain.users;
 import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.dto.NewsDTO.RelatedNewsResponse;
+import team.backend.curio.dto.NewsDTO.NewsSummaryResponseDto;
 import team.backend.curio.repository.NewsRepository;
 import team.backend.curio.repository.UserRepository;
 
@@ -93,6 +94,37 @@ public class NewsService {
 
         // 헤드라인과 이미지 URL 반환
         return new NewsResponseDto(news.getTitle(), news.getImageUrl());
+    }
+
+    // 뉴스 요약 조회 기능 추가
+    public NewsSummaryResponseDto getSummaryByType(Long articleId, String type) {
+        News news = newsRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 기사를 찾을 수 없습니다."));
+
+        String summary;
+
+        // 요청된 요약 타입에 따라 필드를 선택
+        switch (type.toLowerCase()) {
+            case "short":
+                summary = news.getSummaryShort();
+                break;
+            case "medium":
+                summary = news.getSummaryMedium();
+                break;
+            case "long":
+                summary = news.getSummaryLong();
+                break;
+            default:
+                throw new IllegalArgumentException("요약 타입은 short, medium, long 중 하나여야 합니다.");
+        }
+
+        // 요약이 null이거나 빈 문자열이면 예외 발생
+        if (summary == null || summary.isBlank()) {
+            throw new IllegalArgumentException("요약 내용이 존재하지 않습니다.");
+        }
+
+        // 응답 DTO 생성하여 반환
+        return new NewsSummaryResponseDto(news.getNewsId(), news.getTitle(), type, summary);
     }
 }
 
