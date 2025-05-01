@@ -13,10 +13,17 @@ java {
 	}
 }
 
+def querydslDir = "$buildDir/generated/querydsl" // Q파일 생성 경로 지정
+
+sourceSets {
+	main.java.srcDirs += querydslDir
+}
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	querydsl
 }
 
 repositories {
@@ -29,16 +36,30 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0' //swagger 관련 의존성 추가
-	implementation 'org.springframework.boot:spring-boot-starter-mail'  	// 메일 전송 관련 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-mail' // 메일 전송 관련 의존성 추가
+
+	//QueryDSL
+
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta' // QueryDSL 핵심 의존성
+	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+	implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+	annotationProcessor 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
 
+tasks.withType(JavaCompile).configureEach {
+	options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
+}
+
+clean {
+	delete file(querydslDir)
+}

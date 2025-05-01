@@ -8,8 +8,13 @@ import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.dto.NewsDTO.RelatedNewsResponse;
 import team.backend.curio.dto.NewsDTO.NewsSummaryResponseDto;
+import team.backend.curio.dto.NewsDTO.SearchNewsResponseDto;
 import team.backend.curio.repository.NewsRepository;
 import team.backend.curio.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import java.util.Arrays;
+
 
 
 
@@ -126,5 +131,12 @@ public class NewsService {
         // 응답 DTO 생성하여 반환
         return new NewsSummaryResponseDto(news.getNewsId(), news.getTitle(), type, summary);
     }
-}
 
+    public Page<SearchNewsResponseDto> searchArticles(String query, Pageable pageable) {
+        List<String> keywords = Arrays.stream(query.split("\\s+"))
+                .filter(word -> !word.isBlank())
+                .collect(Collectors.toList());
+
+        return newsRepository.searchByKeywords(keywords, pageable);
+    }
+}
