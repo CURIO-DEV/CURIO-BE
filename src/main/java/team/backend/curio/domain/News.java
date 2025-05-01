@@ -5,9 +5,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import team.backend.curio.dto.NewsDTO.NewsWithCountsDto;
 import jakarta.persistence.*;
 import lombok.*;
+import com.querydsl.core.annotations.QueryEntity;
+import jakarta.persistence.Entity;
 
 import java.time.LocalDateTime;
 
+@QueryEntity
 @Entity
 @Table(name = "News")
 @Getter
