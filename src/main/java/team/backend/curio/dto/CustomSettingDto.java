@@ -13,7 +13,7 @@ public class CustomSettingDto {
 
     private int summaryPreference; // 요약 선호도 (1=짧음, 2=보통, 3=김)
     private String summaryType;    // 요약 타입 (short, medium, long)
-
+    private boolean receiveNewsletter;
     private String newsletterEmail;
     private List<String> categories;     // interest 1~4에 매핑
     private String fontSize;           // 글자 크기 (SMALL, MEDIUM, LARGE)
@@ -29,10 +29,11 @@ public class CustomSettingDto {
 
     }
     // 오버로드 생성자
-    public CustomSettingDto(int summaryPreference, String newsletterEmail, List<String> categories, String fontSize) {
+    public CustomSettingDto(int summaryPreference, String newsletterEmail, boolean receiveNewsletter, List<String> categories, String fontSize) {
         this.summaryPreference = summaryPreference;
         this.summaryType = mapSummaryType(summaryPreference);
         this.newsletterEmail = newsletterEmail;
+        this.receiveNewsletter = receiveNewsletter;
         this.categories = categories;
         this.fontSize = fontSize;
     }
