@@ -146,7 +146,7 @@ public class UserController {
             userService.save(user); // DB에 저장
 
             // 성공적으로 업데이트한 후 응답
-            return ResponseEntity.ok("뉴스레터 신청 상태가 업데이트되었습니다.");
+            return ResponseEntity.ok("뉴스레터가 신청되었습니다.");
         } catch (IllegalArgumentException e) {
             // 유저가 존재하지 않으면 404 반환
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
