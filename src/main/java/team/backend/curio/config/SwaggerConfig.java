@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     @Bean
-    public OpenAPI StackPotAPI() {
+    public OpenAPI CURIOAPI() {
         Info info = new Info()
                 .title("CURIO API")
                 .description("CURIO API 명세서")
