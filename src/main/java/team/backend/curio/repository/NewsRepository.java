@@ -3,6 +3,8 @@ package team.backend.curio.repository;
 import team.backend.curio.domain.News;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface NewsRepository extends JpaRepository<News, Long>, NewsSearchRepository {
@@ -21,8 +23,7 @@ public interface NewsRepository extends JpaRepository<News, Long>, NewsSearchRep
     String findCategoryById(Long articleId);
 
     // 해당 카테고리로 관련 뉴스 조회
-    @Query("SELECT n FROM News n WHERE n.category = :category")
-    List<News> findRelatedNewsByCategory(String category);
-
+    @Query(value="SELECT * FROM News WHERE category = :category AND news_id <> :excludeId ORDER BY like_count DESC LIMIT 4", nativeQuery=true)
+    List<News> findTop4RelatedNewsByCategory(@Param("category") String category, @Param("excludeId") Long excludeId);
 
 }

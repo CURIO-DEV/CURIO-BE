@@ -78,7 +78,7 @@ public class NewsService {
         String category=newsRepository.findCategoryById(articleId);
 
         // 해당 카테고리로 관련 기사들을 조회
-        List<News> relatedNews = newsRepository.findByCategory(category);
+        List<News> relatedNews = newsRepository.findTop4RelatedNewsByCategory(category,articleId);
 
         // 관련 뉴스 데이터를 DTO로 변환하여 반환
         return relatedNews.stream()
