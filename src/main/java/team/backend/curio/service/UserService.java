@@ -101,6 +101,9 @@ public class UserService {
         // 수신 이메일 저장
         user.setNewsletterEmail(customSettingDto.getNewsletterEmail());
 
+        // 수신 상태 설정
+        user.setNewsletterStatus(customSettingDto.isReceiveNewsletter() ? 1 : 0);
+
         // 폰트 크기 저장 (String으로)
         user.setFontSize(customSettingDto.getFontSize());
 
@@ -118,6 +121,7 @@ public class UserService {
         return new CustomSettingDto(
                 user.getSummaryPreference(),
                 user.getNewsletterEmail(),
+                user.getNewsletterStatus()==1,
                 List.of(user.getInterest1(), user.getInterest2(), user.getInterest3(), user.getInterest4()),
                 user.getFontSize()
         );
