@@ -16,7 +16,6 @@ import team.backend.curio.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
 public class BookmarkService {
 
@@ -52,30 +51,24 @@ public class BookmarkService {
                 users member = userRepository.findByEmail(memberEmail)
                         .orElseThrow(() -> new IllegalArgumentException("이메일 " + memberEmail + "에 해당하는 유저를 찾을 수 없습니다."));
 
-                // 북마크에 유저 추가
                 bookmark.getMembers().add(member);
-
-                // 해당 유저의 북마크 리스트에 추가
                 member.getBookmarks().add(bookmark);
             }
         }
 
-        // 북마크 저장
         Bookmark savedBookmark = bookmarkRepository.save(bookmark);
 
-        // 멤버 저장
         for (users member : bookmark.getMembers()) {
             userRepository.save(member);
         }
 
-        // members 리스트를 String으로 변환하여 반환
         List<String> memberEmails = bookmark.getMembers().stream()
                 .map(user -> user.getEmail())  // 각 user 객체에서 email 추출
                 .collect(Collectors.toList());
 
 
-        // DTO 변환하여 반환
         return new BookmarkResponseDto(savedBookmark.getId(), savedBookmark.getName(), savedBookmark.getColor(), memberEmails);
+
     }
 
     // 북마크 수정
@@ -86,14 +79,10 @@ public class BookmarkService {
 
         bookmark.updateBookmark(updateDto.getName(), updateDto.getColor());
 
-        // 현재 유저 찾기
         users currentUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 기존 회원 삭제
         bookmark.getMembers().clear();
-
-        // 현재 유저 추가
         bookmark.addMember(currentUser);
 
         if (updateDto.getMembers() != null && !updateDto.getMembers().isEmpty()) {
@@ -107,8 +96,6 @@ public class BookmarkService {
         return bookmarkRepository.save(bookmark); // Bookmark 객체 반환
     }
 
-
-
     // 북마크에서 해당 사용자만 삭제
     @Transactional
     public void deleteBookmarkForUser(Long bookmarkId, String email) {
@@ -118,12 +105,10 @@ public class BookmarkService {
         users users = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다 : " +email ));
 
-        // 사용자가 북마크 멤버인지 확인
         if (!bookmark.getMembers().contains(users)) {
             throw new RuntimeException("User is not a member of this bookmark");
         }
 
-        // 멤버에서 제거
         bookmark.removeMember(users);
 
         // 멤버가 없으면 북마크 삭제
@@ -134,6 +119,7 @@ public class BookmarkService {
         }
     }
 
+    // 북마크에 뉴스 추가
     public void addNewsToBookmark(Long folderId, Long newsId) {
         Bookmark bookmark = bookmarkRepository.findById(folderId)
                 .orElseThrow(() -> new RuntimeException("Bookmark not found"));
@@ -144,6 +130,7 @@ public class BookmarkService {
         bookmarkRepository.save(bookmark);
     }
 
+    // 북마크에서 뉴스 삭제
     public void removeNewsFromBookmark(Long folderId, Long newsId) {
         Bookmark bookmark = bookmarkRepository.findById(folderId)
                 .orElseThrow(() -> new RuntimeException("Bookmark not found"));
