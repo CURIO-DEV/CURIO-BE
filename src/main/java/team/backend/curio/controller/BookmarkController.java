@@ -8,10 +8,12 @@ import org.springframework.web.bind.annotation.*;
 
 import team.backend.curio.domain.Bookmark;
 import team.backend.curio.domain.News;
+import team.backend.curio.domain.users;
 import team.backend.curio.dto.BookmarkDTO.CreateBookmarkDto;
 import team.backend.curio.dto.BookmarkDTO.BookmarkResponseDto;
 import team.backend.curio.dto.BookmarkDTO.NewsAddBookmarkDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
+import team.backend.curio.repository.UserRepository;
 import team.backend.curio.service.BookmarkService;
 
 import java.util.List;
@@ -22,18 +24,24 @@ import java.util.stream.Collectors;
 public class BookmarkController {
 
     private final BookmarkService bookmarkService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public BookmarkController(BookmarkService bookmarkService) {
+    public BookmarkController(BookmarkService bookmarkService, UserRepository userRepository) {
         this.bookmarkService = bookmarkService;
+        this.userRepository = userRepository;
     }
 
     // 북마크 폴더 생성
     @Operation(summary = "북마크 생성")
     @PostMapping("/create")
-    public ResponseEntity<BookmarkResponseDto> createBookmark(@RequestBody CreateBookmarkDto createBookmarkDto) {
-        BookmarkResponseDto bookmarkResponseDto = bookmarkService.createBookmark(createBookmarkDto);
-        return new ResponseEntity<>(bookmarkResponseDto, HttpStatus.CREATED);
+    public ResponseEntity<BookmarkResponseDto> createBookmark(
+            @RequestBody CreateBookmarkDto createBookmarkDto,  // 본문에 있는 JSON 파라미터
+            @RequestParam String email) {  // 쿼리 파라미터로 받는 email
+
+        // 서비스 메서드 호출
+        BookmarkResponseDto response = bookmarkService.createBookmark(createBookmarkDto, email);
+        return ResponseEntity.ok(response);
     }
 
     // 북마크 수정
@@ -41,25 +49,36 @@ public class BookmarkController {
     @PatchMapping("/{bookmarkId}/update")
     public ResponseEntity<BookmarkResponseDto> updateBookmark(
             @PathVariable Long bookmarkId,
-            @RequestBody CreateBookmarkDto updateDto) {
+            @RequestBody CreateBookmarkDto updateDto,
+            @RequestParam String email) {  // 이메일 파라미터 추가
 
-        Bookmark updatedBookmark = bookmarkService.updateBookmark(bookmarkId, updateDto);
+        Bookmark updatedBookmark = bookmarkService.updateBookmark(bookmarkId, updateDto, email); // 이메일 전달
+
+        // 공동작업자 이메일 리스트 생성
+        List<String> memberEmails = updatedBookmark.getMembers().stream()
+                .map(users -> users.getEmail())
+                .toList();
 
         BookmarkResponseDto response = new BookmarkResponseDto(
                 updatedBookmark.getId(),
                 updatedBookmark.getName(),
-                updatedBookmark.getColor()
+                updatedBookmark.getColor(),
+                memberEmails
         );
 
         return ResponseEntity.ok(response);
     }
 
+
     // 북마크 삭제
-    @Operation(summary = "북마크 삭제")
+    @Operation(summary = "내 북마크에서만 나가기")
     @DeleteMapping("/{bookmarkId}/delete")
-    public ResponseEntity<String> deleteBookmark(@PathVariable Long bookmarkId) {
-        bookmarkService.deleteBookmark(bookmarkId);
-        return ResponseEntity.ok("북마크가 삭제되었습니다.");
+    public ResponseEntity<String> leaveBookmark(
+            @PathVariable Long bookmarkId,
+            @RequestParam String email
+    ) {
+        bookmarkService.deleteBookmarkForUser(bookmarkId, email);
+        return ResponseEntity.ok("북마크에서 나갔습니다.");
     }
 
     // 북마크에 뉴스 추가
@@ -87,13 +106,35 @@ public class BookmarkController {
     // 북마크 목록 출력
     @Operation(summary = "북마크 목록 출력")
     @GetMapping("/list")
-    public ResponseEntity<List<BookmarkResponseDto>> getBookmarkList() {
-        List<Bookmark> bookmarks = bookmarkService.getAllBookmarks(); // 또는 로그인한 사용자 기준
+    public ResponseEntity<List<BookmarkResponseDto>> getBookmarkList(@RequestParam String email) {
+        List<Bookmark> bookmarks = bookmarkService.getAllBookmarks(email);
         List<BookmarkResponseDto> result = bookmarks.stream()
                 .map(bookmark -> new BookmarkResponseDto(
                         bookmark.getId(),
                         bookmark.getName(),
-                        bookmark.getColor()
+                        bookmark.getColor(),
+                        bookmark.getMembers().stream()
+                                .map(users -> users.getEmail())
+                                .toList()
+                )).toList();
+
+        return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "특정 유저의 북마크 목록 출력")
+    @GetMapping("/{userId}/list")
+    public ResponseEntity<List<BookmarkResponseDto>> getBookmarksByUser(@PathVariable Long userId) {
+        users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Bookmark> bookmarks = user.getBookmarks(); // 또는 서비스로 분리 가능
+
+        List<BookmarkResponseDto> result = bookmarks.stream()
+                .map(bookmark -> new BookmarkResponseDto(
+                        bookmark.getId(),
+                        bookmark.getName(),
+                        bookmark.getColor(),
+                        bookmark.getMembers().stream().map(users::getEmail).toList()
                 )).toList();
 
         return ResponseEntity.ok(result);

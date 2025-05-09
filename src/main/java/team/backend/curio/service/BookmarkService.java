@@ -14,6 +14,7 @@ import team.backend.curio.repository.NewsRepository;
 import team.backend.curio.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -32,52 +33,105 @@ public class BookmarkService {
     }
 
     // 북마크 생성
-    public BookmarkResponseDto createBookmark(CreateBookmarkDto createBookmarkDto) {
-        // 사용자 정보 가져오기 (임시로 user_id 1로 설정, 실제로는 로그인된 사용자 정보로 처리)
-        users users = userRepository.findById(1L) // 임시로 1L을 사용, 실제 로그인된 사용자로 변경
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // CreateBookmarkDto를 사용하여 Bookmark 객체 생성
+    public BookmarkResponseDto createBookmark(CreateBookmarkDto createBookmarkDto, String email) {
+        // 북마크 생성
         Bookmark bookmark = new Bookmark();
         bookmark.setName(createBookmarkDto.getName());
         bookmark.setColor(createBookmarkDto.getColor());
-        bookmark.setCollaboratorEmail1(createBookmarkDto.getCollaboratorEmail1());
-        bookmark.setCollaboratorEmail2(createBookmarkDto.getCollaboratorEmail2());
-        bookmark.setCollaboratorEmail3(createBookmarkDto.getCollaboratorEmail3());
-        bookmark.setUsers(users);  // 사용자 설정
+
+        // 현재 유저 찾기
+        users currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("현재 유저를 찾을 수 없습니다."));
+
+        // 북마크에 현재 유저 추가
+        bookmark.getMembers().add(currentUser);
+
+        // members가 null이거나 빈 리스트일 경우, 아무것도 추가하지 않음
+        if (createBookmarkDto.getMembers() != null && !createBookmarkDto.getMembers().isEmpty()) {
+            for (String memberEmail : createBookmarkDto.getMembers()) {
+                users member = userRepository.findByEmail(memberEmail)
+                        .orElseThrow(() -> new IllegalArgumentException("이메일 " + memberEmail + "에 해당하는 유저를 찾을 수 없습니다."));
+
+                // 북마크에 유저 추가
+                bookmark.getMembers().add(member);
+
+                // 해당 유저의 북마크 리스트에 추가
+                member.getBookmarks().add(bookmark);
+            }
+        }
 
         // 북마크 저장
         Bookmark savedBookmark = bookmarkRepository.save(bookmark);
 
-        // 저장된 북마크 정보를 BookmarkResponseDto로 변환해서 반환
-        return new BookmarkResponseDto(
-                savedBookmark.getId(),
-                savedBookmark.getName(),
-                savedBookmark.getColor()
-        );
+        // 멤버 저장
+        for (users member : bookmark.getMembers()) {
+            userRepository.save(member);
+        }
+
+        // members 리스트를 String으로 변환하여 반환
+        List<String> memberEmails = bookmark.getMembers().stream()
+                .map(user -> user.getEmail())  // 각 user 객체에서 email 추출
+                .collect(Collectors.toList());
+
+
+        // DTO 변환하여 반환
+        return new BookmarkResponseDto(savedBookmark.getId(), savedBookmark.getName(), savedBookmark.getColor(), memberEmails);
     }
 
     // 북마크 수정
-    public Bookmark updateBookmark(Long bookmarkId, CreateBookmarkDto updateDto) {
+    @Transactional
+    public Bookmark updateBookmark(Long bookmarkId, CreateBookmarkDto updateDto, String email) {
         Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
                 .orElseThrow(() -> new RuntimeException("Bookmark not found"));
 
-        bookmark.updateBookmark(
-                updateDto.getName(),
-                updateDto.getColor(),
-                updateDto.getCollaboratorEmail1(),
-                updateDto.getCollaboratorEmail2(),
-                updateDto.getCollaboratorEmail3()
-        );
+        bookmark.updateBookmark(updateDto.getName(), updateDto.getColor());
 
-        return bookmarkRepository.save(bookmark);
+        // 현재 유저 찾기
+        users currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 기존 회원 삭제
+        bookmark.getMembers().clear();
+
+        // 현재 유저 추가
+        bookmark.addMember(currentUser);
+
+        if (updateDto.getMembers() != null && !updateDto.getMembers().isEmpty()) {
+            for (String memberEmail : updateDto.getMembers()) {
+                users member = userRepository.findByEmail(memberEmail)
+                        .orElseThrow(() -> new RuntimeException("Member with email " + memberEmail + " not found"));
+                bookmark.addMember(member);
+            }
+        }
+
+        return bookmarkRepository.save(bookmark); // Bookmark 객체 반환
     }
 
+
+
+    // 북마크에서 해당 사용자만 삭제
     @Transactional
-    public void deleteBookmark(Long bookmarkId) {
+    public void deleteBookmarkForUser(Long bookmarkId, String email) {
         Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
-                .orElseThrow(() -> new RuntimeException("Bookmark not found"));
-        bookmarkRepository.delete(bookmark);
+                .orElseThrow(() -> new RuntimeException("북마크를 찾을 수 없습니다."));
+
+        users users = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다 : " +email ));
+
+        // 사용자가 북마크 멤버인지 확인
+        if (!bookmark.getMembers().contains(users)) {
+            throw new RuntimeException("User is not a member of this bookmark");
+        }
+
+        // 멤버에서 제거
+        bookmark.removeMember(users);
+
+        // 멤버가 없으면 북마크 삭제
+        if (bookmark.getMembers().isEmpty()) {
+            bookmarkRepository.delete(bookmark);
+        } else {
+            bookmarkRepository.save(bookmark);
+        }
     }
 
     public void addNewsToBookmark(Long folderId, Long newsId) {
@@ -101,9 +155,11 @@ public class BookmarkService {
     }
 
     // 북마크 리스트
-    public List<Bookmark> getAllBookmarks() {
-        return bookmarkRepository.findAll();
-    }
+    public List<Bookmark> getAllBookmarks(String email) {
+        users users = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+
+        return bookmarkRepository.findAllByMembersContaining(users);    }
 
     public Bookmark getBookmarkById(Long id) {
         return bookmarkRepository.findById(id)

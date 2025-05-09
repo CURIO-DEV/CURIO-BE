@@ -1,8 +1,11 @@
 package team.backend.curio.domain;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "`users`") // 테이블 이름이 "User"로 매핑되도록 지정
@@ -13,7 +16,6 @@ import lombok.*;
 @Builder                // 빌더 패턴 사용 가능하게
 public class users {
 
-    // 기본 키 지정, 자동 증가 (AUTO_INCREMENT)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
@@ -49,5 +51,8 @@ public class users {
     @Column(name = "newsletter_status", nullable = false, columnDefinition = "int default 0") // 0이면 구독 안함, 1이면 구독함
     private int newsletterStatus; // 뉴스레터 구독 상태 (0: 구독 안함, 1: 구독함)
 
+    // 사용자와 북마크 관계 설정
+    @ManyToMany(mappedBy = "members") // "members"로 수정
+    private List<Bookmark> bookmarks = new ArrayList<>();
 
 }

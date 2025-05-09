@@ -26,18 +26,13 @@ public class Bookmark {
 
     private String color;
 
-    @Column(name = "collaborator_email_1")
-    private String collaboratorEmail1;
-
-    @Column(name = "collaborator_email_2")
-    private String collaboratorEmail2;
-
-    @Column(name = "collaborator_email_3")
-    private String collaboratorEmail3;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private users users;  // 사용자와의 관계
+    @ManyToMany
+    @JoinTable(
+            name = "bookmark_members",  // 중간 테이블 이름
+            joinColumns = @JoinColumn(name = "bookmark_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<users> members = new ArrayList<>();  // 유저 리스트
 
     @ManyToMany
     @JoinTable(
@@ -47,6 +42,7 @@ public class Bookmark {
     )
     private List<News> newsList = new ArrayList<>();
 
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -55,12 +51,10 @@ public class Bookmark {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public void updateBookmark(String name, String color, String email1, String email2, String email3) {
+
+    public void updateBookmark(String name, String color/*, String email1, String email2, String email3*/) {
         this.name = name;
         this.color = color;
-        this.collaboratorEmail1 = email1;
-        this.collaboratorEmail2 = email2;
-        this.collaboratorEmail3 = email3;
     }
 
     public void addNews(News news) {
@@ -69,6 +63,18 @@ public class Bookmark {
 
     public void removeNews(News news) {
         this.newsList.remove(news);
+    }
+
+    // 멤버 추가 메소드
+    public void addMember(users users) {
+        if (this.members.size() < 4) {
+            this.members.add(users);
+        }
+    }
+
+    // 멤버 삭제 메소드
+    public void removeMember(users users) {
+        this.members.remove(users);
     }
 
 }
