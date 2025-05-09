@@ -8,6 +8,8 @@ import team.backend.curio.dto.NewsDTO.NewsWithCountsDto;
 import team.backend.curio.dto.PopularKeywordDto;
 import team.backend.curio.repository.NewsRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,7 +27,8 @@ public class TrendsService {
     }
 
     public List<NewsWithCountsDto> getPopularArticles() {
-        return newsRepository.findTop4ByOrderByLikeCountDescCreatedAtDesc()
+        LocalDateTime todayStart = LocalDate.now().atStartOfDay(); // 오늘 자정 기준
+        return newsRepository.findTop4ByCreatedAtAfterOrderByLikeCountDescCreatedAtDesc(todayStart)
                 .stream()
                 .map(NewsWithCountsDto::new)
                 .collect(Collectors.toList());

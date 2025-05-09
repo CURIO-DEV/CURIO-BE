@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface NewsRepository extends JpaRepository<News, Long>, NewsSearchRepository {
@@ -15,7 +17,10 @@ public interface NewsRepository extends JpaRepository<News, Long>, NewsSearchRep
     List<News> findByCategory(String category);
 
     // 좋아요 수로 내림차순 정렬, 같으면 최신순으로 정렬
-    List<News> findTop4ByOrderByLikeCountDescCreatedAtDesc();
+    // List<News> findTop4ByOrderByLikeCountDescCreatedAtDesc();
+
+    // 오늘 날짜 기준 + 좋아요 수로 내림차순 정렬, 같으면 최신순으로 정렬
+    List<News> findTop4ByCreatedAtAfterOrderByLikeCountDescCreatedAtDesc(LocalDateTime todayStart);
 
 
     // 특정 뉴스의 카테고리 조회
