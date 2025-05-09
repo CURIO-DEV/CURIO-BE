@@ -1,5 +1,6 @@
 package team.backend.curio.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,12 +16,14 @@ public class UserActionController {
     private final UserActionService userActionService;
 
     // 좋아요 등록
+    @Operation(summary = "기사 좋아요 등록")
     @PostMapping("/{articleId}/like")
     public ResponseEntity<CommonResponseDto<Void>> likeNews(@PathVariable Long articleId, @RequestParam Long userId) {
         userActionService.likeNews(userId, articleId);
         return ResponseEntity.ok(new CommonResponseDto<>(true,"이 기사를 좋아합니다",null));
     }
 
+    @Operation(summary = "기사 좋아요 취소")
     @DeleteMapping("/{articleId}/like")
     public ResponseEntity<CommonResponseDto<Void>> unlikeNews(@PathVariable Long articleId, @RequestParam Long userId) {
         userActionService.unlikeNews(userId, articleId);
@@ -28,6 +31,7 @@ public class UserActionController {
     }
 
     // 추천 등록
+    @Operation(summary = "기사 추천 등록")
     @PostMapping("/{articleId}/recommend")
     public ResponseEntity<CommonResponseDto<Void>> recommend(@PathVariable Long articleId, @RequestParam Long userId) {
         userActionService.recommendNews(userId, articleId);
@@ -36,6 +40,7 @@ public class UserActionController {
     }
 
     // 추천 취소
+    @Operation(summary = "기사 추천 취소")
     @DeleteMapping("/{articleId}/recommend")
     public ResponseEntity<CommonResponseDto<Void>> cancelrecommend(@PathVariable Long articleId, @RequestParam Long userId) {
         userActionService.cancelRecommend(userId, articleId);
@@ -43,6 +48,7 @@ public class UserActionController {
     }
 
     // 비추천 등록
+    @Operation(summary = "기사 비추천 등록")
     @PostMapping("/{articleId}/notrecommend")
     public ResponseEntity<CommonResponseDto<Void>> notRecommend(@PathVariable long articleId, @RequestParam long userId) {
         userActionService.notRecommendNews(userId, articleId);
@@ -51,6 +57,7 @@ public class UserActionController {
     }
 
     // 비추천 취소
+    @Operation(summary = "기사 비추천 취소")
     @DeleteMapping("/{articleId}/notrecommend")
     public ResponseEntity<CommonResponseDto<Void>> cancelNotRecommend(@PathVariable Long articleId, @RequestParam Long userId){
         userActionService.cancelNotRecommend(userId, articleId);
