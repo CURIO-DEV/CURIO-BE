@@ -24,7 +24,9 @@ public class Bookmark {
 
     private String name;
 
-    private String color;
+    @Enumerated(EnumType.STRING) // enum
+    @Column(nullable=false)
+    private BookmarkColor color;
 
     @ManyToMany
     @JoinTable(
@@ -51,8 +53,7 @@ public class Bookmark {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-
-    public void updateBookmark(String name, String color/*, String email1, String email2, String email3*/) {
+    public void updateBookmark(String name, BookmarkColor color) {
         this.name = name;
         this.color = color;
     }

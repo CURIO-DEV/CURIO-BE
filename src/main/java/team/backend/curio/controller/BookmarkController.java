@@ -151,8 +151,5 @@ public class BookmarkController {
                 .map(news -> new NewsResponseDto(news.getTitle(), news.getImageUrl()))
                 .collect(Collectors.toList());
     }
-
-
-
 }
 
