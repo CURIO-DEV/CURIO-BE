@@ -194,6 +194,7 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "회원 탈퇴하기")
     @DeleteMapping("/{userId}/delete")
     public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
         try {
