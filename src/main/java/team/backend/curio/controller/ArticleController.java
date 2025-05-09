@@ -24,6 +24,7 @@ public class ArticleController {
     private final NewsService newsService;  // NewsService 주입
 
     // 특정 뉴스의 관련 뉴스 조회
+    @Operation(summary = "특정 뉴스의 관련 뉴스 조회 : 상세기사 화면")
     @GetMapping("/{articleId}/related")
     public ResponseEntity<List<RelatedNewsResponse>> getRelatedNews(@PathVariable Long articleId) {
         List<RelatedNewsResponse> relatedNews = newsService.getRelatedNews(articleId);
@@ -31,6 +32,7 @@ public class ArticleController {
     }
 
     // 특정 뉴스의 헤드라인과 이미지 URL 조회
+    @Operation(summary = "특정 뉴스의 헤드라인과 이미지 url 조회")
     @GetMapping("/{articleId}/headline")
     public ResponseEntity<NewsResponseDto> getArticleHeadline(@PathVariable Long articleId) {
         NewsResponseDto newsResponse = newsService.getArticleHeadline(articleId); // NewsService에서 데이터 가져오기
