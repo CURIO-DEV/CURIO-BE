@@ -14,7 +14,7 @@ import team.backend.curio.repository.NewsRepository;
 import team.backend.curio.repository.UserRepository;
 
 import java.util.List;
-
+import java.util.ArrayList;
 
 @Service
 public class BookmarkService {
@@ -33,9 +33,10 @@ public class BookmarkService {
 
     // 북마크 생성
     public BookmarkResponseDto createBookmark(CreateBookmarkDto createBookmarkDto) {
+
         // 사용자 정보 가져오기 (임시로 user_id 1로 설정, 실제로는 로그인된 사용자 정보로 처리)
         users users = userRepository.findById(1L) // 임시로 1L을 사용, 실제 로그인된 사용자로 변경
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
         // CreateBookmarkDto를 사용하여 Bookmark 객체 생성
         Bookmark bookmark = new Bookmark();
@@ -45,15 +46,16 @@ public class BookmarkService {
         bookmark.setCollaboratorEmail2(createBookmarkDto.getCollaboratorEmail2());
         bookmark.setCollaboratorEmail3(createBookmarkDto.getCollaboratorEmail3());
         bookmark.setUsers(users);  // 사용자 설정
+        bookmark.setNewsList(new ArrayList<>());
 
         // 북마크 저장
         Bookmark savedBookmark = bookmarkRepository.save(bookmark);
 
         // 저장된 북마크 정보를 BookmarkResponseDto로 변환해서 반환
         return new BookmarkResponseDto(
-                savedBookmark.getId(),
-                savedBookmark.getName(),
-                savedBookmark.getColor()
+            savedBookmark.getId(),
+            savedBookmark.getName(),
+            savedBookmark.getColor()
         );
     }
 

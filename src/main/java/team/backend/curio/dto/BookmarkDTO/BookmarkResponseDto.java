@@ -1,6 +1,6 @@
 package team.backend.curio.dto.BookmarkDTO;
 
-
+import team.backend.curio.domain.BookmarkColor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,5 +10,5 @@ import lombok.Getter;
 public class BookmarkResponseDto {
     private Long bookmarkId;
     private String name;
-    private String color;
+    private BookmarkColor color;
 }
