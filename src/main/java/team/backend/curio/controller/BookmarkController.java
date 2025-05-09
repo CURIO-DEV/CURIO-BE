@@ -104,23 +104,6 @@ public class BookmarkController {
     }
 
     // 북마크 목록 출력
-    @Operation(summary = "북마크 목록 출력")
-    @GetMapping("/list")
-    public ResponseEntity<List<BookmarkResponseDto>> getBookmarkList(@RequestParam String email) {
-        List<Bookmark> bookmarks = bookmarkService.getAllBookmarks(email);
-        List<BookmarkResponseDto> result = bookmarks.stream()
-                .map(bookmark -> new BookmarkResponseDto(
-                        bookmark.getId(),
-                        bookmark.getName(),
-                        bookmark.getColor(),
-                        bookmark.getMembers().stream()
-                                .map(users -> users.getEmail())
-                                .toList()
-                )).toList();
-
-        return ResponseEntity.ok(result);
-    }
-
     @Operation(summary = "특정 유저의 북마크 목록 출력")
     @GetMapping("/{userId}/list")
     public ResponseEntity<List<BookmarkResponseDto>> getBookmarksByUser(@PathVariable Long userId) {
