@@ -14,6 +14,9 @@ public interface NewsRepository extends JpaRepository<News, Long>, NewsSearchRep
     // 관심사(category)별로 createdAt 내림차순으로 상위 10개의 뉴스 조회
     List<News> findTop10ByCategoryOrderByCreatedAtDesc(String category);
 
+    @Query("SELECT n FROM News n WHERE n.createdAt >= :start AND n.createdAt < :end")
+    List<News> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
     List<News> findByCategory(String category);
 
     // 좋아요 수로 내림차순 정렬, 같으면 최신순으로 정렬

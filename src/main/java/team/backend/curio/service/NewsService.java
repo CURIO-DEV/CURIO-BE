@@ -15,9 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.Arrays;
 
-
-
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,12 +24,13 @@ public class NewsService {
 
     private final NewsRepository newsRepository;
     private final UserRepository userRepository;
-
+    private final GptSummaryService gptSummaryService;
 
     @Autowired
-    public NewsService(NewsRepository newsRepository, UserRepository userRepository) {
+    public NewsService(NewsRepository newsRepository, UserRepository userRepository, GptSummaryService gptSummaryService) {
         this.newsRepository = newsRepository;
         this.userRepository = userRepository;
+        this.gptSummaryService = gptSummaryService;
     }
 
     // 관심사에 맞는 뉴스 조회
@@ -69,7 +67,20 @@ public class NewsService {
 
     // 크롤링된 뉴스 여러 개 저장
     public void saveAllNews(List<News> newsList) {
-        newsRepository.saveAll(newsList);  // 여러 개의 뉴스 저장
+        for (News news : newsList) {
+            String content = news.getContent();
+            if (content != null && !content.isBlank()) {
+                news.setSummaryShort(gptSummaryService.summarize(content, "short"));
+                news.setSummaryMedium(gptSummaryService.summarize(content, "medium"));
+                news.setSummaryLong(gptSummaryService.summarize(content, "long"));
+            } else {
+                news.setSummaryShort("");
+                news.setSummaryMedium("");
+                news.setSummaryLong("");
+            }
+        }
+
+        newsRepository.saveAll(newsList);
     }
 
     //특정 뉴스의 관련 뉴스 조회

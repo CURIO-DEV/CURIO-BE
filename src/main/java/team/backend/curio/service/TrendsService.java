@@ -19,11 +19,13 @@ public class TrendsService {
 
     private final NewsRepository newsRepository;
     private final RestTemplate restTemplate;
+    private final GptSummaryService gptSummaryService;
 
     @Autowired
-    public TrendsService(NewsRepository newsRepository,RestTemplate restTemplate) {
+    public TrendsService(NewsRepository newsRepository,RestTemplate restTemplate,GptSummaryService gptSummaryService) {
         this.newsRepository = newsRepository;
         this.restTemplate = restTemplate;
+        this.gptSummaryService = gptSummaryService;
     }
 
     public List<NewsWithCountsDto> getPopularArticles() {
@@ -34,19 +36,36 @@ public class TrendsService {
                 .collect(Collectors.toList());
     }
 
-    // 새로운 메서드: 인기 키워드 반환
+    // 인기 키워드 반환
     public List<PopularKeywordDto> getPopularKeywords() {
-        // GPT API가 들어오기 전에는 고정된 인기 키워드로 반환
-        return Arrays.asList(
-                new PopularKeywordDto("실트1"),
-                new PopularKeywordDto("실트2"),
-                new PopularKeywordDto("실트3"),
-                new PopularKeywordDto("실트4"),
-                new PopularKeywordDto("실트5"),
-                new PopularKeywordDto("실트6"),
-                new PopularKeywordDto("실트7"),
-                new PopularKeywordDto("실트8")
+        // 1. 오늘 날짜 뉴스 조회
+        LocalDate today = LocalDate.now();
+        List<News> todayNews = newsRepository.findAllByCreatedAtBetween(
+                today.atStartOfDay(),
+                today.plusDays(1).atStartOfDay()
         );
+
+        // 2. 뉴스 본문 이어붙이기
+        StringBuilder contentBuilder = new StringBuilder();
+        for (News news : todayNews) {
+            if (news.getSummaryShort() != null) {
+                contentBuilder.append(news.getSummaryShort()).append("\n\n");
+            }
+        }
+
+        // 3. GPT에 키워드 추출 요청
+        String prompt = "다음 뉴스 요약들을 참고해서, 지금 이슈가 되는 키워드 8개를 많이 나온거 같은 키워드 우선으로 순위 매겨서 반환해줘 " +
+                "형식은 쉼표(,)로 구분해서 한 줄로 알려줘.\n\n" + contentBuilder;
+
+        String gptResponse = gptSummaryService.callGptApi(prompt);
+
+        // 4. 응답 파싱
+        String[] keywords = gptResponse.split(",");
+        return Arrays.stream(keywords)
+                .limit(8)
+                .map(String::trim)
+                .map(PopularKeywordDto::new)
+                .collect(Collectors.toList());
     }
 
     // 인기 게시글 4개 가져오기

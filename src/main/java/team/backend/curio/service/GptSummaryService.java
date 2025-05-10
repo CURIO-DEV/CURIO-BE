@@ -28,7 +28,7 @@ public class GptSummaryService {
         return callGptApi(prompt + "\n" + content);
     }
 
-    private String callGptApi(String fullPrompt) {
+    public String callGptApi(String fullPrompt) {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
