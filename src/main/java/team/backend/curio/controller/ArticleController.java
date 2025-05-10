@@ -11,6 +11,7 @@ import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.dto.NewsDTO.RelatedNewsResponse;
 import team.backend.curio.dto.NewsDTO.NewsSummaryResponseDto;
 import team.backend.curio.service.NewsService;
+import team.backend.curio.service.NewsSummaryService;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import java.util.NoSuchElementException;
 
 public class ArticleController {
     private final NewsService newsService;  // NewsService 주입
+    private final NewsSummaryService processor;
 
     // 특정 뉴스의 관련 뉴스 조회
     @Operation(summary = "특정 뉴스의 관련 뉴스 조회 : 상세기사 화면")
@@ -71,5 +73,13 @@ public class ArticleController {
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         }
+    }
+
+    // 뉴스요약해서 저장
+    @Operation(summary = "뉴스 요약해서 저장")
+    @PostMapping("/{id}/summarize")
+    public ResponseEntity<String> summarizeNews(@PathVariable Long id) {
+        processor.summarizeAndSaveNews(id);
+        return ResponseEntity.ok("요약 완료");
     }
 }
