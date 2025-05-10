@@ -6,7 +6,10 @@ import lombok.Getter;
 public class PopularKeywordDto {
     private String keyword;
 
+
     public PopularKeywordDto(String keyword) {
+
         this.keyword = keyword;
+
     }
 }

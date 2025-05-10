@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,6 +26,8 @@ public interface NewsRepository extends JpaRepository<News, Long>, NewsSearchRep
     // 오늘 날짜 기준 + 좋아요 수로 내림차순 정렬, 같으면 최신순으로 정렬
     List<News> findTop4ByCreatedAtAfterOrderByLikeCountDescCreatedAtDesc(LocalDateTime todayStart);
 
+    // 카테고리가 포함되어 있고, 날짜가 일치하는 뉴스 기사들 조회
+    List<News> findByCategoryInAndCreatedAtAfter(List<String> categories, LocalDateTime dateTime);
 
     // 특정 뉴스의 카테고리 조회
     @Query("SELECT n.category FROM News n WHERE n.newsId = :articleId")
