@@ -12,4 +12,6 @@ public class KeywordDto {
         this.weight = weight;
     }
 
+    public KeywordDto() {}
+
 }
