@@ -36,7 +36,7 @@ public class TrendsService {
                 .collect(Collectors.toList());
     }
 
-    // 인기 키워드 반환
+    // 인기 키워드 8개 반환
     public List<PopularKeywordDto> getPopularKeywords() {
         // 1. 오늘 날짜 뉴스 조회
         LocalDate today = LocalDate.now();
