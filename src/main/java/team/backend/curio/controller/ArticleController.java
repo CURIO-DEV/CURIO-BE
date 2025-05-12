@@ -74,7 +74,7 @@ public class ArticleController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         }
     }
-
+  
     // 뉴스요약해서 저장
     @Operation(summary = "뉴스 요약해서 저장")
     @PostMapping("/{id}/summarize")
