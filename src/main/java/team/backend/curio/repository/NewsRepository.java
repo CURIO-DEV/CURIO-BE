@@ -31,4 +31,6 @@ public interface NewsRepository extends JpaRepository<News, Long>, NewsSearchRep
     @Query(value="SELECT * FROM News WHERE category = :category AND news_id <> :excludeId ORDER BY like_count DESC LIMIT 4", nativeQuery=true)
     List<News> findTop4RelatedNewsByCategory(@Param("category") String category, @Param("excludeId") Long excludeId);
 
+    // 관심 카테고리 안에서 좋아요 많은 뉴스 상위 5개
+    List<News> findTop5ByCategoryInOrderByLikeCountDesc(List<String> categories);
 }
