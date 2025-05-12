@@ -27,6 +27,7 @@ public class News {
 
     private String title;
 
+    @Lob
     private String content;
 
     @Column(name = "summary_short")
@@ -37,6 +38,7 @@ public class News {
     @JsonProperty("summary_medium")
     private String summaryMedium;
 
+    @Lob
     @Column(name = "summary_long")
     @JsonProperty("summary_long")
     private String summaryLong;

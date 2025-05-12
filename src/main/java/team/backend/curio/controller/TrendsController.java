@@ -3,6 +3,7 @@ package team.backend.curio.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import team.backend.curio.dto.KeywordDto;
 import team.backend.curio.dto.NewsDTO.NewsWithCountsDto;
 import team.backend.curio.dto.PopularKeywordDto;
 import team.backend.curio.service.TrendsService;
@@ -32,6 +33,24 @@ public class TrendsController {
     @GetMapping("/keywords")
     public List<PopularKeywordDto> getPopularKeywords() {
         return trendsService.getPopularKeywords();
+    }
+
+    // 관심 키워드 (로그인 전)
+    @Operation(summary = "관심 키워드 - 로그인 전 (사회/정치/경제/연예)")
+    @GetMapping("/interests/keywords")
+    public List<KeywordDto> getDefaultInterestKeywords() {
+        return trendsService.getPopularKeywordsByCategories(List.of("사회", "정치", "경제", "연예"));
+    }
+
+    // 관심 키워드 (로그인 후 - 맞춤형)
+    @Operation(summary = "관심 키워드 - 로그인 후 (개인 맞춤 카테고리)")
+    @GetMapping("/interests/{userId}/keywords")
+    public List<KeywordDto> getUserInterestKeywords(@PathVariable Long userId) {
+        List<String> userCategories = trendsService.getUserInterestCategories(userId);
+        if (userCategories == null || userCategories.isEmpty()) {
+            userCategories = List.of("사회", "정치", "경제", "연예");
+        }
+        return trendsService.getPopularKeywordsByCategories(userCategories);
     }
 }
 
