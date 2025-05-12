@@ -6,6 +6,7 @@ import team.backend.curio.domain.News;
 import team.backend.curio.domain.users;
 import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
+import team.backend.curio.dto.NewsDTO.CurioGoNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.RelatedNewsResponse;
 import team.backend.curio.dto.NewsDTO.NewsSummaryResponseDto;
 import team.backend.curio.dto.NewsDTO.SearchNewsResponseDto;
@@ -84,12 +85,12 @@ public class NewsService {
     }
 
     //특정 뉴스의 관련 뉴스 조회
-    public List<RelatedNewsResponse> getRelatedNews(Long articleId){
+    public List<RelatedNewsResponse> getRelatedNews(Long articleId) {
         // 먼저 해당 기사 id로 카테고리조회
-        String category=newsRepository.findCategoryById(articleId);
+        String category = newsRepository.findCategoryById(articleId);
 
         // 해당 카테고리로 관련 기사들을 조회
-        List<News> relatedNews = newsRepository.findTop4RelatedNewsByCategory(category,articleId);
+        List<News> relatedNews = newsRepository.findTop4RelatedNewsByCategory(category, articleId);
 
         // 관련 뉴스 데이터를 DTO로 변환하여 반환
         return relatedNews.stream()
@@ -149,5 +150,32 @@ public class NewsService {
                 .collect(Collectors.toList());
 
         return newsRepository.searchByKeywords(keywords, pageable);
+    }
+
+    //[CurioGo] 사용자의 관심 카테고리를 기반으로 좋아요 수가 높은 뉴스 5개 조회
+    public List<CurioGoNewsResponseDto> getCurioGoNewsByUserId(Long userId) {
+        // 1. 유저 정보 조회
+        users user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 2. 관심사 리스트 생성
+        List<String> interests = List.of(
+                user.getInterest1(),
+                user.getInterest2(),
+                user.getInterest3(),
+                user.getInterest4()
+        );
+
+        // 3. 관심사 리스트에 해당하는 뉴스 중 좋아요 순으로 상위 5개만 조회
+        List<News> top5News = newsRepository.findTop5ByCategoryInOrderByLikeCountDesc(interests);
+
+        // 4. DTO로 변환하여 반환
+        return top5News.stream()
+                .map(news -> new CurioGoNewsResponseDto(
+                        news.getNewsId(),
+                        news.getImageUrl(),
+                        news.getSummaryMedium()
+                ))
+                .collect(Collectors.toList());
     }
 }
