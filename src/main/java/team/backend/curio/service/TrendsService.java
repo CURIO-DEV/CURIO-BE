@@ -99,7 +99,9 @@ public class TrendsService {
             combinedSummaries.append(news.getSummaryShort()).append("\n");
         }
 
-        String prompt = "다음 뉴스 요약들을 기반으로 중요한 키워드를 최대 20개까지 추출하고, 각 키워드에 대해 중요도(1~100)를 부여해줘. JSON 형식으로 반환해줘. 형식은 다음과 같아:\n" +
+        String prompt = "다음 뉴스 요약들을 기반으로, **구체적이고 의미 있는 사건/인물/조직/정책 등**을 대표하는 중요한 키워드만 최대 20개 추출해줘. \n" +
+                "'한국', '경제', '내년'처럼 너무 일반적이거나 추상적인 단어는 제외해줘. \n" +
+                "각 키워드에 대해 중요도(1~100)를 부여하고, **아래 JSON 형식**으로 정확히 반환해줘:\n" +
                 "[{\"keyword\": \"대통령\", \"weight\": 92}, {\"keyword\": \"물가\", \"weight\": 84}, ...]\n\n" +
                 combinedSummaries;
 
