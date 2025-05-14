@@ -25,9 +25,9 @@ public class GptSummaryService {
 
     public String summarize(String content, String type) {
         String prompt = switch (type) {
-            case "short" -> "기사에서 가장 핵심적인 사건만을 간결하게 한 문장으로 요약해 주세요.";
-            case "medium" -> "핵심 사건과 배경 정보를 포함해 3~4문장정도로 요약해 주세요.";
-            case "long" -> "사건의 전체 흐름, 관련자 입장, 법적 쟁점까지 포괄적으로 5~7문장 이상으로 자세히 요약해 주세요. ";
+            case "short" -> "핵심 사건과 배경 정보를 포함해 3문장으로 요약해 주세요.";
+            case "medium" -> "핵심 사건과 배경 정보를 포함해 6문장으로 요약해 주세요.";
+            case "long" -> "이 기사를 관련지식이 없는 사람한테 알아들을 수 있을 정도의 글을 어조는 '-했다' 로 유지해서 정리해줘. 분량은 9문장이상이였음 좋겠어 ";
             default -> throw new IllegalArgumentException("지원하지 않는 요약 타입");
         };
 
