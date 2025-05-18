@@ -55,4 +55,29 @@ public class users {
     @ManyToMany(mappedBy = "members") // "members"로 수정
     private List<Bookmark> bookmarks = new ArrayList<>();
 
+    public users(String email, String nickname) {
+        this.email = email;
+        this.nickname = nickname;
+
+        //기본정보 설정
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.socialType = 1;
+        this.newsletterEmail = email;
+        this.summaryPreference = 2;
+        this.newsletterStatus = 0;
+
+        //관심사 null
+        this.interest1 = null;
+        this.interest2 = null;
+        this.interest3 = null;
+        this.interest4 = null;
+
+        //폰트,프로필 null
+        this.fontSize = null;
+        this.profile_image_url = null;
+
+        //북마크 리스트 초기화
+        this.bookmarks = new ArrayList<>();
+    }
 }
