@@ -80,4 +80,5 @@ public class users {
         //북마크 리스트 초기화
         this.bookmarks = new ArrayList<>();
     }
+
 }
