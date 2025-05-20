@@ -23,7 +23,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/curio/api/auth/kakao/userinfo","/curio/api/auth/google/userinfo").permitAll()  // 모든 경로 허용
+                        .requestMatchers("/auth/kakao/userinfo","/auth/google/userinfo","/articles/**").permitAll()  // 모든 경로 허용
                         .anyRequest().authenticated()
                 )
 
