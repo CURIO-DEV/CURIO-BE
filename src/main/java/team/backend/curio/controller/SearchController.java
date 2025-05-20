@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import team.backend.curio.dto.NewsDTO.SearchNewsResponseDto;
 import team.backend.curio.service.NewsService;
+import io.swagger.v3.oas.annotations.Parameter;
 
 import java.util.List;
 import java.util.Arrays;
@@ -23,7 +24,7 @@ public class SearchController {
     public Page<SearchNewsResponseDto> search(
             @RequestParam String query,
             @RequestParam String type,
-            Pageable pageable
+            @Parameter(hidden = true) Pageable pageable
     ) {
         if (type.equalsIgnoreCase("news")) {
             List<String> keywords = Arrays.stream(query.split("\\s+"))
