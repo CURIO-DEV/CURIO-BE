@@ -14,6 +14,7 @@ import team.backend.curio.domain.users;
 import team.backend.curio.repository.UserRepository;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -22,11 +23,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
 
+    // 인증이 필요 없는 경로 리스트
+    private static final List<String> EXCLUDED_PATHS = List.of(
+            "/search",
+            "/articles",
+            "/auth/kakao/userinfo",
+            "/auth/google/userinfo"
+    );
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
+        String uri = request.getRequestURI();
+
+        // 제외 경로는 인증 필터 건너뜀
+        if (EXCLUDED_PATHS.stream().anyMatch(uri::startsWith)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String token = jwtTokenProvider.resolveToken(request);
 
