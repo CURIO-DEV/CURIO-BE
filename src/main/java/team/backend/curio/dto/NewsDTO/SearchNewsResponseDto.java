@@ -1,13 +1,18 @@
 package team.backend.curio.dto.NewsDTO;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class SearchNewsResponseDto {
-    private Long id;
+    private Long newsId;
     private String title;
     private String content;
     private String imageUrl;
+
+    public SearchNewsResponseDto(Long newsId, String title, String content, String imageUrl) {
+        this.newsId = newsId;
+        this.title = title;
+        this.content = content;
+        this.imageUrl = imageUrl;
+    }
 }
