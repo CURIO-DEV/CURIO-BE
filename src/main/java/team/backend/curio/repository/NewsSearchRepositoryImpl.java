@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import team.backend.curio.domain.QNews;
 import team.backend.curio.dto.NewsDTO.SearchNewsResponseDto;
-import com.querydsl.core.types.dsl.StringPath;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class NewsSearchRepositoryImpl implements NewsSearchRepository {
         BooleanBuilder condition = new BooleanBuilder();
         for (String keyword : keywords) {
             condition.and(
-                    news.title.containsIgnoreCase(keyword)
+                    news.title.like("%"+keyword+"%:")
                             .or(news.content.like("%"+keyword+"%"))
             );
         }
