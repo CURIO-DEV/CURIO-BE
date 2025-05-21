@@ -2,9 +2,6 @@ spring:
   application:
     name: curio
 
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:prod}  # 기본값 dev
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
@@ -15,6 +12,9 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}  # 기본값 dev
 
   mail:
     host: smtp.gmail.com
