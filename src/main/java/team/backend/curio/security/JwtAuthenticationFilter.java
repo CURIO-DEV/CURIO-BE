@@ -25,6 +25,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // 인증이 필요 없는 경로 리스트
     private static final List<String> EXCLUDED_PATHS = List.of(
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/webjars/**",
             "/search",
             "/articles",
             "/auth/kakao/userinfo",
