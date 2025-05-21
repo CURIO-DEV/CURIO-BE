@@ -23,7 +23,15 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/kakao/userinfo","/auth/google/userinfo","/articles/**","/search").permitAll()  // 모든 경로 허용
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/auth/kakao/userinfo",
+                                "/auth/google/userinfo",
+                                "/articles/**",
+                                "/search").permitAll()  // 모든 경로 허용
                         .anyRequest().authenticated()
                 )
 

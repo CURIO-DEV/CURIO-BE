@@ -15,6 +15,7 @@ public class JwtTokenProvider {
     //환경변수에서 키 주입
     public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey) {
         this.secretKey = secretKey;
+        System.out.println(">>> [DEBUG] JWT SECRET KEY: " + secretKey);
     }
 
     // JWT 발급 메서드
