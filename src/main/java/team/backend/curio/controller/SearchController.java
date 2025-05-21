@@ -24,7 +24,6 @@ public class SearchController {
     public Page<SearchNewsResponseDto> search(
             @RequestParam String query,
             @RequestParam String type,
-            @RequestParam(defaultValue = "2") int summaryType,
             @Parameter(hidden = true) Pageable pageable
     ) {
         if (type.equalsIgnoreCase("news")) {
