@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import team.backend.curio.domain.users;
 import team.backend.curio.repository.UserRepository;
@@ -23,21 +24,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
 
+    private static final List<String> EXCLUDED_PATTERNS = List.of(
+            "/**/swagger-ui/**",
+            "/**/v3/api-docs/**",
+            "/**/swagger-resources/**",
+            "/**/webjars/**",
+            "/**/swagger-ui.html",
+            "/search",
+            "/articles",
+            "/auth/kakao/userinfo",
+            "/auth/google/userinfo"
+    );
+
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
-
-        // 인증이 필요 없는 경로 리스트
-        return List.of(
-                "/swagger-ui.html",
-                "/search",
-                "/articles",
-                "/auth/kakao/userinfo",
-                "/auth/google/userinfo"
-        ).contains(uri) || uri.startsWith("/swagger-ui/")
-                || uri.startsWith("/v3/api-docs/")
-                || uri.startsWith("/swagger-resources/")
-                || uri.startsWith("/webjars/");
+        return EXCLUDED_PATTERNS.stream().anyMatch(pattern -> pathMatcher.match(pattern, uri));
     }
 
     @Override
@@ -47,7 +51,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = jwtTokenProvider.resolveToken(request);
-
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
             String email = jwtTokenProvider.getEmailFromToken(token);
