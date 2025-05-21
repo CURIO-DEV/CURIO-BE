@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: ${DB_DEV_URL}
+    username: ${DB_DEV_USERNAME}
+    password: ${DB_DEV_PASSWORD}
+
+openai:
+  api-key: ${OPENAI_API_KEY}
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
