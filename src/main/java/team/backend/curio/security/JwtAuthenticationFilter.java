@@ -28,15 +28,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
 
         // 인증이 필요 없는 경로 리스트
-        return uri.startsWith("/swagger-ui")
-                || uri.equals("/swagger-ui.html")
-                || uri.startsWith("/v3/api-docs")
-                || uri.startsWith("/swagger-resources")
-                || uri.startsWith("/webjars")
-                || uri.startsWith("/search")
-                || uri.startsWith("/articles")
-                || uri.startsWith("/auth/kakao/userinfo")
-                || uri.startsWith("/auth/google/userinfo");
+        return List.of(
+                "/swagger-ui.html",
+                "/search",
+                "/articles",
+                "/auth/kakao/userinfo",
+                "/auth/google/userinfo"
+        ).contains(uri) || uri.startsWith("/swagger-ui/")
+                || uri.startsWith("/v3/api-docs/")
+                || uri.startsWith("/swagger-resources/")
+                || uri.startsWith("/webjars/");
     }
 
     @Override
