@@ -25,6 +25,8 @@ public class EnvLogger implements CommandLineRunner {
         System.out.println("🔍 active profile: " + profile);
         System.out.println("🔍 DB URL: " + url);
         System.out.println("🔍 DB USER: " + user);
-        System.out.println("🔍 jwt: " + secretKey);
+        if (secretKey != null && !secretKey.isBlank()) {
+            System.out.println("🔍 jwt: " + secretKey);
+        }
     }
 }
