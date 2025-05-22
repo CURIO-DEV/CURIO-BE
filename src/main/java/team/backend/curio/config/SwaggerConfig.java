@@ -30,6 +30,8 @@ public class SwaggerConfig {
                         .scheme("bearer")
                         .bearerFormat("JWT"));
 
+
+
         return new OpenAPI()
                 .addServersItem(new Server().url("/api"))
                 .info(info)
