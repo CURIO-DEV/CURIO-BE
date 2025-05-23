@@ -33,7 +33,7 @@ public class SwaggerConfig {
 
 
         return new OpenAPI()
-                .addServersItem(new Server().url("/api"))
+                .addServersItem(new Server().url("/curio/api"))
                 .info(info)
                 .addSecurityItem(securityRequirement)
                 .components(components);
