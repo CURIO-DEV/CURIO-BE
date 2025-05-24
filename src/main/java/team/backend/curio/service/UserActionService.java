@@ -54,68 +54,40 @@ public class UserActionService {
 
     // 추천 등록
     @Transactional
-    public void recommendNews(Long userId, Long newsId) {
+    public int recommendNews(Long userId, Long newsId) {
         UserAction userAction = userActionRepository.findByUserIdAndNewsId(userId, newsId)
                 .orElse(UserAction.builder()
                         .userId(userId)
                         .newsId(newsId)
                         .build());
 
-        // 추천을 클릭할 때 비추천을 취소
-        if (userAction.getVote() == -1) {
-            userAction.setVote(0); // 비추천 취소
-            userActionRepository.save(userAction);
-        }
-
         if (userAction.getVote() != 1) {
             userAction.setVote(1); //추천
-            userActionRepository.save(userAction);
+        } else {
+            userAction.setVote(0); //이미 비추천 상태면 추천 해제
         }
+
+        userActionRepository.save(userAction);
+        return userAction.getVote();
     }
 
-
-    @Transactional
-    public void cancelRecommend(Long userId, Long newsId) {
-        userActionRepository.findByUserIdAndNewsId(userId, newsId)
-                .ifPresent(userAction -> {
-                    if (userAction.getVote() == 1) {
-                        userAction.setVote(0); // 추천 취소
-                        userActionRepository.save(userAction);
-                    }
-                });
-    }
 
     // 비추천 등록
     @Transactional
-    public void notRecommendNews(Long userId, Long newsId){
+    public int notRecommendNews(Long userId, Long newsId){
         UserAction userAction=userActionRepository.findByUserIdAndNewsId(userId,newsId)
                 .orElse(UserAction.builder()
                         .userId(userId)
                         .newsId(newsId)
                         .build());
 
-
-        // 비추천을 클릭할 때 추천을 취소
-        if (userAction.getVote() == 1) {
-            userAction.setVote(0); // 추천 취소
-            userActionRepository.save(userAction);
-        }
-
-        if (userAction.getVote() != -1){
+        if (userAction.getVote() != -1) {
             userAction.setVote(-1);//비추천
-            userActionRepository.save(userAction);
+        } else {
+            userAction.setVote(0); //이미 비추천 상태면 비추천 해제
         }
-    }
 
-    // 비추천 취소
-    @Transactional
-    public void cancelNotRecommend(Long userId, Long newsId){
-        userActionRepository.findByUserIdAndNewsId(userId,newsId)
-                .ifPresent(userAction -> {
-                    if(userAction.getVote()==-1){
-                        userAction.setVote(0); //비추천 취소
-                        userActionRepository.save(userAction);
-                    }
-                });
+        userActionRepository.save(userAction);
+        return userAction.getVote();
     }
 }
