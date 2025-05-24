@@ -135,14 +135,14 @@ public class UserController {
     @Operation(summary = "뉴스레터 신청")
     @PatchMapping("/{userId}/newsletter/subscribe")
     public ResponseEntity<String> updateNewsletterSubscription(
-            @PathVariable Long userId, @RequestParam boolean subscribe) {
+            @PathVariable Long userId) {
 
         try {
             // 유효한 사용자인지 확인
             users user = userService.getUserById(userId); // 유저 정보 조회
 
             // 유저가 가입된 사용자라면 뉴스레터 상태를 업데이트
-            user.setNewsletterStatus(subscribe ? 1 : 0); // 1: 구독, 0: 구독 취소
+            user.setNewsletterStatus(1); // 1: 구독, 0: 구독 취소
             userService.save(user); // DB에 저장
 
             // 성공적으로 업데이트한 후 응답
