@@ -30,37 +30,23 @@ public class UserActionController {
         return ResponseEntity.ok(new CommonResponseDto<>(true,"좋아요를 취소했습니다",null));
     }
 
-    // 추천 등록
-    @Operation(summary = "기사 추천 등록")
+    // 추천 등록 및 취소
+    @Operation(summary = "기사 추천 등록/취소")
     @PostMapping("/{articleId}/recommend")
-    public ResponseEntity<CommonResponseDto<Void>> recommend(@PathVariable Long articleId, @RequestParam Long userId) {
-        userActionService.recommendNews(userId, articleId);
-        userActionService.cancelNotRecommend(userId, articleId); // 추천하면 비추천 취소
-        return ResponseEntity.ok(new CommonResponseDto<>(true,"이 기사를 추천합니다",null));
+    public ResponseEntity<CommonResponseDto<String>> recommend(@PathVariable Long articleId, @RequestParam Long userId) {
+        int vote= userActionService.recommendNews(userId, articleId);
+        String message=(vote==1)?"이 기사를 추천합니다" : "추천을 취소했습니다";
+        String status=(vote==1)?"추천":"추천 없음";
+        return ResponseEntity.ok(new CommonResponseDto<>(true,message,status));
     }
 
-    // 추천 취소
-    @Operation(summary = "기사 추천 취소")
-    @DeleteMapping("/{articleId}/recommend")
-    public ResponseEntity<CommonResponseDto<Void>> cancelrecommend(@PathVariable Long articleId, @RequestParam Long userId) {
-        userActionService.cancelRecommend(userId, articleId);
-        return ResponseEntity.ok(new CommonResponseDto<>(true,"추천을 취소했습니다",null));
-    }
-
-    // 비추천 등록
-    @Operation(summary = "기사 비추천 등록")
+    // 비추천 등록 및 취소
+    @Operation(summary = "기사 비추천 등록/취소")
     @PostMapping("/{articleId}/notrecommend")
-    public ResponseEntity<CommonResponseDto<Void>> notRecommend(@PathVariable long articleId, @RequestParam long userId) {
-        userActionService.notRecommendNews(userId, articleId);
-        userActionService.cancelRecommend(userId, articleId); // 비추천하면 추천 취소
-        return ResponseEntity.ok(new CommonResponseDto<>(true,"이 기사를 비추천합니다",null));
-    }
-
-    // 비추천 취소
-    @Operation(summary = "기사 비추천 취소")
-    @DeleteMapping("/{articleId}/notrecommend")
-    public ResponseEntity<CommonResponseDto<Void>> cancelNotRecommend(@PathVariable Long articleId, @RequestParam Long userId){
-        userActionService.cancelNotRecommend(userId, articleId);
-        return ResponseEntity.ok(new CommonResponseDto<>(true,"비추천을 취소했습니다",null));
+    public ResponseEntity<CommonResponseDto<String>> notRecommend(@PathVariable long articleId, @RequestParam long userId) {
+        int vote=userActionService.notRecommendNews(userId, articleId);
+        String message=(vote==-1)?"이 기사를 비추천합니다" : "비추천을 취소했습니다";
+        String status=(vote==-1)?"비추천":"비추천 없음";
+        return ResponseEntity.ok(new CommonResponseDto<>(true,message,status));
     }
 }
