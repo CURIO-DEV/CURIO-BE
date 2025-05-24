@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.backend.curio.domain.UserAction;
-import team.backend.curio.domain.UserActionId; //추천비추천
 import team.backend.curio.domain.News;
 import team.backend.curio.repository.UserActionRepository;
 import team.backend.curio.repository.NewsRepository;
