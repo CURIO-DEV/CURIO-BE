@@ -32,7 +32,7 @@ public class UserActionController {
 
     // 추천 등록 및 취소
     @Operation(summary = "기사 추천 등록/취소")
-    @PostMapping("/{articleId}/recommend")
+    @PatchMapping("/{articleId}/recommend")
     public ResponseEntity<CommonResponseDto<String>> recommend(@PathVariable Long articleId, @RequestParam Long userId) {
         int vote= userActionService.recommendNews(userId, articleId);
         String message=(vote==1)?"이 기사를 추천합니다" : "추천을 취소했습니다";
@@ -42,7 +42,7 @@ public class UserActionController {
 
     // 비추천 등록 및 취소
     @Operation(summary = "기사 비추천 등록/취소")
-    @PostMapping("/{articleId}/notrecommend")
+    @PatchMapping("/{articleId}/notrecommend")
     public ResponseEntity<CommonResponseDto<String>> notRecommend(@PathVariable long articleId, @RequestParam long userId) {
         int vote=userActionService.notRecommendNews(userId, articleId);
         String message=(vote==-1)?"이 기사를 비추천합니다" : "비추천을 취소했습니다";
