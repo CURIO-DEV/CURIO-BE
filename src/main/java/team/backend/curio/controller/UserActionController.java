@@ -15,19 +15,15 @@ public class UserActionController {
 
     private final UserActionService userActionService;
 
-    // 좋아요 등록
-    @Operation(summary = "기사 좋아요 등록")
-    @PostMapping("/{articleId}/like")
-    public ResponseEntity<CommonResponseDto<Void>> likeNews(@PathVariable Long articleId, @RequestParam Long userId) {
-        userActionService.likeNews(userId, articleId);
-        return ResponseEntity.ok(new CommonResponseDto<>(true,"이 기사를 좋아합니다",null));
-    }
+    // 좋아요 등록 및 취소
+    @Operation(summary = "기사 좋아요 등록/취소")
+    @PatchMapping("/{articleId}/like")
+    public ResponseEntity<CommonResponseDto<String>> likeNews(@PathVariable Long articleId, @RequestParam Long userId) {
+        int vote=userActionService.likeNews(userId, articleId); //좋아요 등록/취소
+        String message=(vote==1)?"이 기사를 좋아합니다":"좋아요를 취소했습니다.";
+        String status=(vote==1)?"좋아요":"좋아요 없음";
 
-    @Operation(summary = "기사 좋아요 취소")
-    @DeleteMapping("/{articleId}/like")
-    public ResponseEntity<CommonResponseDto<Void>> unlikeNews(@PathVariable Long articleId, @RequestParam Long userId) {
-        userActionService.unlikeNews(userId, articleId);
-        return ResponseEntity.ok(new CommonResponseDto<>(true,"좋아요를 취소했습니다",null));
+        return ResponseEntity.ok(new CommonResponseDto<>(true,message,status));
     }
 
     // 추천 등록 및 취소
