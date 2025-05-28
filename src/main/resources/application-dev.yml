@@ -6,3 +6,7 @@ spring:
 
 openai:
   api-key: ${OPENAI_API_KEY}
+
+kakao:
+  client-id: ${KAKAO_CLIENT_ID}
+  redirect-uri: http://localhost:8080/curio/api/auth/kakao/login
