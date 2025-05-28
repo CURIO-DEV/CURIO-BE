@@ -67,13 +67,13 @@ public class TrendsService {
 
         // 4. 응답 파싱 및 하나의 문자열로 병합
         String[] keywords = gptResponse.split(",");
-        String keywordString = Arrays.stream(keywords)
+        List<String> keywordList = Arrays.stream(keywords)
                 .limit(8)
                 .map(String::trim)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.toList());
 
         // 5. PopularKeywordDto 하나에 모든 키워드를 담아서 리스트로 반환
-        return Collections.singletonList(new PopularKeywordDto(keywordString));
+        return Collections.singletonList(new PopularKeywordDto(keywordList));
     }
 
     // 인기 게시글 4개 가져오기

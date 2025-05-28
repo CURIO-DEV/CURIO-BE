@@ -1,13 +1,15 @@
 package team.backend.curio.dto;
 
+import java.util.List;
+
 import lombok.Getter;
 
 @Getter
 public class PopularKeywordDto {
-    private String keyword;
+    private List<String> keyword;
 
 
-    public PopularKeywordDto(String keyword) {
+    public PopularKeywordDto(List<String> keyword) {
 
         this.keyword = keyword;
 
