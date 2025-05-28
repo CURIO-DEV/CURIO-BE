@@ -19,6 +19,7 @@ import team.backend.curio.service.BookmarkService;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @RestController
 @RequestMapping("/bookmarks")
 public class BookmarkController {

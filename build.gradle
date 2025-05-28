@@ -23,7 +23,6 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-	querydsl
 }
 
 repositories {
@@ -46,11 +45,18 @@ dependencies {
 
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta' // QueryDSL 핵심 의존성
 	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
-	implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
-	annotationProcessor 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+	annotationProcessor 'jakarta.annotation:jakarta.annotation-api:2.1.1' // 💡 QueryDSL APT 설정 추가
+	annotationProcessor 'jakarta.persistence:jakarta.persistence-api:3.1.0' // 💡 QueryDSL APT 설정 추가
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+
+
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.2'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
