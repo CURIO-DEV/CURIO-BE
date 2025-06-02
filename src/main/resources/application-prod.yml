@@ -9,4 +9,4 @@ openai:
 
 kakao:
   client-id: ${KAKAO_CLIENT_ID}
-  redirect-uri: https://port-0-curio-be-mar0zdvm42447885.sel4.cloudtype.app/curio/api/auth/kakao/login
+  redirect-uri: https://port-0-curio-be-mar0zdvm42447885.sel4.cloudtype.app/curio/api/auth/kakao/callback
