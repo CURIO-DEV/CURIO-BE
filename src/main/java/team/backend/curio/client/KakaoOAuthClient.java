@@ -23,7 +23,7 @@ public class KakaoOAuthClient {
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     //카카오 인가코드'code'로 accesstoken 받기
     public String getAccessToken(String code) {
@@ -68,5 +68,14 @@ public class KakaoOAuthClient {
                 .nickname((String) profile.get("nickname"))
                 .profileImage((String) profile.get("profile_image_url"))
                 .build();
+    }
+
+    // code → 사용자 정보까지 한 번에 처리하는 메서드 추가 (callback용)
+    public OAuthUserInfo getUserInfoByCode(String code) {
+        // 1. code로 access_token 발급
+        String accessToken = getAccessToken(code);
+
+        // 2. access_token으로 사용자 정보 조회
+        return getUserInfo(accessToken);
     }
 }
