@@ -12,5 +12,9 @@ public interface UserRepository extends JpaRepository<users, Long> {
 
     Optional<users> findByEmail(String email);
 
+    // 카카오 유저만 조회
+    List<users> findBySocialType(int socialType);
 
+    // 구글 유저만 조회
+    //List<users> findBySocialType(String socialType);
 }
