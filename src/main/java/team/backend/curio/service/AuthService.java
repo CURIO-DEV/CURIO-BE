@@ -16,21 +16,17 @@ public class AuthService {
     //private final GoogleOAuthClient googleOAuthClient;
     private final UserRepository userRepository;
 
-    public KakaoLoginResponseDto loginWithKakao(String code) {
-        // 1. 토큰 요청
-        String accessToken = kakaoOAuthClient.getAccessToken(code);
+    public KakaoLoginResponseDto loginWithKakao(OAuthUserInfo kakaoUser) {
 
-        // 2. 사용자 정보 요청
-        OAuthUserInfo kakaoUser = kakaoOAuthClient.getUserInfo(accessToken);
-
-        // 3. DB 저장 or 조회
+        // 1. DB에서 사용자 조회
         users user = userRepository.findByEmail(kakaoUser.getEmail())
                 .orElseGet(() -> {
+                    // 2. 신규 사용자 저장
                     users newUser = users.builder()
                             .email(kakaoUser.getEmail())
                             .nickname(kakaoUser.getNickname())
                             .profile_image_url(kakaoUser.getProfileImage())
-                            .socialType(1)
+                            .socialType(1) // ⭐️ (1 = 카카오) 유지
                             .build();
                     return userRepository.save(newUser);
                 });
