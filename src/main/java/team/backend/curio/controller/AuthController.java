@@ -1,6 +1,7 @@
 package team.backend.curio.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final KakaoOAuthClient kakaoOAuthClient;
 
+    @Operation(summary = "카카오 소셜 로그인 callback")
     @GetMapping("/kakao/callback")
     public ResponseEntity<KakaoLoginResponseDto> kakaoCallback(@RequestParam String code) {
         // 1. 받은 code로 access_token 요청
@@ -39,6 +41,7 @@ public class AuthController {
         return ResponseEntity.ok(loginResponse);
     }
 
+    @Operation(summary = "카카오 로그인 사용자 정보 조회")
     @GetMapping("/kakao/userinfo")
     public ResponseEntity<List<users>> getKakaoUsers() {
         List<users> kakaoUsers = userRepository.findBySocialType(1);
