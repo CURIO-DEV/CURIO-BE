@@ -69,20 +69,36 @@ public class NewsService {
     // 크롤링된 뉴스 여러 개 저장
     public void saveAllNews(List<News> newsList) {
         for (News news : newsList) {
-            String content = news.getContent();
-            if (content != null && !content.isBlank()) {
-                news.setSummaryShort(gptSummaryService.summarize(content, "short"));
-                news.setSummaryMedium(gptSummaryService.summarize(content, "medium"));
-                news.setSummaryLong(gptSummaryService.summarize(content, "long"));
-            } else {
+            try {
+                String content = news.getContent();
+                if (content != null && !content.isBlank()) {
+                    news.setSummaryShort(gptSummaryService.summarize(content, "short"));
+                    news.setSummaryMedium(gptSummaryService.summarize(content, "medium"));
+                    news.setSummaryLong(gptSummaryService.summarize(content, "long"));
+                } else {
+                    news.setSummaryShort("");
+                    news.setSummaryMedium("");
+                    news.setSummaryLong("");
+                }
+            } catch (Exception e) {
+                System.err.println("Error summarizing news with title: " + news.getTitle());
+                e.printStackTrace();
+                // 필요 시 summary 필드를 빈 문자열 처리해서 저장할 수도 있음
                 news.setSummaryShort("");
                 news.setSummaryMedium("");
                 news.setSummaryLong("");
             }
         }
 
-        newsRepository.saveAll(newsList);
+        try {
+            newsRepository.saveAll(newsList);
+        } catch (Exception e) {
+            System.err.println("Error saving news list to repository");
+            e.printStackTrace();
+            throw e;  // 다시 던져서 컨트롤러 쪽에서 처리하도록
+        }
     }
+
 
     //특정 뉴스의 관련 뉴스 조회
     public List<RelatedNewsResponse> getRelatedNews(Long articleId) {
