@@ -125,8 +125,13 @@ public class NewsService {
         News news = newsRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("Article not found"));
 
-        // 헤드라인과 이미지 URL 반환
-        return new NewsResponseDto(news.getTitle(), news.getImageUrl());
+        // 헤드라인과 이미지 URL, 생성일 수정일까지 반환
+        return new NewsResponseDto(
+                news.getTitle(),
+                news.getImageUrl(),
+                news.getCreatedAt(),
+                news.getUpdatedAt()
+        );
     }
 
     // 뉴스 요약 조회 기능 추가
