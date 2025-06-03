@@ -13,7 +13,7 @@ import static team.backend.curio.domain.QNews.news;
 @Getter
 @Setter
 public class NewsResponseDto {
-
+    private Long articleId;
     private String title;
     private String content;
     private String imageUrl;
@@ -22,6 +22,7 @@ public class NewsResponseDto {
 
     // 생성자
     public NewsResponseDto(News news) {
+        this.articleId = news.getNewsId();
         this.title = news.getTitle();
         this.content = news.getContent();
         this.imageUrl = news.getImageUrl();  // 이미지 URL 추가
