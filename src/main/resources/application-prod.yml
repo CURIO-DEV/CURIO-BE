@@ -6,3 +6,6 @@ spring:
 
 openai:
   api-key: ${OPENAI_API_KEY}
+
+frontend:
+  redirect-url: https://www.curi-o.site/

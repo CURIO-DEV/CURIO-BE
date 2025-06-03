@@ -6,3 +6,6 @@ spring:
 
 openai:
   api-key: ${OPENAI_API_KEY}
+
+frontend:
+  redirect-url: http://localhost:3000/
