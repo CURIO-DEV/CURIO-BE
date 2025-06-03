@@ -132,7 +132,7 @@ public class BookmarkController {
         List<News> newsList = bookmark.getNewsList();
 
         return newsList.stream()
-                .map(news -> new NewsResponseDto(news.getTitle(), news.getImageUrl()))
+                .map(news -> new NewsResponseDto(news))
                 .collect(Collectors.toList());
     }
 }
