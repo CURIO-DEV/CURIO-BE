@@ -34,7 +34,7 @@ public interface NewsRepository extends JpaRepository<News, Long>, NewsSearchRep
     String findCategoryById(Long articleId);
 
     // 해당 카테고리로 관련 뉴스 조회
-    @Query(value="SELECT * FROM News WHERE category = :category AND news_id <> :excludeId ORDER BY like_count DESC LIMIT 4", nativeQuery=true)
+    @Query(value="SELECT * FROM news WHERE category = :category AND news_id <> :excludeId ORDER BY like_count DESC LIMIT 4", nativeQuery=true)
     List<News> findTop4RelatedNewsByCategory(@Param("category") String category, @Param("excludeId") Long excludeId);
 
     // 관심 카테고리 안에서 좋아요 많은 뉴스 상위 5개
