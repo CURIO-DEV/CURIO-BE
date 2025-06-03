@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import team.backend.curio.domain.Bookmark;
 import team.backend.curio.domain.News;
 import team.backend.curio.domain.users;
-import team.backend.curio.dto.BookmarkDTO.CreateBookmarkDto;
-import team.backend.curio.dto.BookmarkDTO.BookmarkResponseDto;
-import team.backend.curio.dto.BookmarkDTO.MessageResponse;
-import team.backend.curio.dto.BookmarkDTO.NewsAddBookmarkDto;
+import team.backend.curio.dto.BookmarkDTO.*;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.repository.UserRepository;
 import team.backend.curio.service.BookmarkService;
@@ -128,12 +125,12 @@ public class BookmarkController {
     // 북마크에 뉴스 리스트 출력
     @Operation(summary = "북마크별 뉴스 리스트 출력")
     @GetMapping("/{folderId}/news")
-    public List<NewsResponseDto> getNewsByBookmark(@PathVariable("folderId") Long folderId) {
+    public List<BookmarkNewsDto> getNewsByBookmark(@PathVariable("folderId") Long folderId) {
         Bookmark bookmark = bookmarkService.getBookmarkById(folderId);
         List<News> newsList = bookmark.getNewsList();
 
         return newsList.stream()
-                .map(news -> new NewsResponseDto(news))
+                .map(news -> new BookmarkNewsDto(news))
                 .collect(Collectors.toList());
     }
 }

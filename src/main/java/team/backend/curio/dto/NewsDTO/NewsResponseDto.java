@@ -22,10 +22,9 @@ public class NewsResponseDto {
 
     // 생성자
     public NewsResponseDto(News news) {
-        this.articleId = news.getNewsId();
         this.title = news.getTitle();
         this.content = news.getContent();
-        this.imageUrl = news.getImageUrl();  // 이미지 URL 추가
+        this.imageUrl = news.getImageUrl();
     }
 
     // 새로운 생성자 (title과 imageUrl을 받는 생성자 추가)
