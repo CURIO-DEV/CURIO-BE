@@ -58,9 +58,24 @@ public class KakaoOAuthClient {
         //요청 후 응답 받기
         Map<String, Object> response = restTemplate.exchange(url, HttpMethod.GET, request, Map.class).getBody();
 
+        //⬇️로그 확인
+        System.out.println("카카오 사용자 정보 응답: " + response);
+
+        // Null 체크 추가 (중요!)
+        if (response == null) {
+            throw new RuntimeException("카카오 사용자 정보 요청 실패: 응답이 null입니다.");
+        }
+
         //kakao 응답 데이터에서 원하는 정보 추출
         Map<String, Object> kakaoAccount = (Map<String, Object>) response.get("kakao_account");
+        if (kakaoAccount == null) {
+            throw new RuntimeException("카카오 사용자 정보 요청 실패: kakao_account가 null입니다.");
+        }
+
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+        if (profile == null) {
+            throw new RuntimeException("카카오 사용자 정보 요청 실패: profile이 null입니다.");
+        }
 
         //dto로 변환하여 반환
         return OAuthUserInfo.builder()

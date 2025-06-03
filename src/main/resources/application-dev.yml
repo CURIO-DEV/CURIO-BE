@@ -10,7 +10,13 @@ openai:
 frontend:
   redirect-url: http://localhost:3000/
 
+
 kakao:
   client-id: ${KAKAO_CLIENT_ID}
   redirect-uri: http://localhost:8080/curio/api/auth/kakao/callback
 
+oauth:
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
+    redirect-uri: http://localhost:8080/curio/api/auth/google/callback

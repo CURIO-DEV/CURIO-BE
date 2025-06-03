@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team.backend.curio.client.KakaoOAuthClient;
+import team.backend.curio.client.GoogleOAuthClient;
 import team.backend.curio.domain.users;
-import team.backend.curio.dto.authlogin.KakaoLoginRequestDto;
-import team.backend.curio.dto.authlogin.KakaoLoginResponseDto;
+import team.backend.curio.dto.authlogin.SocialLoginResponseDto;
 import team.backend.curio.dto.authlogin.OAuthUserInfo;
 import team.backend.curio.repository.UserRepository;
 import team.backend.curio.service.AuthService;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -26,13 +25,14 @@ public class AuthController {
     private final AuthService authService;
     private final UserRepository userRepository;
     private final KakaoOAuthClient kakaoOAuthClient;
+    private final GoogleOAuthClient googleOAuthClient;
 
     @Value("${frontend.redirect-url}")
     private String frontendRedirectUrl;
   
     @Operation(summary = "카카오 소셜로그인 callback")
     @GetMapping("/kakao/callback")
-    public ResponseEntity<KakaoLoginResponseDto> kakaoCallback(@RequestParam String code) {
+    public ResponseEntity<SocialLoginResponseDto> kakaoCallback(@RequestParam String code) {
         // 1. 받은 code로 access_token 요청
         String accessToken = kakaoOAuthClient.getAccessToken(code);
 
@@ -40,7 +40,7 @@ public class AuthController {
         OAuthUserInfo userInfo = kakaoOAuthClient.getUserInfo(accessToken);
 
         // 3. 사용자 정보로 회원가입/로그인 처리
-        KakaoLoginResponseDto loginResponse = authService.loginWithKakao(userInfo);
+        SocialLoginResponseDto loginResponse = authService.loginWithKakao(userInfo);
         Long userId = loginResponse.getUserId(); // DB 저장
 
         String redirectUrl = frontendRedirectUrl + "?userId=" + userId
@@ -52,7 +52,6 @@ public class AuthController {
                 .header("Location",redirectUrl)
                 .build();
     }
- 
 
     @Operation(summary = "카카오로그인 사용자 정보 조회")
     @GetMapping("/kakao/userinfo")
@@ -61,12 +60,38 @@ public class AuthController {
         return ResponseEntity.ok(kakaoUsers);
     }
 
-    /*
-    @PostMapping("/login/google")
-    public ResponseEntity<String> googleLogin(@RequestBody Map<String, String> request) {
-        String code = request.get("code");
-        String result = authService.loginWithGoogle(code);
-        return ResponseEntity.ok(result);
+    @Operation(summary ="구글 소셜로그인 callback")
+    @GetMapping("/google/callback")
+    public ResponseEntity<Void> googleCallback(@RequestParam String code) {
+        // 1. 받은 code로 access_token 요청
+        String accessToken = googleOAuthClient.getAccessToken(code);
+
+        // 2. access_token으로 사용자 정보 요청
+        OAuthUserInfo userInfo = googleOAuthClient.getUserInfo(accessToken);
+
+        // 3. 사용자 정보로 회원가입/로그인 처리
+        SocialLoginResponseDto loginResponse = authService.loginWithGoogle(userInfo);
+
+        Long userId = loginResponse.getUserId(); // DB 저장된 userId
+
+        String nickname = loginResponse.getNickname() != null ? loginResponse.getNickname() : "";
+        String email = loginResponse.getEmail() != null ? loginResponse.getEmail() : "";
+
+        // 4. 프론트로 리다이렉트 URL 생성
+        String redirectUrl = frontendRedirectUrl + "?userId=" + userId
+                + "&nickname=" + URLEncoder.encode(nickname, StandardCharsets.UTF_8)
+                + "&email=" + URLEncoder.encode(email, StandardCharsets.UTF_8); // [추가] 프론트 리다이렉트 URL 생성
+
+        // 5. 302 리다이렉트 응답
+        return ResponseEntity.status(302)
+                .header("Location", redirectUrl)
+                .build();
     }
-    */
+
+    @Operation(summary = "카카오로그인 사용자 정보 조회")
+    @GetMapping("/google/userinfo")
+    public ResponseEntity<List<users>> getGoogleUsers() {
+        List<users> googleUsers = userRepository.findBySocialType(2);
+        return ResponseEntity.ok(googleUsers);
+    }
 }
