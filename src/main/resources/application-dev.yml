@@ -4,6 +4,11 @@ spring:
     username: ${DB_DEV_USERNAME}
     password: ${DB_DEV_PASSWORD}
 
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
 openai:
   api-key: ${OPENAI_API_KEY}
 

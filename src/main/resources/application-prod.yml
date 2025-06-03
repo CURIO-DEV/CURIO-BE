@@ -4,6 +4,11 @@ spring:
     username: ${DB_PROD_USERNAME}
     password: ${DB_PROD_PASSWORD}
 
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+
 openai:
   api-key: ${OPENAI_API_KEY}
 
