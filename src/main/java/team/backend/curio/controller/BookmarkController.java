@@ -11,6 +11,7 @@ import team.backend.curio.domain.News;
 import team.backend.curio.domain.users;
 import team.backend.curio.dto.BookmarkDTO.CreateBookmarkDto;
 import team.backend.curio.dto.BookmarkDTO.BookmarkResponseDto;
+import team.backend.curio.dto.BookmarkDTO.MessageResponse;
 import team.backend.curio.dto.BookmarkDTO.NewsAddBookmarkDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.repository.UserRepository;
@@ -90,7 +91,7 @@ public class BookmarkController {
             @RequestBody NewsAddBookmarkDto requestDto
     ) {
         bookmarkService.addNewsToBookmark(folderId, requestDto.getNewsId());
-        return ResponseEntity.ok("뉴스가 북마크에 추가되었습니다.");
+        return ResponseEntity.ok(new MessageResponse("뉴스가 북마크에 추가되었습니다."));
     }
 
     // 북마크에  뉴스 삭제
@@ -101,7 +102,7 @@ public class BookmarkController {
             @PathVariable Long newsId
     ) {
         bookmarkService.removeNewsFromBookmark(folderId, newsId);
-        return ResponseEntity.ok("뉴스가 북마크에서 제거되었습니다.");
+        return ResponseEntity.ok(new MessageResponse("뉴스가 북마크에 추가되었습니다."));
     }
 
     // 북마크 목록 출력
