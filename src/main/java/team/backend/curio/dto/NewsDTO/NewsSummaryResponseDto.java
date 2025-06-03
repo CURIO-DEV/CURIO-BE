@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class NewsSummaryResponseDto {
-    private Long newsId;
+    private Long articleId;
     private String title;
     private String summaryType;
     private String summary;
