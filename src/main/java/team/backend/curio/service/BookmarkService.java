@@ -127,7 +127,13 @@ public class BookmarkService {
                 .orElseThrow(() -> new RuntimeException("News not found"));
 
         bookmark.addNews(news);
+
+        // 저장 수 증가
+        news.setSaveCount(news.getSaveCount() + 1);
+
+        // 저장
         bookmarkRepository.save(bookmark);
+        newsRepository.save(news);
     }
 
     // 북마크에서 뉴스 삭제
@@ -138,8 +144,18 @@ public class BookmarkService {
                 .orElseThrow(() -> new RuntimeException("News not found"));
 
         bookmark.removeNews(news);
+
+        // 저장 수 감소 (0 이하로는 내려가지 않게 처리)
+        int currentSaveCount = news.getSaveCount();
+        if (currentSaveCount > 0) {
+            news.setSaveCount(currentSaveCount - 1);
+        }
+
+        // 저장
         bookmarkRepository.save(bookmark);
+        newsRepository.save(news);
     }
+
 
     // 북마크 리스트
     public List<Bookmark> getAllBookmarks(String email) {
