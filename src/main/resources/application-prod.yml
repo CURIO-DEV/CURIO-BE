@@ -7,6 +7,11 @@ spring:
 openai:
   api-key: ${OPENAI_API_KEY}
 
+
+frontend:
+  redirect-url: https://www.curi-o.site/
+
 kakao:
   client-id: ${KAKAO_CLIENT_ID}
   redirect-uri: https://port-0-curio-be-mar0zdvm42447885.sel4.cloudtype.app/curio/api/auth/kakao/callback
+
