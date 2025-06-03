@@ -43,6 +43,7 @@ public class GptSummaryService {
 
         Map<String, Object> requestBody = Map.of(
                 "model", "gpt-3.5-turbo",
+                "temperature", 0,
                 "messages", List.of(
                         Map.of("role", "user", "content", fullPrompt)
                 )

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -28,8 +29,8 @@ public class AuthController {
 
     @Value("${frontend.redirect-url}")
     private String frontendRedirectUrl;
-
-    @Operation(summary = "카카오 소셜 로그인 callback")
+  
+    @Operation(summary = "카카오 소셜로그인 callback")
     @GetMapping("/kakao/callback")
     public ResponseEntity<KakaoLoginResponseDto> kakaoCallback(@RequestParam String code) {
         // 1. 받은 code로 access_token 요청
@@ -51,8 +52,9 @@ public class AuthController {
                 .header("Location",redirectUrl)
                 .build();
     }
+ 
 
-    @Operation(summary = "카카오 로그인 사용자 정보 조회")
+    @Operation(summary = "카카오로그인 사용자 정보 조회")
     @GetMapping("/kakao/userinfo")
     public ResponseEntity<List<users>> getKakaoUsers() {
         List<users> kakaoUsers = userRepository.findBySocialType(1);

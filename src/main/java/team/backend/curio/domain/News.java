@@ -70,7 +70,7 @@ public class News {
 
     // NewsWithCountsDto를 받는 생성자 추가
     public News(NewsWithCountsDto dto) {
-        this.newsId = dto.getNewsId();
+        this.newsId = dto.getArticleId();
         this.title = dto.getTitle();
     }
 }
