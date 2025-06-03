@@ -75,12 +75,12 @@ public class BookmarkController {
     // 북마크 삭제
     @Operation(summary = "내 북마크에서만 나가기")
     @DeleteMapping("/{bookmarkId}/delete")
-    public ResponseEntity<String> leaveBookmark(
+    public ResponseEntity<MessageResponse> leaveBookmark(
             @PathVariable Long bookmarkId,
             @RequestParam String email
     ) {
         bookmarkService.deleteBookmarkForUser(bookmarkId, email);
-        return ResponseEntity.ok("북마크에서 나갔습니다.");
+        return ResponseEntity.ok(new MessageResponse("북마크에서 나갔습니다."));
     }
 
     // 북마크에 뉴스 추가
@@ -102,7 +102,7 @@ public class BookmarkController {
             @PathVariable Long newsId
     ) {
         bookmarkService.removeNewsFromBookmark(folderId, newsId);
-        return ResponseEntity.ok(new MessageResponse("뉴스가 북마크에 추가되었습니다."));
+        return ResponseEntity.ok(new MessageResponse("뉴스가 북마크에서 삭제되었습니다."));
     }
 
     // 북마크 목록 출력
