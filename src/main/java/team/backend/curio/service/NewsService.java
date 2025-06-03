@@ -102,13 +102,16 @@ public class NewsService {
 
     //특정 뉴스의 관련 뉴스 조회
     public List<RelatedNewsResponse> getRelatedNews(Long articleId) {
-        // 먼저 해당 기사 id로 카테고리조회
+        // 1. 기사 존재 여부 및 카테고리 조회
         String category = newsRepository.findCategoryById(articleId);
+        if (category == null) {
+            throw new IllegalArgumentException("해당 ID의 뉴스 기사가 존재하지 않거나 카테고리가 없습니다. articleId=" + articleId);
+        }
 
-        // 해당 카테고리로 관련 기사들을 조회
+        // 2. 관련 뉴스 조회
         List<News> relatedNews = newsRepository.findTop4RelatedNewsByCategory(category, articleId);
 
-        // 관련 뉴스 데이터를 DTO로 변환하여 반환
+        // 3. DTO로 변환
         return relatedNews.stream()
                 .map(news -> new RelatedNewsResponse(
                         news.getTitle(),
@@ -116,8 +119,9 @@ public class NewsService {
                         news.getLikeCount(),
                         news.getSaveCount()
                 ))
-                .collect(Collectors.toList()); // Stream을 List로 변환
+                .collect(Collectors.toList());
     }
+
 
     // 기사 헤드라인과 이미지 URL 조회
     public NewsResponseDto getArticleHeadline(Long articleId) {
