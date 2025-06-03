@@ -80,7 +80,7 @@ public class BookmarkController {
             @RequestParam String email
     ) {
         bookmarkService.deleteBookmarkForUser(bookmarkId, email);
-        return ResponseEntity.ok(new MessageResponse("북마크에서 나갔습니다."));
+        return ResponseEntity.ok(new MessageResponse("해당 북마크를 목록에서 삭제했습니다."));
     }
 
     // 북마크에 뉴스 추가
