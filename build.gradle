@@ -13,7 +13,7 @@ java {
 	}
 }
 
-def querydslDir = "$buildDir/generated/querydsl" // Q파일 생성 경로 지정
+def querydslDir = file("$buildDir/generated/querydsl")
 
 sourceSets {
 	main.java.srcDirs += querydslDir
@@ -64,9 +64,7 @@ tasks.named('test') {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
-}
-
-clean {
-	delete file(querydslDir)
+	options.compilerArgs += [
+			"-Aquerydsl.generatedSourcesDir=${querydslDir}"
+	]
 }
