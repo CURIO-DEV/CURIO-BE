@@ -57,6 +57,19 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	implementation 'org.springframework.boot:spring-boot-starter-security' //spring security 의존성
+	implementation 'org.springframework:spring-context'
+
+	// Jackson 명시 (버전 충돌 방지)
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
+
+	// JWT 관련 추가 필요
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5' // 핵심 API
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'   // 내부 구현체
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JSON 직렬화용
 }
 
 tasks.named('test') {

@@ -17,38 +17,31 @@ public class AuthService {
     private final GoogleOAuthClient googleOAuthClient;
     private final UserRepository userRepository;
 
-    public SocialLoginResponseDto loginWithKakao(OAuthUserInfo kakaoUser) {
-
-        // 1. DB에서 사용자 조회
-        users user = userRepository.findByEmail(kakaoUser.getEmail())
+    // ✅ 변경 후: 사용자 엔티티 리턴
+    public users findOrCreateKakaoUser(OAuthUserInfo kakaoUser) {
+        return userRepository.findByEmail(kakaoUser.getEmail())
                 .orElseGet(() -> {
-                    // 2. 신규 사용자 저장
                     users newUser = users.builder()
                             .email(kakaoUser.getEmail())
                             .nickname(kakaoUser.getNickname())
                             .profile_image_url(kakaoUser.getProfileImage())
-                            .socialType(1) // (1 = 카카오) 유지
+                            .socialType(1) // 카카오
                             .build();
                     return userRepository.save(newUser);
                 });
-
-        return new SocialLoginResponseDto(user.getUserId(), user.getNickname(), user.getEmail());
     }
 
-    public SocialLoginResponseDto loginWithGoogle(OAuthUserInfo googleUser) {
-        // 1. DB에서 사용자 조회
-        users user = userRepository.findByEmail(googleUser.getEmail())
+    //public SocialLoginResponseDto loginWithGoogle(OAuthUserInfo googleUser) {
+    public users findOrCreateGoogleUser(OAuthUserInfo googleUser) {
+        return userRepository.findByEmail(googleUser.getEmail())
                 .orElseGet(() -> {
                     users newUser = users.builder()
                             .email(googleUser.getEmail())
                             .nickname(googleUser.getNickname())
                             .profile_image_url(googleUser.getProfileImage())
-                            .socialType(2) // (2 = 구글)
+                            .socialType(2) // 구글
                             .build();
                     return userRepository.save(newUser);
                 });
-
-
-        return new SocialLoginResponseDto(user.getUserId(), user.getNickname(), user.getEmail());
     }
 }
