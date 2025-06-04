@@ -64,6 +64,7 @@ tasks.named('test') {
 }
 
 tasks.withType(JavaCompile).configureEach {
+	options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
 	options.compilerArgs += [
 			"-Aquerydsl.generatedSourcesDir=${querydslDir}"
 	]

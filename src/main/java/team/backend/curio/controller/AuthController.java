@@ -2,6 +2,7 @@ package team.backend.curio.controller;
 
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -32,7 +34,7 @@ public class AuthController {
   
     @Operation(summary = "카카오 소셜로그인 callback")
     @GetMapping("/kakao/callback")
-    public ResponseEntity<SocialLoginResponseDto> kakaoCallback(@RequestParam String code) {
+    public ResponseEntity<SocialLoginResponseDto> kakaoCallback(@RequestParam String code, HttpServletRequest request) {
         // 1. 받은 code로 access_token 요청
         String accessToken = kakaoOAuthClient.getAccessToken(code);
 
@@ -41,9 +43,16 @@ public class AuthController {
 
         // 3. 사용자 정보로 회원가입/로그인 처리
         SocialLoginResponseDto loginResponse = authService.loginWithKakao(userInfo);
-        Long userId = loginResponse.getUserId(); // DB 저장
 
-        String redirectUrl = frontendRedirectUrl + "?userId=" + userId
+        String referer = request.getHeader("Referer");
+        boolean isLocal = referer != null && referer.contains("localhost");
+
+        //Long userId = loginResponse.getUserId(); // DB 저장
+
+        // 5. 환경에 따라 리다이렉트 경로 설정
+        String baseRedirectUrl = isLocal ? "http://localhost:3000" : "https://curi-o.site";
+
+        String redirectUrl = baseRedirectUrl + "?userId=" + loginResponse.getUserId()
                 + "&nickname=" + URLEncoder.encode(loginResponse.getNickname(), StandardCharsets.UTF_8)
                 + "&email=" + URLEncoder.encode(loginResponse.getEmail(), StandardCharsets.UTF_8);
 
@@ -62,7 +71,7 @@ public class AuthController {
 
     @Operation(summary ="구글 소셜로그인 callback")
     @GetMapping("/google/callback")
-    public ResponseEntity<Void> googleCallback(@RequestParam String code) {
+    public ResponseEntity<?> googleCallback(@RequestParam String code, HttpServletRequest request) {
         // 1. 받은 code로 access_token 요청
         String accessToken = googleOAuthClient.getAccessToken(code);
 
@@ -72,15 +81,19 @@ public class AuthController {
         // 3. 사용자 정보로 회원가입/로그인 처리
         SocialLoginResponseDto loginResponse = authService.loginWithGoogle(userInfo);
 
-        Long userId = loginResponse.getUserId(); // DB 저장된 userId
+        //Long userId = loginResponse.getUserId(); // DB 저장된 userId
 
-        String nickname = loginResponse.getNickname() != null ? loginResponse.getNickname() : "";
-        String email = loginResponse.getEmail() != null ? loginResponse.getEmail() : "";
+        // 4. Host 또는 Referer로 로컬/배포 환경 판단
+        String referer = request.getHeader("Referer"); // 또는 request.getHeader("Origin") 도 가능
+        boolean isLocal = referer != null && referer.contains("localhost");
+
+        // 환경에 따라 리다이렉트 주소 분기
+        String baseRedirectUrl = isLocal ? "http://localhost:3000" : "https://curi-o.site";
 
         // 4. 프론트로 리다이렉트 URL 생성
-        String redirectUrl = frontendRedirectUrl + "?userId=" + userId
-                + "&nickname=" + URLEncoder.encode(nickname, StandardCharsets.UTF_8)
-                + "&email=" + URLEncoder.encode(email, StandardCharsets.UTF_8); // [추가] 프론트 리다이렉트 URL 생성
+        String redirectUrl = baseRedirectUrl + "?userId=" + loginResponse.getUserId()
+                + "&nickname=" + URLEncoder.encode(loginResponse.getNickname(), StandardCharsets.UTF_8)
+                + "&email=" + URLEncoder.encode(loginResponse.getEmail(), StandardCharsets.UTF_8); // [추가] 프론트 리다이렉트 URL 생성
 
         // 5. 302 리다이렉트 응답
         return ResponseEntity.status(302)
