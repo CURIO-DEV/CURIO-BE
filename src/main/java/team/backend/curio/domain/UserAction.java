@@ -46,13 +46,13 @@ public class UserAction implements Serializable {
     /* 사용자 행동이 처음 기록된 시점
      * 기본값은 현재 시간 (LocalDateTime.now())
      */
-    @Column(name="create_at",nullable=false,updatable=false)
+    @Column(name="createAt",nullable=false,updatable=false)
     private LocalDateTime createAt=LocalDateTime.now();
 
     /* 사용자 행동이 마지막으로 수정된 시점
      * 좋아요나 추천 상태가 바뀔 때마다 갱신됨
      */
-    @Column(name="update_at",nullable=false)
+    @Column(name="updateAt",nullable=false)
     private LocalDateTime updateAt=LocalDateTime.now();
 
     // 데이터베이스에 저장되기 전에 호출되는 메서드
