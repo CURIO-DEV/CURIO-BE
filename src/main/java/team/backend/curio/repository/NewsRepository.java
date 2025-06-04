@@ -40,6 +40,4 @@ public interface NewsRepository extends JpaRepository<News, Long>, NewsSearchRep
     // 관심 카테고리 안에서 좋아요 많은 뉴스 상위 5개
     List<News> findTop5ByCategoryInOrderByLikeCountDesc(List<String> categories);
 
-    // 관심사(category)에 맞는 뉴스 목록을 publishedAt 내림차순(최신순)으로 조회
-    List<News> findByCategoryOrderByCreatedAtDesc(String category);
 }
