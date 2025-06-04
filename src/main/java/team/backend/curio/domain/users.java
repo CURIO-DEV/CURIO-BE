@@ -35,9 +35,9 @@ public class users {
     @Column(columnDefinition = "int default 2")
     private int summaryPreference = 2; // 요약 길이 선호도 (1=짧음, 2=보통, 3=김)
 
-    @Column(name = "createdAt")
+    @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
-    @Column(name = "updatedAt")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     // 관심사 최대 4개

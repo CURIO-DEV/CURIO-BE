@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @QueryEntity
 @Entity
-@Table(name = "News")
+@Table(name = "news")
 @Getter
 @Setter
 @NoArgsConstructor
