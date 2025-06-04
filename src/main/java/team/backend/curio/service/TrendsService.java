@@ -25,6 +25,8 @@ public class TrendsService {
     private final RestTemplate restTemplate;
     private final GptSummaryService gptSummaryService;
     private final UserRepository userRepository;
+    private String cachedKeywords = null;
+    private LocalDate lastCacheDate = null;
 
     @Autowired
     public TrendsService(NewsRepository newsRepository,RestTemplate restTemplate,GptSummaryService gptSummaryService, UserRepository userRepository) {
@@ -42,16 +44,21 @@ public class TrendsService {
                 .collect(Collectors.toList());
     }
 
-    // 인기 키워드 8개 반환
     public List<PopularKeywordDto> getPopularKeywords() {
-        // 1. 오늘 날짜 뉴스 조회
         LocalDate today = LocalDate.now();
+
+        // 오늘 요청이 이미 처리된 경우, 캐시된 결과 사용
+        if (lastCacheDate != null && lastCacheDate.equals(today) && cachedKeywords != null) {
+            return parseKeywordResponse(cachedKeywords);
+        }
+
+        // 1. 오늘 날짜 뉴스 조회
         List<News> todayNews = newsRepository.findAllByCreatedAtBetween(
                 today.atStartOfDay(),
                 today.plusDays(1).atStartOfDay()
         );
 
-        // 2. 뉴스 본문 이어붙이기
+        // 2. 뉴스 요약 이어붙이기
         StringBuilder contentBuilder = new StringBuilder();
         for (News news : todayNews) {
             if (news.getSummaryShort() != null) {
@@ -59,20 +66,28 @@ public class TrendsService {
             }
         }
 
-        // 3. GPT에 키워드 추출 요청
-        String prompt = "다음 뉴스 요약들을 참고해서, 지금 이슈가 되는 키워드 8개를 많이 나온거 같은 키워드 우선으로 순위 매겨서 반환해줘 " +
+        // 3. GPT 프롬프트 구성
+        String prompt = "다음 뉴스 요약들을 참고해서, 지금 이슈가 되는 키워드 8개를 많이 나온 거 같은 키워드 우선으로 순위 매겨서 반환해줘. " +
                 "형식은 쉼표(,)로 구분해서 한 줄로 알려줘.\n\n" + contentBuilder;
 
+        // 4. GPT 호출
         String gptResponse = gptSummaryService.callGptApi(prompt);
 
-        // 4. 응답 파싱 및 하나의 문자열로 병합
-        String[] keywords = gptResponse.split(",");
+        // 5. 캐시 저장
+        cachedKeywords = gptResponse;
+        lastCacheDate = today;
+
+        // 6. 결과 파싱 및 반환
+        return parseKeywordResponse(gptResponse);
+    }
+
+    private List<PopularKeywordDto> parseKeywordResponse(String response) {
+        String[] keywords = response.split(",");
         List<String> keywordList = Arrays.stream(keywords)
                 .limit(8)
                 .map(String::trim)
                 .collect(Collectors.toList());
 
-        // 5. PopularKeywordDto 하나에 모든 키워드를 담아서 리스트로 반환
         return Collections.singletonList(new PopularKeywordDto(keywordList));
     }
 
