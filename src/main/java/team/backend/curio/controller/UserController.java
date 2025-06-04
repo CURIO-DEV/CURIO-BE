@@ -1,8 +1,10 @@
 package team.backend.curio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.beans.factory.annotation.Autowired;
 import team.backend.curio.domain.users;
 import team.backend.curio.domain.News;
+import team.backend.curio.dto.BookmarkDTO.MessageResponse;
 import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.dto.UserCreateDto;
@@ -13,7 +15,6 @@ import team.backend.curio.service.NewsService;
 import team.backend.curio.service.EmailService;
 import team.backend.curio.service.TrendsService;
 import team.backend.curio.dto.UserResponseDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    private TrendsService trendsService; // TrendsService 주입
+    private EmailService emailService;
 
     // 회원 가입
     @Operation(summary = "임시 회원 가입" /*,description = "새로운 유저를 등록합니다."*/)
@@ -134,7 +137,7 @@ public class UserController {
     // 뉴스레터 수신 여부 설정 (가입된 회원만)
     @Operation(summary = "뉴스레터 신청")
     @PatchMapping("/{userId}/newsletter/subscribe")
-    public ResponseEntity<String> updateNewsletterSubscription(
+    public ResponseEntity<MessageResponse> updateNewsletterSubscription(
             @PathVariable Long userId) {
 
         try {
@@ -146,18 +149,13 @@ public class UserController {
             userService.save(user); // DB에 저장
 
             // 성공적으로 업데이트한 후 응답
-            return ResponseEntity.ok("뉴스레터가 신청되었습니다.");
+            return ResponseEntity.ok(new MessageResponse("뉴스레터가 신청되었습니다."));
         } catch (IllegalArgumentException e) {
             // 유저가 존재하지 않으면 404 반환
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("사용자를 찾을 수 없습니다."));
         }
     }
-
-    @Autowired
-    private TrendsService trendsService; // TrendsService 주입
-
-    @Autowired
-    private EmailService emailService;
 
     // 최근 트렌드 뉴스 4개 가져오기
     private List<News> getTrendingNews() {
@@ -171,7 +169,7 @@ public class UserController {
     // 뉴스레터 발송 기능
     @Operation(summary = "뉴스레터 발송")
     @PatchMapping("/{userId}/newsletter/send")
-    public ResponseEntity<String> sendNewsletter(@PathVariable Long userId) {
+    public ResponseEntity<MessageResponse> sendNewsletter(@PathVariable Long userId) {
         try {
             // 뉴스레터를 신청한 사용자를 가져오기
             users user = userService.getUserById(userId);
@@ -179,7 +177,7 @@ public class UserController {
             // 뉴스레터를 구독하는 사용자인지 확인
             if (user.getNewsletterStatus() != 1) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("뉴스레터를 신청한 사용자만 발송 가능합니다.");
+                        .body(new MessageResponse("뉴스레터를 신청한 사용자만 발송 가능합니다."));
             }
 
             // 최신 트렌드 뉴스 4개 가져오기
@@ -188,9 +186,10 @@ public class UserController {
             // 이메일 발송
             emailService.sendNewsletter(user.getEmail(), trendingNews);
 
-            return ResponseEntity.ok("뉴스레터가 발송되었습니다.");
+            return ResponseEntity.ok(new MessageResponse("뉴스레터가 발송되었습니다."));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("사용자를 찾을 수 없습니다."));
         }
     }
 
