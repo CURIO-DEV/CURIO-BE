@@ -89,7 +89,7 @@ public class BookmarkController {
             @RequestBody NewsAddBookmarkDto requestDto
     ) {
         try {
-            bookmarkService.addNewsToBookmark(folderId, requestDto.getNewsId());
+            bookmarkService.addNewsToBookmark(folderId, requestDto.getArticleId());
             return ResponseEntity.ok(new MessageResponse("뉴스가 북마크에 추가되었습니다."));
         } catch (DuplicateNewsInBookmarkException e) {
             return ResponseEntity
