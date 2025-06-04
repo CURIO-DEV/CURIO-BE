@@ -46,11 +46,11 @@ public class Bookmark {
 
 
     @CreationTimestamp
-    @Column(name = "created_at")
+    @Column(name = "createdAt")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
+    @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 
     public void updateBookmark(String name, BookmarkColor color) {

@@ -61,11 +61,11 @@ public class News {
     private String sourceUrl;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @Column(name = "created_at")
+    @Column(name = "createdAt")
     private LocalDateTime createdAt;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @Column(name = "updated_at")
+    @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 
     // NewsWithCountsDto를 받는 생성자 추가
