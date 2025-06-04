@@ -11,6 +11,7 @@ import team.backend.curio.domain.News;
 import team.backend.curio.domain.users;
 import team.backend.curio.dto.BookmarkDTO.*;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
+import team.backend.curio.exception.DuplicateNewsInBookmarkException;
 import team.backend.curio.repository.UserRepository;
 import team.backend.curio.service.BookmarkService;
 
@@ -87,8 +88,14 @@ public class BookmarkController {
             @PathVariable Long folderId,
             @RequestBody NewsAddBookmarkDto requestDto
     ) {
-        bookmarkService.addNewsToBookmark(folderId, requestDto.getNewsId());
-        return ResponseEntity.ok(new MessageResponse("뉴스가 북마크에 추가되었습니다."));
+        try {
+            bookmarkService.addNewsToBookmark(folderId, requestDto.getNewsId());
+            return ResponseEntity.ok(new MessageResponse("뉴스가 북마크에 추가되었습니다."));
+        } catch (DuplicateNewsInBookmarkException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse(e.getMessage()));
+        }
     }
 
     // 북마크에  뉴스 삭제

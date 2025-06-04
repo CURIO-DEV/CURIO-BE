@@ -9,6 +9,7 @@ import team.backend.curio.dto.BookmarkDTO.BookmarkResponseDto;
 import team.backend.curio.domain.Bookmark;
 import team.backend.curio.domain.News;
 import team.backend.curio.domain.users;
+import team.backend.curio.exception.DuplicateNewsInBookmarkException;
 import team.backend.curio.repository.BookmarkRepository;
 import team.backend.curio.repository.NewsRepository;
 import team.backend.curio.repository.UserRepository;
@@ -125,6 +126,11 @@ public class BookmarkService {
                 .orElseThrow(() -> new RuntimeException("Bookmark not found"));
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new RuntimeException("News not found"));
+
+        // 이미 추가된 뉴스인지 확인
+        if (bookmark.getNewsList().contains(news)) {
+            throw new DuplicateNewsInBookmarkException("이미 추가된 뉴스입니다.");
+        }
 
         bookmark.addNews(news);
 
