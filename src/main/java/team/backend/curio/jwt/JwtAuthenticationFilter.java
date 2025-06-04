@@ -27,6 +27,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/search",
             "/articles/", // 시작 경로만 잡고 아래에서 상세 조건 처리
             "/swagger-ui.html", "/swagger-ui/**",
+            "/v3/api-docs",
+            "/v3/api-docs/**",
             "/v3/api-docs/**",
             "/auth/**",
             "/auth/kakao/callback",
