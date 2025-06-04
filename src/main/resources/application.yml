@@ -69,4 +69,8 @@ oauth:
     redirect-uri: http://localhost:8080/curio/api/auth/google/callback
 
 frontend:
-  redirect-url: http://localhost:3000/
+  redirect-url-local: http://localhost:3000/
+  redirect-url-prod: https://curi-o.site/
+
+jwt:
+  secret: ${JWT_SECRET}
