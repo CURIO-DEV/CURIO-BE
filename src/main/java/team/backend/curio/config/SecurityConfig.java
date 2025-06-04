@@ -30,7 +30,8 @@ public class SecurityConfig {
                                 "/search",
                                 "/articles/**", // 여기는 정규식이 안 되니까 wildcard 사용
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**",
+                                "/swagger-ui-custom.html",
+                                "/custom-api-docs",
                                 "/auth/**"
                         ).permitAll()
                         .anyRequest().authenticated()
