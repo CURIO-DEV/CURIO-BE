@@ -5,5 +5,5 @@ import lombok.Getter;
 @Getter
 
 public class NewsAddBookmarkDto {
-    private Long newsId;
+    private Long articleId;
 }
