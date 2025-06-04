@@ -177,6 +177,10 @@ public class NewsService {
         return newsRepository.searchByKeywords(keywords, pageable);
     }
 
+    public List<News> getNewsByInterestSortedByRecent(String category) {
+        return newsRepository.findByCategoryOrderByCreatedAtDesc(category);
+    }
+
     //[CurioGo] 사용자의 관심 카테고리를 기반으로 좋아요 수가 높은 뉴스 5개 조회
     public List<CurioGoNewsResponseDto> getCurioGoNewsByUserId(Long userId) {
         // 1. 유저 정보 조회

@@ -16,6 +16,7 @@ import team.backend.curio.service.NewsSummaryService;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/articles")  // api/articles로 경로 설정
@@ -31,6 +32,15 @@ public class ArticleController {
     public ResponseEntity<List<RelatedNewsResponse>> getRelatedNews(@PathVariable Long articleId) {
         List<RelatedNewsResponse> relatedNews = newsService.getRelatedNews(articleId);
         return ResponseEntity.ok(relatedNews);
+    }
+
+    // 해당 카테고리별 리스트 출력
+    @GetMapping("/interests")
+    public List<NewsResponseDto> getNewsByInterest(@RequestParam String category) {
+        return newsService.getNewsByInterestSortedByRecent(category)
+                .stream()
+                .map(NewsResponseDto::new)
+                .collect(Collectors.toList());
     }
 
     // 특정 뉴스의 헤드라인과 이미지 URL 조회

@@ -28,7 +28,7 @@ public class Bookmark {
     @Column(nullable=false)
     private BookmarkColor color;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "bookmark_members",  // 중간 테이블 이름
             joinColumns = @JoinColumn(name = "bookmark_id"),
@@ -36,7 +36,7 @@ public class Bookmark {
     )
     private List<users> members = new ArrayList<>();  // 유저 리스트
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "bookmark_news",  // 중간 테이블 이름
             joinColumns = @JoinColumn(name = "bookmark_id"),
