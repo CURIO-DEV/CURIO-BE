@@ -26,10 +26,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
-    private TrendsService trendsService; // TrendsService 주입
-    private EmailService emailService;
+    private final UserService userService;
+    private final TrendsService trendsService;
+    private final EmailService emailService;
+
+    public UserController(UserService userService, TrendsService trendsService, EmailService emailService) {
+        this.userService = userService;
+        this.trendsService = trendsService;
+        this.emailService = emailService;
+    }
 
     // 회원 가입
     @Operation(summary = "임시 회원 가입" /*,description = "새로운 유저를 등록합니다."*/)
