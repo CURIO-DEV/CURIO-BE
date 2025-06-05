@@ -115,26 +115,16 @@ public class UserController {
 
     // 사용자 설정 전체 수정
     @Operation(summary = "사용자의 커스텀 설정 전체 수정 (요약, 이메일, 카테고리, 폰트크기)")
-    @PatchMapping("/{userId}/settings")
-    public ResponseEntity<CustomSettingDto> updateUserCustomSettings(
-            @PathVariable Long userId,
-            @RequestBody CustomSettingDto customSettingDto
+    @PatchMapping("/settings")
+    public ResponseEntity<?> updateUserCustomSettings(
+            @RequestBody CustomSettingDto customSettingDto,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         try {
-            CustomSettingDto updated = userService.updateUserCustomSettings(userId, customSettingDto);
+            CustomSettingDto updated = userService.updateUserCustomSettings(userDetails.getUserId(), customSettingDto);
             return ResponseEntity.ok(updated);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
-
-    // summaryPreference 값을 short, medium, long으로 매핑하는 함수 추가
-    private String mapSummaryType(int summaryPreference) {
-        switch (summaryPreference) {
-            case 1: return "short";
-            case 2: return "medium";
-            case 3: return "long";
-            default: return "medium"; // 기본값은 "medium"으로 설정
         }
     }
 
