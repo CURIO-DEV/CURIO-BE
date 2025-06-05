@@ -95,9 +95,11 @@ public class UserController {
     }*/
 
     @Operation(summary = "사용자의 커스텀 설정 조회 (요약 선호도)")
-    @GetMapping("/{userId}/custom")
-    public ResponseEntity<CustomSettingDto> getUserCustomSettings(@PathVariable Long userId){
-        CustomSettingDto customSettingDto= userService.getUserCustomSettings(userId); // 유저 서비스 호출하여 데이터 가져오기
+    @GetMapping("/custom")
+    public ResponseEntity<CustomSettingDto> getUserCustomSettings(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        CustomSettingDto customSettingDto = userService.getUserCustomSettings(userDetails.getUserId());
         return ResponseEntity.ok(customSettingDto);
     }
 
