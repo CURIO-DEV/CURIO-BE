@@ -195,13 +195,15 @@ public class UserController {
     }
 
     @Operation(summary = "회원 탈퇴하기")
-    @DeleteMapping("/{userId}/delete")
-    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long authenticatedUserId = userDetails.getUserId();
+
         try {
-            userService.deleteUser(userId);  // 유저 삭제 서비스 호출
-            return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully");
+            userService.deleteUser(authenticatedUserId);
+            return ResponseEntity.status(HttpStatus.OK).body("회원 탈퇴가 완료되었습니다.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting user");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 탈퇴 중 오류가 발생했습니다.");
         }
     }
 }
