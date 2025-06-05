@@ -62,7 +62,7 @@ public class NewsService {
     }
 
     // 관심사 이름으로 뉴스 조회
-    public List<News> getNewsByInterest(String interestName) {
+    public List<News> getNewsByInterest(Long userId, String interestName) {
         return newsRepository.findByCategory(interestName);
     }
 

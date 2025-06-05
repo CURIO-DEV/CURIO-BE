@@ -62,14 +62,17 @@ public class UserController {
 
     // 회원 관심사 수정하기
     @Operation(summary = "관심 카테고리 설정 및 수정")
-    @PatchMapping("/{userId}/interests")
-    public ResponseEntity<UserInterestResponse> updateInterests(@PathVariable Long userId, @RequestBody List<String> interests) {
+    @PatchMapping("/interests")
+    public ResponseEntity<UserInterestResponse> updateInterests(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody List<String> interests
+    ) {
         if (interests == null || interests.size() != 4) {
-            return ResponseEntity.badRequest().build(); // 관심사는 4개여야 함
+            return ResponseEntity.badRequest().build();
         }
         try {
-            UserInterestResponse updatedInterests = userService.updateUserInterests(userId, interests);
-            return ResponseEntity.ok(updatedInterests);
+            UserInterestResponse updated = userService.updateUserInterests(userDetails.getUserId(), interests);
+            return ResponseEntity.ok(updated);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -80,12 +83,17 @@ public class UserController {
 
     // 유저의 관심사별 뉴스 목록 GET -> 유저아이디랑 관심사 이름 두개 필요
     @Operation(summary = "사용자의 특정 관심사 뉴스 목록 불러오기")
-    @GetMapping("{userId}/interests/{interestName}/news")
-    public List<NewsResponseDto> getNewsByInterest(@PathVariable int userId, @PathVariable String interestName) {
-        return newsService.getNewsByInterest(interestName)
+    @GetMapping("/interests/{interestName}/news")
+    public ResponseEntity<List<NewsResponseDto>> getNewsByInterest(
+            @PathVariable String interestName,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        List<NewsResponseDto> newsList = newsService.getNewsByInterest(userDetails.getUserId(), interestName)
                 .stream()
                 .map(NewsResponseDto::new)
                 .collect(Collectors.toList());
+
+        return ResponseEntity.ok(newsList);
     }
 
     // 유저의 관심사별 뉴스 목록 GET -> 유저아이디만 있으므로 4개 다 각각 출력
