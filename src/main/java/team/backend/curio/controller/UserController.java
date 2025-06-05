@@ -84,12 +84,12 @@ public class UserController {
     }
 
     // 유저의 관심사별 뉴스 목록 GET -> 유저아이디만 있으므로 4개 다 각각 출력
-    @Operation(summary = "사용자별 뉴스 목록 불러오기")
+    /*@Operation(summary = "사용자별 뉴스 목록 불러오기")
     @GetMapping("{userId}/interests/news")
     public ResponseEntity<List<InterestNewsResponseDto>> getInterestNews(@PathVariable Long userId) {
         List<InterestNewsResponseDto> response = newsService.getInterestNewsByUserId(userId);
         return ResponseEntity.ok(response);
-    }
+    }*/
 
     @Operation(summary = "사용자의 커스텀 설정 조회 (요약 선호도)")
     @GetMapping("/{userId}/custom")
