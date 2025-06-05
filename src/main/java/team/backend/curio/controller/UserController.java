@@ -6,6 +6,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import team.backend.curio.domain.users;
 import team.backend.curio.domain.News;
 import team.backend.curio.dto.BookmarkDTO.MessageResponse;
+import team.backend.curio.dto.CommonResponseDto;
 import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.dto.UserCreateDto;
@@ -196,14 +197,22 @@ public class UserController {
 
     @Operation(summary = "회원 탈퇴하기")
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<CommonResponseDto<String>> deleteUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new CommonResponseDto<>(false, "로그인/회원가입을 해주세요", null));
+        }
+
         Long authenticatedUserId = userDetails.getUserId();
 
         try {
             userService.deleteUser(authenticatedUserId);
-            return ResponseEntity.status(HttpStatus.OK).body("회원 탈퇴가 완료되었습니다.");
+            return ResponseEntity.ok(new CommonResponseDto<>(true, "회원 탈퇴가 완료되었습니다.", null));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 탈퇴 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CommonResponseDto<>(false, "회원 탈퇴 중 오류가 발생했습니다.", null));
         }
     }
 }
