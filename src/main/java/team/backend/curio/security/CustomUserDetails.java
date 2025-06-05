@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import team.backend.curio.domain.users;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
@@ -20,31 +21,46 @@ public class CustomUserDetails implements UserDetails {
         return user.getUserId();
     }
 
-    public users getUser() {
-        return user;
+    public String getEmail() {
+        return user.getEmail();
     }
 
+    // 필요하면 users 클래스에 더 추가 메서드 만들고 여기서 위임 가능
+
     @Override
-    public String getUsername() {
-        return user.getEmail(); // 보통 로그인 시 기준이 되는 이메일이나 닉네임을 리턴
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // 권한 정보가 따로 없으면 빈 리스트 반환
+        return Collections.emptyList();
     }
 
     @Override
     public String getPassword() {
-        return null; // 소셜 로그인만 쓴다면 null 또는 빈 문자열 처리
+        // 소셜 로그인이라 비밀번호 없으면 null 또는 빈 문자열
+        return null;
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 권한이 필요한 경우 이렇게
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    public String getUsername() {
+        return user.getEmail();
     }
 
-    // 그 외 true 반환
-    @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return true; }
-    @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return true; }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
-

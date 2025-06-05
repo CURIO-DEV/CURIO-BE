@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import team.backend.curio.domain.users;
 import team.backend.curio.repository.UserRepository;
+import team.backend.curio.security.CustomUserDetails;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,8 +39,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String email = jwtUtil.getEmail(token);
             users user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+            CustomUserDetails userDetails = new CustomUserDetails(user);
+
             UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(user, null, List.of()); // 필요 시 권한 추가
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
         filterChain.doFilter(request, response);
