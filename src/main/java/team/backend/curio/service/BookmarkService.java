@@ -74,13 +74,13 @@ public class BookmarkService {
 
     // 북마크 수정
     @Transactional
-    public Bookmark updateBookmark(Long bookmarkId, CreateBookmarkDto updateDto, String email) {
+    public Bookmark updateBookmark(Long bookmarkId, CreateBookmarkDto updateDto, Long userId) {
         Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
                 .orElseThrow(() -> new RuntimeException("Bookmark not found"));
 
         bookmark.updateBookmark(updateDto.getName(), updateDto.getColor());
 
-        users currentUser = userRepository.findByEmail(email)
+        users currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         bookmark.getMembers().clear();

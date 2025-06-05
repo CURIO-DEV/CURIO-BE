@@ -86,8 +86,8 @@ public class BookmarkController {
             @RequestBody CreateBookmarkDto updateDto,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        String email = userDetails.getEmail();
-        Bookmark updatedBookmark = bookmarkService.updateBookmark(bookmarkId, updateDto, email);
+        Long userId = userDetails.getUserId();
+        Bookmark updatedBookmark = bookmarkService.updateBookmark(bookmarkId, updateDto, userId);
 
         // 공동작업자 이메일 리스트 생성
         List<String> memberEmails = updatedBookmark.getMembers().stream()
