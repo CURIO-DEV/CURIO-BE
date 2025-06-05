@@ -16,6 +16,7 @@ import team.backend.curio.domain.users;
 import team.backend.curio.dto.BookmarkDTO.*;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.exception.DuplicateNewsInBookmarkException;
+import team.backend.curio.repository.BookmarkRepository;
 import team.backend.curio.repository.UserRepository;
 import team.backend.curio.security.CustomUserDetails;
 import team.backend.curio.service.BookmarkService;
@@ -33,11 +34,14 @@ public class BookmarkController {
 
     private final BookmarkService bookmarkService;
     private final UserRepository userRepository;
+    private final BookmarkRepository bookmarkRepository;
+
 
     @Autowired
-    public BookmarkController(BookmarkService bookmarkService, UserRepository userRepository) {
+    public BookmarkController(BookmarkService bookmarkService, UserRepository userRepository, BookmarkRepository bookmarkRepository) {
         this.bookmarkService = bookmarkService;
         this.userRepository = userRepository;
+        this.bookmarkRepository = bookmarkRepository;
     }
 
     private users getCurrentUser() {
@@ -169,24 +173,37 @@ public class BookmarkController {
     // 북마크에 뉴스 리스트 출력
     @Operation(summary = "북마크별 뉴스 리스트 출력")
     @GetMapping("/{folderId}/news")
-    /*public List<BookmarkNewsDto> getNewsByBookmark(@PathVariable("folderId") Long folderId) {
-        Bookmark bookmark = bookmarkService.getBookmarkById(folderId);
-        List<News> newsList = bookmark.getNewsList();
-
-        return newsList.stream()
-                .map(news -> new BookmarkNewsDto(news))
-                .collect(Collectors.toList());
-    }*/
-    public ResponseEntity<List<News>> getNewsListForBookmark(
-            @PathVariable Long id,
+    public ResponseEntity<?> getNewsListForBookmark(
+            @PathVariable Long folderId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        users currentUser = userRepository.findByEmail(userDetails.getEmail())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        try {
+            // 1. 액세스 토큰으로부터 userId 또는 email 바로 꺼내기
+            String userEmail = userDetails.getEmail();
 
-        List<News> newsList = bookmarkService.getNewsListForBookmark(currentUser, id);
-        return ResponseEntity.ok(newsList);
+            // 2. folderId로 북마크 가져오기
+            Bookmark bookmark = bookmarkRepository.findById(folderId)
+                    .orElseThrow(() -> new RuntimeException("북마크가 존재하지 않습니다."));
+
+            // 3. 북마크 참여자 이메일 리스트 가져오기 (users 객체 대신 이메일 비교)
+            boolean isMember = bookmark.getMembers().stream()
+                    .anyMatch(member -> member.getEmail().equals(userEmail));
+
+            if (!isMember) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "본인의 북마크가 아닙니다."));
+            }
+
+            // 4. 권한 확인 통과 시 뉴스 리스트 반환
+            List<News> newsList = bookmark.getNewsList();
+            return ResponseEntity.ok(newsList);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
     }
+
 
 }
 
