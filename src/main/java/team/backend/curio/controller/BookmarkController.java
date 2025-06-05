@@ -36,15 +36,6 @@ public class BookmarkController {
 
     // 북마크 폴더 생성
     @Operation(summary = "북마크 생성")
-    /*@PostMapping("/create")
-    public ResponseEntity<BookmarkResponseDto> createBookmark(
-            @RequestBody CreateBookmarkDto createBookmarkDto,  // 본문에 있는 JSON 파라미터
-            @RequestParam String email) {  // 쿼리 파라미터로 받는 email
-
-        // 서비스 메서드 호출
-        BookmarkResponseDto response = bookmarkService.createBookmark(createBookmarkDto, email);
-        return ResponseEntity.ok(response);
-    }*/
     @PostMapping("/create")
     public ResponseEntity<BookmarkResponseDto> createBookmark(
             @RequestBody CreateBookmarkDto createBookmarkDto,
@@ -57,29 +48,6 @@ public class BookmarkController {
 
     // 북마크 수정
     @Operation(summary = "북마크 정보 수정")
-    /*
-    @PatchMapping("/{bookmarkId}/update")
-    public ResponseEntity<BookmarkResponseDto> updateBookmark(
-            @PathVariable Long bookmarkId,
-            @RequestBody CreateBookmarkDto updateDto,
-            @RequestParam String email) {  // 이메일 파라미터 추가
-
-        Bookmark updatedBookmark = bookmarkService.updateBookmark(bookmarkId, updateDto, email); // 이메일 전달
-
-        // 공동작업자 이메일 리스트 생성
-        List<String> memberEmails = updatedBookmark.getMembers().stream()
-                .map(users -> users.getEmail())
-                .toList();
-
-        BookmarkResponseDto response = new BookmarkResponseDto(
-                updatedBookmark.getId(),
-                updatedBookmark.getName(),
-                updatedBookmark.getColor(),
-                memberEmails
-        );
-
-        return ResponseEntity.ok(response);
-    }*/
     @PatchMapping("/{bookmarkId}/update")
     public ResponseEntity<BookmarkResponseDto> updateBookmark(
             @PathVariable Long bookmarkId,
@@ -146,23 +114,6 @@ public class BookmarkController {
 
     // 북마크 목록 출력
     @Operation(summary = "특정 유저의 북마크 목록 출력")
-    /*@GetMapping("/{userId}/list")
-    public ResponseEntity<List<BookmarkResponseDto>> getBookmarksByUser(@PathVariable Long userId) {
-        users user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        List<Bookmark> bookmarks = user.getBookmarks(); // 또는 서비스로 분리 가능
-
-        List<BookmarkResponseDto> result = bookmarks.stream()
-                .map(bookmark -> new BookmarkResponseDto(
-                        bookmark.getId(),
-                        bookmark.getName(),
-                        bookmark.getColor(),
-                        bookmark.getMembers().stream().map(users::getEmail).toList()
-                )).toList();
-
-        return ResponseEntity.ok(result);
-    }*/
     @GetMapping("/list")
     public ResponseEntity<List<BookmarkResponseDto>>
     getBookmarksByUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
