@@ -88,7 +88,7 @@ public class UserController {
             @PathVariable String interestName,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        List<NewsResponseDto> newsList = newsService.getNewsByInterest(userDetails.getUserId(), interestName)
+        List<NewsResponseDto> newsList = newsService.getNewsByInterestSortedByRecent(interestName)
                 .stream()
                 .map(NewsResponseDto::new)
                 .collect(Collectors.toList());
