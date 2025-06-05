@@ -37,12 +37,12 @@ public class UserController {
     }
 
     // 회원 가입
-    @Operation(summary = "임시 회원 가입" /*,description = "새로운 유저를 등록합니다."*/)
+    /* @Operation(summary = "임시 회원 가입" )
     @PostMapping("/userCreate")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponseDto createUser(@RequestBody UserCreateDto userCreateDto) {
         return userService.createUser(userCreateDto);
-    }
+    }*/
 
     @Operation(summary = "관심 카테고리 불러오기")
     @GetMapping("/{userId}/interests")
