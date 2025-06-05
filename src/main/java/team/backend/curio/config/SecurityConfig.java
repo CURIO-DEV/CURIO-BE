@@ -28,12 +28,14 @@ public class SecurityConfig {
                                 "/trends/keywords",
                                 "/trends/popular-articles",
                                 "/search",
-                                "/articles/**", // 여기는 정규식이 안 되니까 wildcard 사용
+                                "/articles/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui-custom.html",
                                 "/custom-api-docs",
-                                "/curio/api/swagger-ui/**",
-                                "/curio/api/v3/api-docs/**",
+                                "/custom-api-docs/**",
+                                "/v3/api-docs/**",
+                                "/curio/api/swagger-ui-custom.html",
+                                "/curio/api/custom-api-docs/**",
                                 "/auth/**"
                         ).permitAll()
                         .anyRequest().authenticated()
