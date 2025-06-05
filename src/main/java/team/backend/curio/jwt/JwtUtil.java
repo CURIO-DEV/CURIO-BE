@@ -31,7 +31,7 @@ public class JwtUtil {
         return createToken(user, REFRESH_EXP);
     }
 
-    private String createToken(users user, long exp) {
+    public String createToken(users user, long exp) {
         Claims claims = Jwts.claims().setSubject(user.getEmail());
         claims.put("userId", user.getUserId());
         claims.put("nickname", user.getNickname());
@@ -43,6 +43,10 @@ public class JwtUtil {
                 .setExpiration(new Date(now.getTime() + exp))
                 .signWith(SignatureAlgorithm.HS256, secretKey.getBytes())
                 .compact();
+    }
+
+    public String createToken(users user) {
+        return createToken(user, ACCESS_EXP); // 기본값: Access Token 만료시간
     }
 
     public boolean validateToken(String token) {

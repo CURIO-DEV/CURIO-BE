@@ -11,7 +11,8 @@ import team.backend.curio.client.GoogleOAuthClient;
 import team.backend.curio.domain.users;
 import team.backend.curio.dto.authlogin.SocialLoginResponseDto;
 import team.backend.curio.dto.authlogin.OAuthUserInfo;
-import team.backend.curio.jwt.JwtTokenProvider;
+// import team.backend.curio.jwt.JwtTokenProvider;
+import team.backend.curio.jwt.JwtUtil;
 import team.backend.curio.repository.UserRepository;
 import team.backend.curio.service.AuthService;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +30,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final KakaoOAuthClient kakaoOAuthClient;
     private final GoogleOAuthClient googleOAuthClient;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtUtil jwtUtil;
 
     @Value("${frontend.redirect-url}")
     private String frontendRedirectUrl;
@@ -45,7 +46,7 @@ public class AuthController {
 
         users user = authService.findOrCreateKakaoUser(userInfo); // users 엔티티 리턴하도록 수정
 
-        String token = jwtTokenProvider.createToken(user); // JWT 생성
+        String token = jwtUtil.createToken(user);
 
         // 수정: Referer 대신 serverName과 port 사용
         String serverName = request.getServerName(); // ex: localhost, curi-o.site
@@ -80,7 +81,7 @@ public class AuthController {
 
         users user = authService.findOrCreateGoogleUser(userInfo);
 
-        String token = jwtTokenProvider.createToken(user);
+        String token = jwtUtil.createToken(user);
 
         // 수정: Referer 대신 serverName과 port 사용
         String serverName = request.getServerName(); // ex: localhost, curi-o.site

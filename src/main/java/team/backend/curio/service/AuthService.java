@@ -35,7 +35,7 @@ public class AuthService {
     }
 
     // 기존 로직 유지
-    private users findOrCreateKakaoUser(OAuthUserInfo kakaoUser) {
+    public users findOrCreateKakaoUser(OAuthUserInfo kakaoUser) {
         return userRepository.findByEmail(kakaoUser.getEmail())
                 .orElseGet(() -> {
                     users newUser = users.builder()
@@ -48,7 +48,7 @@ public class AuthService {
                 });
     }
 
-    private users findOrCreateGoogleUser(OAuthUserInfo googleUser) {
+    public users findOrCreateGoogleUser(OAuthUserInfo googleUser) {
         return userRepository.findByEmail(googleUser.getEmail())
                 .orElseGet(() -> {
                     users newUser = users.builder()
