@@ -7,11 +7,11 @@ import team.backend.curio.client.KakaoOAuthClient;
 import team.backend.curio.domain.RefreshToken;
 import team.backend.curio.domain.users;
 import team.backend.curio.dto.UserDTO.TokenResponse;
-import team.backend.curio.dto.authlogin.SocialLoginResponseDto;
 import team.backend.curio.dto.authlogin.OAuthUserInfo;
 import team.backend.curio.jwt.JwtUtil;
 import team.backend.curio.repository.RefreshTokenRepository;
 import team.backend.curio.repository.UserRepository;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -21,6 +21,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final NicknameService nicknameService;
+
 
     // 카카오 로그인 후 토큰 발급
     public TokenResponse loginWithKakao(OAuthUserInfo kakaoUser) {
@@ -38,9 +40,10 @@ public class AuthService {
     public users findOrCreateKakaoUser(OAuthUserInfo kakaoUser) {
         return userRepository.findByEmail(kakaoUser.getEmail())
                 .orElseGet(() -> {
+
                     users newUser = users.builder()
                             .email(kakaoUser.getEmail())
-                            .nickname(kakaoUser.getNickname())
+                            .nickname(nicknameService.generateNickname()) //자동 생성 닉네임
                             .profile_image_url(kakaoUser.getProfileImage())
                             .socialType(1)
                             .build();
@@ -51,9 +54,10 @@ public class AuthService {
     public users findOrCreateGoogleUser(OAuthUserInfo googleUser) {
         return userRepository.findByEmail(googleUser.getEmail())
                 .orElseGet(() -> {
+
                     users newUser = users.builder()
                             .email(googleUser.getEmail())
-                            .nickname(googleUser.getNickname())
+                            .nickname(nicknameService.generateNickname())
                             .profile_image_url(googleUser.getProfileImage())
                             .socialType(2)
                             .build();
