@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -98,31 +99,43 @@ public class BookmarkController {
 
     // 북마크에 뉴스 추가
     @Operation(summary = "북마크에 뉴스 추가하기")
-    @PostMapping("/{folderId}/news/add")
-    public ResponseEntity<?> addNewsToBookmark(
+    @PostMapping("/{folderId}/news/{newsId}")
+    public ResponseEntity<String> addNewsToBookmark(
             @PathVariable Long folderId,
-            @RequestBody NewsAddBookmarkDto requestDto
+            @PathVariable Long newsId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
+        users currentUser = userRepository.findByEmail(userDetails.getEmail())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
         try {
-            bookmarkService.addNewsToBookmark(folderId, requestDto.getArticleId());
-            return ResponseEntity.ok(new MessageResponse("뉴스가 북마크에 추가되었습니다."));
+            bookmarkService.addNewsToBookmark(folderId, newsId, currentUser);
+            return ResponseEntity.ok("뉴스가 북마크에 추가되었습니다.");
         } catch (DuplicateNewsInBookmarkException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
     }
 
 
     // 북마크에  뉴스 삭제
     @Operation(summary = "북마크에 있는 뉴스 삭제하기")
-    @DeleteMapping("/{folderId}/news/{newsId}/remove")
-    public ResponseEntity<?> removeNewsFromBookmark(
+    @DeleteMapping("/{folderId}/news/{newsId}")
+    public ResponseEntity<String> removeNewsFromBookmark(
             @PathVariable Long folderId,
-            @PathVariable Long newsId
+            @PathVariable Long newsId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        bookmarkService.removeNewsFromBookmark(folderId, newsId);
-        return ResponseEntity.ok(new MessageResponse("뉴스가 북마크에서 삭제되었습니다."));
+        users currentUser = userRepository.findByEmail(userDetails.getEmail())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        try {
+            bookmarkService.removeNewsFromBookmark(folderId, newsId, currentUser);
+            return ResponseEntity.ok("뉴스가 북마크에서 삭제되었습니다.");
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
     }
 
     // 북마크 목록 출력

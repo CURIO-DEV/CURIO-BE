@@ -122,45 +122,39 @@ public class BookmarkService {
     }
 
     // 북마크에 뉴스 추가
-    public void addNewsToBookmark(Long folderId, Long newsId) {
+    public void addNewsToBookmark(Long folderId, Long newsId, users user) {
         Bookmark bookmark = bookmarkRepository.findById(folderId)
-                .orElseThrow(() -> new RuntimeException("Bookmark not found"));
-        News news = newsRepository.findById(newsId)
-                .orElseThrow(() -> new RuntimeException("News not found"));
+                .orElseThrow(() -> new RuntimeException("북마크가 존재하지 않습니다."));
 
-        // 이미 추가된 뉴스인지 확인
-        if (bookmark.getNewsList().contains(news)) {
-            throw new DuplicateNewsInBookmarkException("이미 추가된 뉴스입니다.");
+        if (!bookmark.getMembers().contains(user)) {
+            throw new AccessDeniedException("본인의 북마크가 아닙니다.");
         }
 
-        bookmark.addNews(news);
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new RuntimeException("뉴스가 존재하지 않습니다."));
 
-        // 저장 수 증가
-        news.setSaveCount(news.getSaveCount() + 1);
+        if (bookmark.getNewsList().contains(news)) {
+            throw new DuplicateNewsInBookmarkException("이미 북마크에 추가된 뉴스입니다.");
+        }
 
-        // 저장
+        bookmark.getNewsList().add(news);
         bookmarkRepository.save(bookmark);
-        newsRepository.save(news);
     }
 
     // 북마크에서 뉴스 삭제
-    public void removeNewsFromBookmark(Long folderId, Long newsId) {
+    public void removeNewsFromBookmark(Long folderId, Long newsId, users user) {
         Bookmark bookmark = bookmarkRepository.findById(folderId)
-                .orElseThrow(() -> new RuntimeException("Bookmark not found"));
-        News news = newsRepository.findById(newsId)
-                .orElseThrow(() -> new RuntimeException("News not found"));
+                .orElseThrow(() -> new RuntimeException("북마크가 존재하지 않습니다."));
 
-        bookmark.removeNews(news);
-
-        // 저장 수 감소 (0 이하로는 내려가지 않게 처리)
-        int currentSaveCount = news.getSaveCount();
-        if (currentSaveCount > 0) {
-            news.setSaveCount(currentSaveCount - 1);
+        if (!bookmark.getMembers().contains(user)) {
+            throw new AccessDeniedException("본인의 북마크가 아닙니다.");
         }
 
-        // 저장
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new RuntimeException("뉴스가 존재하지 않습니다."));
+
+        bookmark.getNewsList().remove(news);
         bookmarkRepository.save(bookmark);
-        newsRepository.save(news);
     }
 
 
