@@ -103,7 +103,7 @@ public class AuthController {
         return ResponseEntity.ok(tokenResponse); // JSON 응답
     }
 
-    @Operation(summary = "카카오로그인 사용자 정보 조회")
+    @Operation(summary = "구글로그인 사용자 정보 조회")
     @GetMapping("/google/userinfo")
     public ResponseEntity<List<users>> getGoogleUsers() {
         List<users> googleUsers = userRepository.findBySocialType(2);
