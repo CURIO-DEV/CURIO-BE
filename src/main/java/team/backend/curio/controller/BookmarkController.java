@@ -22,6 +22,8 @@ import team.backend.curio.service.BookmarkService;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static team.backend.curio.domain.QBookmark.bookmark;
+
 
 @RestController
 @RequestMapping("/bookmarks")
@@ -111,6 +113,7 @@ public class BookmarkController {
         }
     }
 
+
     // 북마크에  뉴스 삭제
     @Operation(summary = "북마크에 있는 뉴스 삭제하기")
     @DeleteMapping("/{folderId}/news/{newsId}/remove")
@@ -157,13 +160,16 @@ public class BookmarkController {
                 .map(news -> new BookmarkNewsDto(news))
                 .collect(Collectors.toList());
     }*/
-    public List<BookmarkNewsDto> getNewsByBookmark(@PathVariable("folderId") Long folderId) {
-        users user = getCurrentUser();
-        List<News> newsList = bookmarkService.getNewsListForBookmark(user, folderId);
+    public ResponseEntity<List<News>> getNewsListForBookmark(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        users currentUser = userRepository.findByEmail(userDetails.getEmail())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        return newsList.stream()
-                .map(BookmarkNewsDto::new)
-                .collect(Collectors.toList());
+        List<News> newsList = bookmarkService.getNewsListForBookmark(currentUser, id);
+        return ResponseEntity.ok(newsList);
     }
+
 }
 

@@ -2,6 +2,7 @@ package team.backend.curio.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import team.backend.curio.dto.BookmarkDTO.CreateBookmarkDto;
@@ -164,17 +165,6 @@ public class BookmarkService {
 
 
     // 북마크 리스트
-    /*public List<Bookmark> getAllBookmarks(String email) {
-        users users = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
-
-        return bookmarkRepository.findAllByMembersContaining(users);    }
-
-    public Bookmark getBookmarkById(Long id) {
-        return bookmarkRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Bookmark not found"));
-    }*/
-
     public List<News> getNewsListForBookmark(users user, Long folderId) {
         Bookmark bookmark = bookmarkRepository.findById(folderId)
                 .orElseThrow(() -> new RuntimeException("북마크가 존재하지 않습니다."));
