@@ -32,6 +32,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui-custom.html",
                                 "/custom-api-docs",
+                                "/curio/api/swagger-ui/**",
+                                "/curio/api/v3/api-docs/**",
                                 "/auth/**"
                         ).permitAll()
                         .anyRequest().authenticated()
