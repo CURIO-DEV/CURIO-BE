@@ -25,6 +25,16 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
+    public String getUsername() {
+        return user.getEmail(); // 보통 로그인 시 기준이 되는 이메일이나 닉네임을 리턴
+    }
+
+    @Override
+    public String getPassword() {
+        return null; // 소셜 로그인만 쓴다면 null 또는 빈 문자열 처리
+    }
+
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 권한이 필요한 경우 이렇게
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
