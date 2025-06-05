@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import team.backend.curio.domain.Bookmark;
@@ -77,10 +79,13 @@ public class BookmarkController {
     @Operation(summary = "내 북마크에서만 나가기")
     @DeleteMapping("/{bookmarkId}/delete")
     public ResponseEntity<MessageResponse> leaveBookmark(
-            @PathVariable Long bookmarkId,
-            @RequestParam String email
+            @PathVariable Long bookmarkId
     ) {
-        bookmarkService.deleteBookmarkForUser(bookmarkId, email);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        users user = (users) authentication.getPrincipal();
+
+        bookmarkService.deleteBookmarkForUser(bookmarkId, user.getEmail());
         return ResponseEntity.ok(new MessageResponse("해당 북마크를 목록에서 삭제했습니다."));
     }
 
