@@ -164,7 +164,7 @@ public class BookmarkService {
 
 
     // 북마크 리스트
-    public List<Bookmark> getAllBookmarks(String email) {
+    /*public List<Bookmark> getAllBookmarks(String email) {
         users users = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
 
@@ -173,6 +173,17 @@ public class BookmarkService {
     public Bookmark getBookmarkById(Long id) {
         return bookmarkRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Bookmark not found"));
+    }*/
+
+    public List<News> getNewsListForBookmark(users user, Long folderId) {
+        Bookmark bookmark = bookmarkRepository.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("북마크가 존재하지 않습니다."));
+
+        if (!bookmark.getMembers().contains(user)) {
+            throw new RuntimeException("본인의 북마크가 아닙니다.");
+        }
+
+        return bookmark.getNewsList();
     }
 
 }

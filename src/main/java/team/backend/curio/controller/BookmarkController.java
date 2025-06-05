@@ -36,6 +36,11 @@ public class BookmarkController {
         this.userRepository = userRepository;
     }
 
+    private users getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (users) authentication.getPrincipal();
+    }
+
     // 북마크 폴더 생성
     @Operation(summary = "북마크 생성")
     @PostMapping("/create")
@@ -144,12 +149,20 @@ public class BookmarkController {
     // 북마크에 뉴스 리스트 출력
     @Operation(summary = "북마크별 뉴스 리스트 출력")
     @GetMapping("/{folderId}/news")
-    public List<BookmarkNewsDto> getNewsByBookmark(@PathVariable("folderId") Long folderId) {
+    /*public List<BookmarkNewsDto> getNewsByBookmark(@PathVariable("folderId") Long folderId) {
         Bookmark bookmark = bookmarkService.getBookmarkById(folderId);
         List<News> newsList = bookmark.getNewsList();
 
         return newsList.stream()
                 .map(news -> new BookmarkNewsDto(news))
+                .collect(Collectors.toList());
+    }*/
+    public List<BookmarkNewsDto> getNewsByBookmark(@PathVariable("folderId") Long folderId) {
+        users user = getCurrentUser();
+        List<News> newsList = bookmarkService.getNewsListForBookmark(user, folderId);
+
+        return newsList.stream()
+                .map(BookmarkNewsDto::new)
                 .collect(Collectors.toList());
     }
 }
