@@ -2,6 +2,7 @@ package team.backend.curio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import team.backend.curio.domain.users;
 import team.backend.curio.domain.News;
 import team.backend.curio.dto.BookmarkDTO.MessageResponse;
@@ -10,6 +11,7 @@ import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.dto.UserCreateDto;
 import team.backend.curio.dto.CustomSettingDto;
 import team.backend.curio.dto.UserDTO.UserInterestResponse;
+import team.backend.curio.security.CustomUserDetails;
 import team.backend.curio.service.UserService;
 import team.backend.curio.service.NewsService;
 import team.backend.curio.service.EmailService;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -125,18 +128,18 @@ public class UserController {
 
     // 사용자 프로필 조회 (닉네임과 프로필 사진)
     @Operation(summary = "사용자 프로필 조회 (닉네임, 프로필 사진)")
-    @GetMapping("/{userId}/profile")
-    public ResponseEntity<?> getUserProfile(@PathVariable Long userId) {
-        // 사용자 조회
-        users user = userService.getUserById(userId); // userService에서 사용자 정보 조회
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        users user = userService.getUserById(userDetails.getUserId());
+
         if (user == null) {
-            return ResponseEntity.status(404).body("User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
-        // 닉네임과 프로필 이미지 URL을 응답
-        return ResponseEntity.ok(new Object() {
-            public final String nickname = user.getNickname();
-            public final String profile_image_url = user.getProfile_image_url();
-        });
+
+        return ResponseEntity.ok(Map.of(
+                "nickname", user.getNickname(),
+                "profile_image_url", user.getProfile_image_url()
+        ));
     }
 
     // 뉴스레터 수신 여부 설정 (가입된 회원만)
