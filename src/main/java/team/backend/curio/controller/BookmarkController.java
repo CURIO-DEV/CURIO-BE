@@ -21,6 +21,7 @@ import team.backend.curio.security.CustomUserDetails;
 import team.backend.curio.service.BookmarkService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static team.backend.curio.domain.QBookmark.bookmark;
@@ -100,7 +101,7 @@ public class BookmarkController {
     // 북마크에 뉴스 추가
     @Operation(summary = "북마크에 뉴스 추가하기")
     @PostMapping("/{folderId}/news/{newsId}")
-    public ResponseEntity<String> addNewsToBookmark(
+    public ResponseEntity<Map<String, String>> addNewsToBookmark(
             @PathVariable Long folderId,
             @PathVariable Long newsId,
             @AuthenticationPrincipal CustomUserDetails userDetails
@@ -110,11 +111,13 @@ public class BookmarkController {
 
         try {
             bookmarkService.addNewsToBookmark(folderId, newsId, currentUser);
-            return ResponseEntity.ok("뉴스가 북마크에 추가되었습니다.");
+            return ResponseEntity.ok(Map.of("message", "뉴스가 북마크에 추가되었습니다."));
         } catch (DuplicateNewsInBookmarkException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", e.getMessage()));
         } catch (AccessDeniedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", e.getMessage()));
         }
     }
 
@@ -122,7 +125,7 @@ public class BookmarkController {
     // 북마크에  뉴스 삭제
     @Operation(summary = "북마크에 있는 뉴스 삭제하기")
     @DeleteMapping("/{folderId}/news/{newsId}")
-    public ResponseEntity<String> removeNewsFromBookmark(
+    public ResponseEntity<Map<String, String>> removeNewsFromBookmark(
             @PathVariable Long folderId,
             @PathVariable Long newsId,
             @AuthenticationPrincipal CustomUserDetails userDetails
@@ -132,9 +135,10 @@ public class BookmarkController {
 
         try {
             bookmarkService.removeNewsFromBookmark(folderId, newsId, currentUser);
-            return ResponseEntity.ok("뉴스가 북마크에서 삭제되었습니다.");
+            return ResponseEntity.ok(Map.of("message", "뉴스가 북마크에서 삭제되었습니다."));
         } catch (AccessDeniedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", e.getMessage()));
         }
     }
 
