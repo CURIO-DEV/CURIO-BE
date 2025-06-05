@@ -90,29 +90,17 @@ public class AuthController {
     @Operation(summary ="구글 소셜로그인 callback")
     @GetMapping("/google/callback")
     public ResponseEntity<?> googleCallback(@RequestParam String code, HttpServletRequest request) {
-        // 1. 받은 code로 access_token 요청
         String accessToken = googleOAuthClient.getAccessToken(code);
-
-        // 2. access_token으로 사용자 정보 요청
         OAuthUserInfo userInfo = googleOAuthClient.getUserInfo(accessToken);
 
         users user = authService.findOrCreateGoogleUser(userInfo);
 
-        String token = jwtUtil.createToken(user);
+        // Access & Refresh Token 생성
+        String accessJwt = jwtUtil.createAccessToken(user);
+        String refreshJwt = jwtUtil.createRefreshToken(user);
 
-        // 수정: Referer 대신 serverName과 port 사용
-        String serverName = request.getServerName(); // ex: localhost, curi-o.site
-        int port = request.getServerPort();          // ex: 8080
-        boolean isLocal = serverName.equals("localhost") && port == 8080;
-
-        // 환경에 따라 리다이렉트 주소 분기 , 프론트로 리다이렉트 URL 생성
-        String baseRedirectUrl = isLocal ? "http://localhost:3000" : "https://curi-o.site";
-        String redirectUrl = baseRedirectUrl + "?token=" + token;
-
-        // 5. 302 리다이렉트 응답
-        return ResponseEntity.status(302)
-                .header("Location", redirectUrl)
-                .build();
+        TokenResponse tokenResponse = new TokenResponse(accessJwt, refreshJwt);
+        return ResponseEntity.ok(tokenResponse); // JSON 응답
     }
 
     @Operation(summary = "카카오로그인 사용자 정보 조회")
