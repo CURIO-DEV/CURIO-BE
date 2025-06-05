@@ -25,7 +25,7 @@ public class NicknameService {
         headers.setBearerAuth(apiKey);
 
         // GPT에게 보낼 메시지
-        String prompt = "형용사 + 명사 형태의 자연스럽고 유쾌한 한글 닉네임 하나만 생성해줘. 예: 귀여운 고양이, 불타는 치즈볼";
+        String prompt = "형용사 + 명사 형태의 자연스럽고 창의적인 한글 닉네임 하나만 생성해줘. 예: 귀여운 고양이, 불타는 치즈볼 단, 위 예시 단어들을 그대로 사용하지 말고, 새로운 단어로 구성해줘.";
 
         JSONObject message = new JSONObject();
         message.put("role", "user");
@@ -34,7 +34,7 @@ public class NicknameService {
         JSONObject body = new JSONObject();
         body.put("model", "gpt-4o");
         body.put("messages", new org.json.JSONArray().put(message));
-        body.put("temperature", 0.8); // 다양성 조절
+        body.put("temperature", 0.9); // 다양성 조절
 
         HttpEntity<String> entity = new HttpEntity<>(body.toString(), headers);
 
