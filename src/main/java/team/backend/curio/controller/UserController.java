@@ -48,10 +48,12 @@ public class UserController {
     }*/
 
     @Operation(summary = "관심 카테고리 불러오기")
-    @GetMapping("/{userId}/interests")
-    public ResponseEntity<UserInterestResponse> getInterests(@PathVariable Long userId) {
+    @GetMapping("/interests")
+    public ResponseEntity<UserInterestResponse> getInterests(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
         try {
-            UserInterestResponse response = userService.getUserInterests(userId);
+            UserInterestResponse response = userService.getUserInterests(userDetails.getUserId());
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
