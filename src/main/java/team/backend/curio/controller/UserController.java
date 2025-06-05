@@ -146,22 +146,16 @@ public class UserController {
 
     // 뉴스레터 수신 여부 설정 (가입된 회원만)
     @Operation(summary = "뉴스레터 신청")
-    @PatchMapping("/{userId}/newsletter/subscribe")
+    @PatchMapping("/newsletter/subscribe")
     public ResponseEntity<MessageResponse> updateNewsletterSubscription(
-            @PathVariable Long userId) {
-
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
         try {
-            // 유효한 사용자인지 확인
-            users user = userService.getUserById(userId); // 유저 정보 조회
-
-            // 유저가 가입된 사용자라면 뉴스레터 상태를 업데이트
-            user.setNewsletterStatus(1); // 1: 구독, 0: 구독 취소
-            userService.save(user); // DB에 저장
-
-            // 성공적으로 업데이트한 후 응답
+            users user = userService.getUserById(userDetails.getUserId());
+            user.setNewsletterStatus(1);
+            userService.save(user);
             return ResponseEntity.ok(new MessageResponse("뉴스레터가 신청되었습니다."));
         } catch (IllegalArgumentException e) {
-            // 유저가 존재하지 않으면 404 반환
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new MessageResponse("사용자를 찾을 수 없습니다."));
         }
@@ -178,22 +172,19 @@ public class UserController {
 
     // 뉴스레터 발송 기능
     @Operation(summary = "뉴스레터 발송")
-    @PatchMapping("/{userId}/newsletter/send")
-    public ResponseEntity<MessageResponse> sendNewsletter(@PathVariable Long userId) {
+    @PatchMapping("/newsletter/send")
+    public ResponseEntity<MessageResponse> sendNewsletter(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
         try {
-            // 뉴스레터를 신청한 사용자를 가져오기
-            users user = userService.getUserById(userId);
+            users user = userService.getUserById(userDetails.getUserId());
 
-            // 뉴스레터를 구독하는 사용자인지 확인
             if (user.getNewsletterStatus() != 1) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new MessageResponse("뉴스레터를 신청한 사용자만 발송 가능합니다."));
             }
 
-            // 최신 트렌드 뉴스 4개 가져오기
-            List<News> trendingNews = getTrendingNews(); // 여기서 실제 API로부터 뉴스 데이터를 가져옵니다.
-
-            // 이메일 발송
+            List<News> trendingNews = getTrendingNews();
             emailService.sendNewsletter(user.getEmail(), trendingNews);
 
             return ResponseEntity.ok(new MessageResponse("뉴스레터가 발송되었습니다."));
