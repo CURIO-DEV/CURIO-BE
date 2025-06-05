@@ -91,15 +91,22 @@ public class BookmarkController {
     // 북마크 삭제
     @Operation(summary = "내 북마크에서만 나가기")
     @DeleteMapping("/{bookmarkId}/delete")
-    public ResponseEntity<MessageResponse> leaveBookmark(
-            @PathVariable Long bookmarkId
+    public ResponseEntity<?> leaveBookmark(
+            @PathVariable Long bookmarkId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
+        String userEmail = userDetails.getEmail();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        users user = (users) authentication.getPrincipal();
-
-        bookmarkService.deleteBookmarkForUser(bookmarkId, user.getEmail());
-        return ResponseEntity.ok(new MessageResponse("해당 북마크를 목록에서 삭제했습니다."));
+        try {
+            bookmarkService.deleteBookmarkForUser(bookmarkId, userEmail);
+            return ResponseEntity.ok(new MessageResponse("해당 북마크를 목록에서 삭제했습니다."));
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
     }
 
     // 북마크에 뉴스 추가

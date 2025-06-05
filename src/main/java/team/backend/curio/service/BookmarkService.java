@@ -104,16 +104,20 @@ public class BookmarkService {
         Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
                 .orElseThrow(() -> new RuntimeException("북마크를 찾을 수 없습니다."));
 
-        users users = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다 : " +email ));
+        users user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다: " + email));
 
-        if (!bookmark.getMembers().contains(users)) {
-            throw new RuntimeException("User is not a member of this bookmark");
+        // 소속된 사용자만 삭제 가능
+        boolean isMember = bookmark.getMembers().stream()
+                .anyMatch(member -> member.getEmail().equals(email));
+
+        if (!isMember) {
+            throw new AccessDeniedException("본인의 북마크가 아닙니다.");
         }
 
-        bookmark.removeMember(users);
+        bookmark.removeMember(user);
 
-        // 멤버가 없으면 북마크 삭제
+        // 멤버가 아예 없으면 북마크도 제거
         if (bookmark.getMembers().isEmpty()) {
             bookmarkRepository.delete(bookmark);
         } else {
