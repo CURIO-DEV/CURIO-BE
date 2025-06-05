@@ -14,6 +14,7 @@ import team.backend.curio.dto.BookmarkDTO.*;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.exception.DuplicateNewsInBookmarkException;
 import team.backend.curio.repository.UserRepository;
+import team.backend.curio.security.CustomUserDetails;
 import team.backend.curio.service.BookmarkService;
 
 import java.util.List;
@@ -49,8 +50,8 @@ public class BookmarkController {
             @RequestBody CreateBookmarkDto createBookmarkDto,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        String email = userDetails.getEmail();
-        BookmarkResponseDto response = bookmarkService.createBookmark(createBookmarkDto, email);
+        Long userId = userDetails.getUserId();
+        BookmarkResponseDto response = bookmarkService.createBookmark(createBookmarkDto, userId);
         return ResponseEntity.ok(response);
     }
 

@@ -33,15 +33,15 @@ public class BookmarkService {
     }
 
     // 북마크 생성
-    public BookmarkResponseDto createBookmark(CreateBookmarkDto createBookmarkDto, String email) {
+    public BookmarkResponseDto createBookmark(CreateBookmarkDto createBookmarkDto, Long userId) {
         // 북마크 생성
         Bookmark bookmark = new Bookmark();
         bookmark.setName(createBookmarkDto.getName());
         bookmark.setColor(createBookmarkDto.getColor());
 
-        // 현재 유저 찾기
-        users currentUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("현재 유저를 찾을 수 없습니다."));
+        // 현재 유저 찾기 : 아이디로
+        users currentUser = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("현재 유저를 찾을 수 없습니다."));
 
         // 북마크에 현재 유저 추가
         bookmark.getMembers().add(currentUser);
