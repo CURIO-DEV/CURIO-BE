@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import team.backend.curio.client.KakaoOAuthClient;
 import team.backend.curio.client.GoogleOAuthClient;
 import team.backend.curio.domain.users;
+import team.backend.curio.dto.UserDTO.TokenResponse;
 import team.backend.curio.dto.authlogin.SocialLoginResponseDto;
 import team.backend.curio.dto.authlogin.OAuthUserInfo;
 // import team.backend.curio.jwt.JwtTokenProvider;
@@ -35,7 +36,7 @@ public class AuthController {
     @Value("${frontend.redirect-url}")
     private String frontendRedirectUrl;
   
-    @Operation(summary = "카카오 소셜로그인 callback")
+    /*@Operation(summary = "카카오 소셜로그인 callback")
     @GetMapping("/kakao/callback")
     public ResponseEntity<SocialLoginResponseDto> kakaoCallback(@RequestParam String code, HttpServletRequest request) {
         // 1. 받은 code로 access_token 요청
@@ -61,6 +62,22 @@ public class AuthController {
         return ResponseEntity.status(302)
                 .header("Location",redirectUrl)
                 .build();
+    }*/
+
+    @Operation(summary = "카카오 소셜로그인 callback - JSON 응답")
+    @GetMapping("/kakao/callback")
+    public ResponseEntity<TokenResponse> kakaoCallback(@RequestParam String code) {
+        String accessToken = kakaoOAuthClient.getAccessToken(code);
+        OAuthUserInfo userInfo = kakaoOAuthClient.getUserInfo(accessToken);
+
+        users user = authService.findOrCreateKakaoUser(userInfo);
+
+        // Access & Refresh Token 생성
+        String accessJwt = jwtUtil.createAccessToken(user);
+        String refreshJwt = jwtUtil.createRefreshToken(user);
+
+        TokenResponse tokenResponse = new TokenResponse(accessJwt, refreshJwt);
+        return ResponseEntity.ok(tokenResponse); // JSON 응답
     }
 
     @Operation(summary = "카카오로그인 사용자 정보 조회")
