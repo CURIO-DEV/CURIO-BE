@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,8 @@ import org.springframework.util.AntPathMatcher;
 import team.backend.curio.domain.users;
 import team.backend.curio.repository.UserRepository;
 import team.backend.curio.security.CustomUserDetails;
+import jakarta.servlet.http.Cookie;
+
 
 import java.io.IOException;
 import java.util.List;
@@ -40,18 +43,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             users user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
+            // 여기에서 ROLE_USER 권한을 명시적으로 부여
+            Authentication auth = new UsernamePasswordAuthenticationToken(
+                    user, // Principal
+                    null, // Credentials
+                    List.of(new SimpleGrantedAuthority("ROLE_USER"))
+            );
+
+            /*
             CustomUserDetails userDetails = new CustomUserDetails(user);
 
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
+*/
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
         filterChain.doFilter(request, response);
     }
 
+
     private String resolveToken(HttpServletRequest request) {
-        String bearer = request.getHeader("Authorization");
-        return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
+        if (request.getCookies() == null) return null;
+
+        for (Cookie cookie : request.getCookies()) {
+            if ("accessToken".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 }
