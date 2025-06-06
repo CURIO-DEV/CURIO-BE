@@ -20,6 +20,7 @@ import team.backend.curio.service.AuthService;
 import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 import jakarta.servlet.http.Cookie;
+import org.springframework.http.ResponseCookie;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -93,37 +94,48 @@ public class AuthController {
         String accessJwt = jwtUtil.createAccessToken(user);
         String refreshJwt = jwtUtil.createRefreshToken(user);
 
+        // ✅ 콜백 주소 기준으로 로컬/배포 환경 판단
+        String callbackUrl = request.getRequestURL().toString();
+        boolean isLocal = callbackUrl.contains("localhost");
+
         // access token 쿠키
-        Cookie accessCookie = new Cookie("accessToken", accessJwt);
-        accessCookie.setHttpOnly(true);
-        accessCookie.setSecure(true); // HTTPS 환경
-        accessCookie.setPath("/");
-        accessCookie.setMaxAge(60 * 60); // 60분
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
+                .httpOnly(true)
+                .secure(!isLocal ? true :false) // HTTPS 환경
+                .path("/")
+                .maxAge(60 * 60)// 60분
+                .sameSite("None")
+                .build();
 
         // refresh token 쿠키
-        Cookie refreshCookie = new Cookie("refreshToken", refreshJwt);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
-        refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshJwt)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(60 * 60 * 24 * 7)
+                .sameSite("None")
+                .build();// 7일
 
-        // 쿠키 추가
-        response.addCookie(accessCookie);
-        response.addCookie(refreshCookie);
+        // 쿠키 설정
+        response.addHeader("Set-Cookie", accessCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
 
+        /*
         // SameSite=None 추가 (크로스도메인용)
         response.addHeader("Set-Cookie",
                 "accessToken=" + accessJwt + "; Path=/; HttpOnly; Secure; SameSite=None");
         response.addHeader("Set-Cookie",
                 "refreshToken=" + refreshJwt + "; Path=/; HttpOnly; Secure; SameSite=None");
+        */
 
-
+        /*
         // Referer를 기준으로 로컬/배포 분기
         String referer = request.getHeader("referer");
         boolean isLocal = referer != null && referer.contains("localhost:3000");
         String redirectUrl = isLocal ? "http://localhost:3000/" : "https://curi-o.site/";
-
+         */
         // 리다이렉트
+        String redirectUrl = isLocal ? "http://localhost:3000" : "https://curi-o.site";
         response.sendRedirect(redirectUrl);
     }
 
@@ -168,34 +180,34 @@ public class AuthController {
         String accessJwt = jwtUtil.createAccessToken(user);
         String refreshJwt = jwtUtil.createRefreshToken(user);
 
-        // 5. 쿠키 설정
-        Cookie accessCookie = new Cookie("accessToken", accessJwt);
-        accessCookie.setHttpOnly(true);
-        accessCookie.setSecure(true);
-        accessCookie.setPath("/");
-        accessCookie.setMaxAge(60 * 60); // 1시간
+        // 콜백 주소 기준으로 로컬/배포 환경 판단
+        String callbackUrl = request.getRequestURL().toString();
+        boolean isLocal = callbackUrl.contains("localhost");
 
-        Cookie refreshCookie = new Cookie("refreshToken", refreshJwt);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
-        refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
+        // 5. access token 쿠키 설정
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
+                .httpOnly(true)
+                .secure(!isLocal ? true : false)
+                .path("/")
+                .maxAge(60 * 60) // 1시간
+                .sameSite("None")
+                .build();
 
-        response.addCookie(accessCookie);
-        response.addCookie(refreshCookie);
+        // 6. refresh token 쿠키 설정
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshJwt)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(60 * 60 * 24 * 7) // 7일
+                .sameSite("None")
+                .build();
 
-        // SameSite=None 추가 (크로스도메인용)
-        response.addHeader("Set-Cookie",
-                "accessToken=" + accessJwt + "; Path=/; HttpOnly; Secure; SameSite=None");
-        response.addHeader("Set-Cookie",
-                "refreshToken=" + refreshJwt + "; Path=/; HttpOnly; Secure; SameSite=None");
+        // 7. 쿠키 헤더 추가
+        response.addHeader("Set-Cookie", accessCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
 
-        // Referer를 기준으로 로컬/배포 분기
-        String referer = request.getHeader("referer");
-        boolean isLocal = referer != null && referer.contains("localhost:3000");
-        String redirectUrl = isLocal ? "http://localhost:3000/" : "https://curi-o.site/";
-
-        // 7. 리다이렉트 응답
+        // 8. 리다이렉트
+        String redirectUrl = isLocal ? "http://localhost:3000" : "https://curi-o.site";
         response.sendRedirect(redirectUrl);
     }
 

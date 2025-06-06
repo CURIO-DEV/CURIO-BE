@@ -58,6 +58,7 @@ public class BookmarkController {
 
         Long userId = userDetails.getUserId();
         BookmarkResponseDto response = bookmarkService.createBookmark(createBookmarkDto, userId);
+
         return ResponseEntity.ok(response);
     }
 
@@ -74,8 +75,7 @@ public class BookmarkController {
 
         // 공동작업자 이메일 리스트 생성
         List<String> memberEmails = updatedBookmark.getMembers().stream()
-                .map(users -> users.getEmail())
-                .toList();
+                .map(users::getEmail).toList();
 
         BookmarkResponseDto response = new BookmarkResponseDto(
                 updatedBookmark.getId(),
@@ -210,7 +210,5 @@ public class BookmarkController {
                     .body(Map.of("message", e.getMessage()));
         }
     }
-
-
 }
 
