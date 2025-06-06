@@ -111,6 +111,13 @@ public class AuthController {
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
 
+        // SameSite=None 추가 (크로스도메인용)
+        response.addHeader("Set-Cookie",
+                "accessToken=" + accessJwt + "; Path=/; HttpOnly; Secure; SameSite=None");
+        response.addHeader("Set-Cookie",
+                "refreshToken=" + refreshJwt + "; Path=/; HttpOnly; Secure; SameSite=None");
+
+
         // 환경에 따른 리다이렉트 URL 설정
         String serverName = request.getServerName();
         int port = request.getServerPort();
@@ -177,6 +184,12 @@ public class AuthController {
 
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
+
+        // SameSite=None 추가 (크로스도메인용)
+        response.addHeader("Set-Cookie",
+                "accessToken=" + accessJwt + "; Path=/; HttpOnly; Secure; SameSite=None");
+        response.addHeader("Set-Cookie",
+                "refreshToken=" + refreshJwt + "; Path=/; HttpOnly; Secure; SameSite=None");
 
         // 6. 리다이렉트 경로 설정 (로컬 or 배포)
         String serverName = request.getServerName();
