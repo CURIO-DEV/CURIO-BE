@@ -118,11 +118,10 @@ public class AuthController {
                 "refreshToken=" + refreshJwt + "; Path=/; HttpOnly; Secure; SameSite=None");
 
 
-        // 환경에 따른 리다이렉트 URL 설정
-        String serverName = request.getServerName();
-        int port = request.getServerPort();
-        boolean isLocal = serverName.equals("localhost") && port == 8080;
-        String redirectUrl = isLocal ? "http://localhost:3000" : "https://curi-o.site";
+        // Referer를 기준으로 로컬/배포 분기
+        String referer = request.getHeader("referer");
+        boolean isLocal = referer != null && referer.contains("localhost:3000");
+        String redirectUrl = isLocal ? "http://localhost:3000/" : "https://curi-o.site/";
 
         // 리다이렉트
         response.sendRedirect(redirectUrl);
@@ -191,12 +190,10 @@ public class AuthController {
         response.addHeader("Set-Cookie",
                 "refreshToken=" + refreshJwt + "; Path=/; HttpOnly; Secure; SameSite=None");
 
-        // 6. 리다이렉트 경로 설정 (로컬 or 배포)
-        String serverName = request.getServerName();
-        int port = request.getServerPort();
-        boolean isLocal = serverName.equals("localhost") && port == 8080;
-        String redirectUrl = isLocal ? "http://localhost:3000" : "https://curi-o.site";
-
+        // Referer를 기준으로 로컬/배포 분기
+        String referer = request.getHeader("referer");
+        boolean isLocal = referer != null && referer.contains("localhost:3000");
+        String redirectUrl = isLocal ? "http://localhost:3000/" : "https://curi-o.site/";
 
         // 7. 리다이렉트 응답
         response.sendRedirect(redirectUrl);
