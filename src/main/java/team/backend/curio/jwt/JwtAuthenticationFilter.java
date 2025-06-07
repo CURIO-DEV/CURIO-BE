@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.util.List;
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
@@ -42,6 +44,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String email = jwtUtil.getEmail(token);
             users user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+            //로그 찍기
+            log.info("✅ JWT 토큰 이메일: {}", email);
+            log.info("✅ DB에서 찾은 유저: {}", user.getEmail());
+            log.info("✅ ROLE_USER 권한 부여됨");
 
             // 여기에서 ROLE_USER 권한을 명시적으로 부여
             Authentication auth = new UsernamePasswordAuthenticationToken(
