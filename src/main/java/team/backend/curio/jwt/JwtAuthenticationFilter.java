@@ -50,11 +50,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("✅ DB에서 찾은 유저: {}", user.getEmail());
             log.info("✅ ROLE_USER 권한 부여됨");
 
-            // 여기에서 ROLE_USER 권한을 명시적으로 부여
+            CustomUserDetails userDetails = new CustomUserDetails(user);
+
             Authentication auth = new UsernamePasswordAuthenticationToken(
-                    user, // Principal
-                    null, // Credentials
-                    List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities()
             );
 
             /*
