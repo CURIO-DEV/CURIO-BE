@@ -7,7 +7,6 @@ import team.backend.curio.domain.users;
 import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.dto.NewsDTO.CurioGoNewsResponseDto;
-import team.backend.curio.dto.NewsDTO.RelatedNewsResponse;
 import team.backend.curio.dto.NewsDTO.NewsSummaryResponseDto;
 import team.backend.curio.dto.NewsDTO.SearchNewsResponseDto;
 import team.backend.curio.repository.NewsRepository;
@@ -101,25 +100,15 @@ public class NewsService {
 
 
     //특정 뉴스의 관련 뉴스 조회
-    public List<RelatedNewsResponse> getRelatedNews(Long articleId) {
+    public List<News> getRelatedNews(Long articleId) {
         // 1. 기사 존재 여부 및 카테고리 조회
         String category = newsRepository.findCategoryById(articleId);
         if (category == null) {
             throw new IllegalArgumentException("해당 ID의 뉴스 기사가 존재하지 않거나 카테고리가 없습니다. articleId=" + articleId);
         }
 
-        // 2. 관련 뉴스 조회
-        List<News> relatedNews = newsRepository.findTop4RelatedNewsByCategory(category, articleId);
-
-        // 3. DTO로 변환
-        return relatedNews.stream()
-                .map(news -> new RelatedNewsResponse(
-                        news.getTitle(),
-                        news.getImageUrl(),
-                        news.getLikeCount(),
-                        news.getSaveCount()
-                ))
-                .collect(Collectors.toList());
+        // 2. 관련 뉴스 조회 (News entity 반환)
+        return newsRepository.findTop4RelatedNewsByCategory(category, articleId);
     }
 
 

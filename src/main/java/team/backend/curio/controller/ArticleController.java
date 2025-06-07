@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import team.backend.curio.domain.News;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
-import team.backend.curio.dto.NewsDTO.RelatedNewsResponse;
+import team.backend.curio.dto.NewsDTO.NewsWithCountsDto;
 import team.backend.curio.dto.NewsDTO.NewsSummaryResponseDto;
 import team.backend.curio.service.NewsService;
 import team.backend.curio.service.NewsSummaryService;
@@ -29,9 +29,13 @@ public class ArticleController {
     // 특정 뉴스의 관련 뉴스 조회
     @Operation(summary = "특정 뉴스의 관련 뉴스 조회 : 상세기사 화면")
     @GetMapping("/{articleId}/related")
-    public ResponseEntity<List<RelatedNewsResponse>> getRelatedNews(@PathVariable Long articleId) {
-        List<RelatedNewsResponse> relatedNews = newsService.getRelatedNews(articleId);
-        return ResponseEntity.ok(relatedNews);
+    public ResponseEntity<List<NewsWithCountsDto>> getRelatedNews(@PathVariable Long articleId) {
+        List<News> relatedNewsList = newsService.getRelatedNews(articleId);
+        List<NewsWithCountsDto> dtoList = relatedNewsList.stream()
+                .map(NewsWithCountsDto::new)
+                .toList();
+
+        return ResponseEntity.ok(dtoList);
     }
 
     // 해당 카테고리별 리스트 출력
