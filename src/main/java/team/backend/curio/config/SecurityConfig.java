@@ -56,7 +56,9 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "https://www.curi-o.site"
+                "https://www.curi-o.site",
+                "https://port-0-curio-be-mar0zdvm42447885.sel4.cloudtype.app"
+
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
