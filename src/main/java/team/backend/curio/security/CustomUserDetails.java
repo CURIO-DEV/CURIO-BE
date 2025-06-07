@@ -25,17 +25,13 @@ public class CustomUserDetails implements UserDetails {
         return user.getEmail();
     }
 
-    // 필요하면 users 클래스에 더 추가 메서드 만들고 여기서 위임 가능
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 권한 정보가 따로 없으면 빈 리스트 반환
-        return Collections.emptyList();
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
     public String getPassword() {
-        // 소셜 로그인이라 비밀번호 없으면 null 또는 빈 문자열
         return null;
     }
 
