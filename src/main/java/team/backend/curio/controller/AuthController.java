@@ -135,7 +135,7 @@ public class AuthController {
         String redirectUrl = isLocal ? "http://localhost:3000/" : "https://curi-o.site/";
          */
         // 리다이렉트
-        String redirectUrl = isLocal ? "http://localhost:3000" : "https://curi-o.site";
+        String redirectUrl = isLocal ? "http://localhost:3000/" : "https://curi-o.site";
         response.sendRedirect(redirectUrl);
     }
 
@@ -207,7 +207,7 @@ public class AuthController {
         response.addHeader("Set-Cookie", refreshCookie.toString());
 
         // 8. 리다이렉트
-        String redirectUrl = isLocal ? "http://localhost:3000" : "https://curi-o.site";
+        String redirectUrl = isLocal ? "http://localhost:3000/" : "https://curi-o.site";
         response.sendRedirect(redirectUrl);
     }
 
