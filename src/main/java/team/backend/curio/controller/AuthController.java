@@ -98,13 +98,17 @@ public class AuthController {
         boolean isLocal = "local".equals(env);
 
         // access token 쿠키
-        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
+        ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from("accessToken", accessJwt)
                 .httpOnly(true)
                 .secure(!isLocal) // HTTPS 환경
                 .path("/")
-                .maxAge(60 * 60)// 60분
-                .sameSite("None")
-                .build();
+                .maxAge(60 * 60);// 60분
+
+        if (!isLocal) {
+            accessCookieBuilder.sameSite("None"); // 배포 환경에서만 SameSite 설정
+        }
+
+        ResponseCookie accessCookie = accessCookieBuilder.build();
 
         // refresh token 쿠키
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshJwt)
@@ -183,13 +187,17 @@ public class AuthController {
         boolean isLocal = "local".equals(env);
 
         // 5. access token 쿠키 설정
-        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
+        ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from("accessToken", accessJwt)
                 .httpOnly(true)
                 .secure(!isLocal)
                 .path("/")
-                .maxAge(60 * 60) // 1시간
-                .sameSite("None")
-                .build();
+                .maxAge(60 * 60); // 1시간
+
+        if (!isLocal) {
+            accessCookieBuilder.sameSite("None"); // 배포 환경에서만 SameSite 설정
+        }
+
+        ResponseCookie accessCookie = accessCookieBuilder.build();
 
         // 6. refresh token 쿠키 설정
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshJwt)
