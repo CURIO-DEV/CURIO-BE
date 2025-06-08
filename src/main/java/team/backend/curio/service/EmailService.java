@@ -44,7 +44,7 @@ public class EmailService {
         StringBuilder content = new StringBuilder("안녕하세요, 큐리오입니다.\n 오늘의 인기 뉴스입니다:) \n\n");
         for (News news : trendingNews) {
             // 뉴스 아이디를 사용하여 전체 URL 생성
-            String articleUrl = websiteDomain + "/domain/detail/" + news.getNewsId();
+            String articleUrl = websiteDomain + "/detail/" + news.getNewsId();
             content.append(news.getTitle())
                     .append("\n")
                     .append(articleUrl) // 웹사이트의 해당 기사 링크
