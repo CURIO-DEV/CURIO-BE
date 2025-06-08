@@ -86,7 +86,7 @@ public class AuthController {
     */
     @Operation(summary = "카카오 소셜로그인 callback - 쿠키 방식")
     @GetMapping("/kakao/callback")
-    public void kakaoCallback(@RequestParam String code, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void kakaoCallback(@RequestParam String code, @RequestParam(required = false) String env, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String accessToken = kakaoOAuthClient.getAccessToken(code);
         OAuthUserInfo userInfo = kakaoOAuthClient.getUserInfo(accessToken);
         users user = authService.findOrCreateKakaoUser(userInfo);
@@ -95,13 +95,12 @@ public class AuthController {
         String refreshJwt = jwtUtil.createRefreshToken(user);
 
         // ✅ 콜백 주소 기준으로 로컬/배포 환경 판단
-        String callbackUrl = request.getRequestURL().toString();
-        boolean isLocal = callbackUrl.contains("localhost");
+        boolean isLocal = "local".equals(env);
 
         // access token 쿠키
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
                 .httpOnly(true)
-                .secure(!isLocal ? true :false) // HTTPS 환경
+                .secure(!isLocal) // HTTPS 환경
                 .path("/")
                 .maxAge(60 * 60)// 60분
                 .sameSite("None")
@@ -135,7 +134,7 @@ public class AuthController {
         String redirectUrl = isLocal ? "http://localhost:3000/" : "https://curi-o.site/";
          */
         // 리다이렉트
-        String redirectUrl = isLocal ? "http://localhost:3000/" : "https://curi-o.site/";
+        String redirectUrl = isLocal ? "http://localhost:3000/" : "https://www.curi-o.site/";
         response.sendRedirect(redirectUrl);
     }
 
@@ -166,7 +165,7 @@ public class AuthController {
 
     @Operation(summary = "구글 소셜로그인 callback - 쿠키 + 리다이렉트")
     @GetMapping("/google/callback")
-    public void googleCallback(@RequestParam String code, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void googleCallback(@RequestParam String code, @RequestParam(required = false) String env, HttpServletRequest request, HttpServletResponse response) throws IOException {
         // 1. 구글에서 accessToken 받아오기
         String accessToken = googleOAuthClient.getAccessToken(code);
 
@@ -181,13 +180,12 @@ public class AuthController {
         String refreshJwt = jwtUtil.createRefreshToken(user);
 
         // 콜백 주소 기준으로 로컬/배포 환경 판단
-        String callbackUrl = request.getRequestURL().toString();
-        boolean isLocal = callbackUrl.contains("localhost");
+        boolean isLocal = "local".equals(env);
 
         // 5. access token 쿠키 설정
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
                 .httpOnly(true)
-                .secure(!isLocal ? true : false)
+                .secure(!isLocal)
                 .path("/")
                 .maxAge(60 * 60) // 1시간
                 .sameSite("None")
@@ -207,7 +205,7 @@ public class AuthController {
         response.addHeader("Set-Cookie", refreshCookie.toString());
 
         // 8. 리다이렉트
-        String redirectUrl = isLocal ? "http://localhost:3000/" : "https://curi-o.site/";
+        String redirectUrl = isLocal ? "http://localhost:3000/" : "https://www.curi-o.site/";
         response.sendRedirect(redirectUrl);
     }
 
