@@ -247,13 +247,13 @@ public class UserController {
         }
     }
 
-    @GetMapping("/newsletter_email")
+    /*@GetMapping("/newsletter_email")
     public ResponseEntity<String> getNewsletterEmail(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long userId = userDetails.getUserId();
 
         String newsletterEmail = userService.getNewsletterEmailByUserId(userId);
         return ResponseEntity.ok(newsletterEmail);
-    }
+    }*/
 }
 
