@@ -172,7 +172,12 @@ public class UserService {
     public String getNewsletterEmailByUserId(Long userId) {
         users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        return user.getNewsletterEmail();
+
+        String newsletterEmail = user.getNewsletterEmail();
+        if (newsletterEmail == null || newsletterEmail.isBlank()) {
+            return user.getEmail();
+        }
+        return newsletterEmail;
     }
 
 }

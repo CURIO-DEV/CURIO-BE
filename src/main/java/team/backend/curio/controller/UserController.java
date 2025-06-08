@@ -169,7 +169,14 @@ public class UserController {
             users user = userService.getUserById(userDetails.getUserId());
 
             user.setNewsletterStatus(1);
-            user.setNewsletterEmail(requestDto.getNewsletterEmail());
+
+            // 요청에서 newsletter-email이 비어 있으면 기본 이메일 사용
+            String inputEmail = requestDto.getNewsletterEmail();
+            String newsletterEmailToSet = (inputEmail == null || inputEmail.isBlank())
+                    ? user.getEmail()
+                    : inputEmail;
+
+            user.setNewsletterEmail(newsletterEmailToSet);
 
             userService.save(user);
 
