@@ -33,16 +33,23 @@ public class GoogleOAuthClient {
     private static final String USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
 
     // code -> access_token
-    public String getAccessToken(String code) {
+    public String getAccessToken(String code, boolean isLocal) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        // 🔥 env=local 처리된 redirect_uri
+        String finalRedirectUri = isLocal
+                ? redirectUri + "?env=local"
+                : redirectUri;
+
+        System.out.println("🟡 [카카오 토큰 요청] redirect_uri = " + finalRedirectUri);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("code", code);
         params.add("client_id", clientId);
         params.add("client_secret", clientSecret);
-        params.add("redirect_uri", redirectUri);
+        params.add("redirect_uri", finalRedirectUri);
         params.add("grant_type", "authorization_code");
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
@@ -77,8 +84,8 @@ public class GoogleOAuthClient {
     }
 
     // ✅ Step 3: code → accessToken → 사용자 정보까지 한번에
-    public OAuthUserInfo getUserInfoByCode(String code) {
-        String accessToken = getAccessToken(code);
+    public OAuthUserInfo getUserInfoByCode(String code, boolean isLocal) {
+        String accessToken = getAccessToken(code, isLocal);
         return getUserInfo(accessToken);
     }
 }

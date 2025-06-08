@@ -175,23 +175,20 @@ public class AuthController {
 
     @Operation(summary = "구글 소셜로그인 callback - 쿠키 + 리다이렉트")
     @GetMapping("/google/callback")
-    public void googleCallback(@RequestParam String code, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void googleCallback(@RequestParam String code, @RequestParam(required = false) String env, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        boolean isLocal = "local".equals(env); // ✅ 로컬 여부 판단
+
+        System.out.println("[GoogleCallback] env = " + env);
+        System.out.println("[GoogleCallback] isLocal = " + isLocal);
+
         // 1. 구글에서 accessToken 받아오기
-        String accessToken = googleOAuthClient.getAccessToken(code);
-
-        // 2. 사용자 정보 조회
+        String accessToken = googleOAuthClient.getAccessToken(code, isLocal);
         OAuthUserInfo userInfo = googleOAuthClient.getUserInfo(accessToken);
-
-        // 3. 사용자 생성 or 조회
         users user = authService.findOrCreateGoogleUser(userInfo);
 
         // 4. JWT 토큰 생성
         String accessJwt = jwtUtil.createAccessToken(user);
         String refreshJwt = jwtUtil.createRefreshToken(user);
-
-        // 콜백 주소 기준으로 로컬/배포 환경 판단More actions
-        String callbackUrl = request.getRequestURL().toString();
-        boolean isLocal = callbackUrl.contains("localhost");
 
         // 5. access token 쿠키 설정
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
@@ -199,7 +196,7 @@ public class AuthController {
                 .secure(!isLocal)
                 .path("/")
                 .maxAge(60 * 60) // 1시간
-                .sameSite("None")
+                .sameSite(isLocal ? "Lax" : "None")
                 .build();
 
         // 6. refresh token 쿠키 설정
@@ -208,7 +205,7 @@ public class AuthController {
                 .secure(true)
                 .path("/")
                 .maxAge(60 * 60 * 24 * 7) // 7일
-                .sameSite("None")
+                .sameSite(isLocal ? "Lax" : "None")
                 .build();
 
         // 7. 쿠키 헤더 추가
