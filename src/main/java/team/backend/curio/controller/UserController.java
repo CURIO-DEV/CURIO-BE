@@ -53,26 +53,30 @@ public class UserController {
     @Operation(summary = "관심 카테고리 불러오기")
     @GetMapping("/interests")
     public ResponseEntity<UserInterestResponse> getInterests(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            Authentication authentication  // 인증 객체 직접 주입
     ) {
         try {
-            if (userDetails == null) {
-                // 비로그인 사용자일 경우 기본 카테고리 반환
-                return ResponseEntity.ok(
-                        new UserInterestResponse(List.of("사회", "정치", "경제", "연예"))
-                );
+            // 로그인 사용자일 경우
+            if (authentication != null && authentication.isAuthenticated()
+                    && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+
+                UserInterestResponse response = userService.getUserInterests(userDetails.getUserId());
+                return ResponseEntity.ok(response);
             }
 
-            UserInterestResponse response = userService.getUserInterests(userDetails.getUserId());
-            return ResponseEntity.ok(response);
+            // 비로그인 사용자일 경우 기본값
+            return ResponseEntity.ok(
+                    new UserInterestResponse(List.of("사회", "정치", "경제", "연예"))
+            );
 
-        } catch (IllegalArgumentException e) {
-            // 예외가 발생하면 기본 카테고리 반환
+        } catch (Exception e) {
+            // 예외 발생 시에도 기본값 반환
             return ResponseEntity.ok(
                     new UserInterestResponse(List.of("사회", "정치", "경제", "연예"))
             );
         }
     }
+
 
     // 회원 관심사 수정하기
     @Operation(summary = "관심 카테고리 설정 및 수정")
