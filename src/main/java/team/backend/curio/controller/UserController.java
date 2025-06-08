@@ -158,7 +158,8 @@ public class UserController {
 
         return ResponseEntity.ok(Map.of(
                 "nickname", user.getNickname(),
-                "profile_image_url", user.getProfile_image_url()
+                "profile_image_url", user.getProfile_image_url(),
+                "email", user.getEmail()
         ));
     }
 
