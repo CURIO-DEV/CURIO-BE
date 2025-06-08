@@ -23,6 +23,7 @@ public class KakaoOAuthClient {
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
 
+
     private final RestTemplate restTemplate;
 
     //카카오 인가코드'code'로 accesstoken 받기
@@ -36,6 +37,9 @@ public class KakaoOAuthClient {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", clientId);
+
+        System.out.println("🟡 [카카오 토큰 요청] redirect_uri = " + redirectUri);
+
         params.add("redirect_uri", redirectUri);
         params.add("code", code); //프론트에서 받아올 코드
 
