@@ -86,7 +86,7 @@ public class AuthController {
     */
     @Operation(summary = "카카오 소셜로그인 callback - 쿠키 방식")
     @GetMapping("/kakao/callback")
-    public void kakaoCallback(@RequestParam String code, @RequestParam(required = false) String env, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void kakaoCallback(@RequestParam String code, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String accessToken = kakaoOAuthClient.getAccessToken(code);
         OAuthUserInfo userInfo = kakaoOAuthClient.getUserInfo(accessToken);
         users user = authService.findOrCreateKakaoUser(userInfo);
@@ -94,21 +94,18 @@ public class AuthController {
         String accessJwt = jwtUtil.createAccessToken(user);
         String refreshJwt = jwtUtil.createRefreshToken(user);
 
-        // ✅ 콜백 주소 기준으로 로컬/배포 환경 판단
-        boolean isLocal = "local".equals(env);
+        // ✅ 콜백 주소 기준으로 로컬/배포 환경 판단More actions
+        String callbackUrl = request.getRequestURL().toString();
+        boolean isLocal = callbackUrl.contains("localhost");
 
         // access token 쿠키
-        ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from("accessToken", accessJwt)
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
                 .httpOnly(true)
                 .secure(!isLocal) // HTTPS 환경
                 .path("/")
-                .maxAge(60 * 60);// 60분
-
-        if (!isLocal) {
-            accessCookieBuilder.sameSite("None"); // 배포 환경에서만 SameSite 설정
-        }
-
-        ResponseCookie accessCookie = accessCookieBuilder.build();
+                .maxAge(60 * 60) //60분
+                .sameSite("None")
+                .build();
 
         // refresh token 쿠키
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshJwt)
@@ -169,7 +166,7 @@ public class AuthController {
 
     @Operation(summary = "구글 소셜로그인 callback - 쿠키 + 리다이렉트")
     @GetMapping("/google/callback")
-    public void googleCallback(@RequestParam String code, @RequestParam(required = false) String env, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void googleCallback(@RequestParam String code, HttpServletRequest request, HttpServletResponse response) throws IOException {
         // 1. 구글에서 accessToken 받아오기
         String accessToken = googleOAuthClient.getAccessToken(code);
 
@@ -183,21 +180,18 @@ public class AuthController {
         String accessJwt = jwtUtil.createAccessToken(user);
         String refreshJwt = jwtUtil.createRefreshToken(user);
 
-        // 콜백 주소 기준으로 로컬/배포 환경 판단
-        boolean isLocal = "local".equals(env);
+        // 콜백 주소 기준으로 로컬/배포 환경 판단More actions
+        String callbackUrl = request.getRequestURL().toString();
+        boolean isLocal = callbackUrl.contains("localhost");
 
         // 5. access token 쿠키 설정
-        ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from("accessToken", accessJwt)
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
                 .httpOnly(true)
                 .secure(!isLocal)
                 .path("/")
-                .maxAge(60 * 60); // 1시간
-
-        if (!isLocal) {
-            accessCookieBuilder.sameSite("None"); // 배포 환경에서만 SameSite 설정
-        }
-
-        ResponseCookie accessCookie = accessCookieBuilder.build();
+                .maxAge(60 * 60) // 1시간
+                .sameSite("None")
+                .build();
 
         // 6. refresh token 쿠키 설정
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshJwt)
