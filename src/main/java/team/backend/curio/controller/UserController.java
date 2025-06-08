@@ -56,10 +56,21 @@ public class UserController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         try {
+            if (userDetails == null) {
+                // 비로그인 사용자일 경우 기본 카테고리 반환
+                return ResponseEntity.ok(
+                        new UserInterestResponse(List.of("사회", "정치", "경제", "연예"))
+                );
+            }
+
             UserInterestResponse response = userService.getUserInterests(userDetails.getUserId());
             return ResponseEntity.ok(response);
+
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
+            // 예외가 발생하면 기본 카테고리 반환
+            return ResponseEntity.ok(
+                    new UserInterestResponse(List.of("사회", "정치", "경제", "연예"))
+            );
         }
     }
 
