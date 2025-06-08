@@ -33,7 +33,7 @@ public class SecurityConfig {
                                 "/trends/interests/keywords",
                                 "/trends/keywords",
                                 "/trends/popular-articles",
-                                "/api/users/interests",
+                                "/users/interests",
                                 "/search",
                                 "/articles/**",
                                 "/swagger-ui/**",
