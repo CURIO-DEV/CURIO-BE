@@ -168,4 +168,11 @@ public class UserService {
 
         return "User가 성공적으로 삭제되었습니다."; //성공 메세지 반환
     }
+
+    public String getNewsletterEmailByUserId(Long userId) {
+        users user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        return user.getNewsletterEmail();
+    }
+
 }

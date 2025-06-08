@@ -2,6 +2,7 @@ package team.backend.curio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import team.backend.curio.domain.users;
 import team.backend.curio.domain.News;
@@ -214,6 +215,15 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new CommonResponseDto<>(false, "회원 탈퇴 중 오류가 발생했습니다.", null));
         }
+    }
+
+    @GetMapping("/newsletter_email")
+    public ResponseEntity<String> getNewsletterEmail(Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = userDetails.getUserId();
+
+        String newsletterEmail = userService.getNewsletterEmailByUserId(userId);
+        return ResponseEntity.ok(newsletterEmail);
     }
 }
 
