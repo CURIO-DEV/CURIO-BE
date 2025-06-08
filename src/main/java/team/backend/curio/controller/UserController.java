@@ -12,6 +12,7 @@ import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.dto.UserCreateDto;
 import team.backend.curio.dto.CustomSettingDto;
+import team.backend.curio.dto.UserDTO.NewsletterRequestDto;
 import team.backend.curio.dto.UserDTO.UserInterestResponse;
 import team.backend.curio.security.CustomUserDetails;
 import team.backend.curio.service.UserService;
@@ -150,17 +151,23 @@ public class UserController {
     @Operation(summary = "뉴스레터 신청")
     @PatchMapping("/newsletter/subscribe")
     public ResponseEntity<MessageResponse> updateNewsletterSubscription(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody NewsletterRequestDto requestDto
     ) {
         try {
             users user = userService.getUserById(userDetails.getUserId());
+
             user.setNewsletterStatus(1);
+            user.setNewsletterEmail(requestDto.getNewsletterEmail());
+
             userService.save(user);
+
             return ResponseEntity.ok(new MessageResponse("뉴스레터가 신청되었습니다."));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new MessageResponse("사용자를 찾을 수 없습니다."));
         }
+
     }
 
     // 최근 트렌드 뉴스 4개 가져오기
