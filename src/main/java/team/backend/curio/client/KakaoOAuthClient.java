@@ -27,20 +27,24 @@ public class KakaoOAuthClient {
     private final RestTemplate restTemplate;
 
     //카카오 인가코드'code'로 accesstoken 받기
-    public String getAccessToken(String code) {
+    public String getAccessToken(String code,boolean isLocal) {
         String url = "https://kauth.kakao.com/oauth/token";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
+        // 🔥 env=local 처리된 redirect_uri
+        String finalRedirectUri = isLocal
+                ? redirectUri + "?env=local"
+                : redirectUri;
+
+        System.out.println("🟡 [카카오 토큰 요청] redirect_uri = " + finalRedirectUri);
+
         //요청 파라미터 생성
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", clientId);
-
-        System.out.println("🟡 [카카오 토큰 요청] redirect_uri = " + redirectUri);
-
-        params.add("redirect_uri", redirectUri);
+        params.add("redirect_uri", finalRedirectUri);
         params.add("code", code); //프론트에서 받아올 코드
 
         //요청후응답 받기(map으로 access-token만 추출)
@@ -90,9 +94,9 @@ public class KakaoOAuthClient {
     }
 
     // code → 사용자 정보까지 한 번에 처리하는 메서드 추가 (callback용)
-    public OAuthUserInfo getUserInfoByCode(String code) {
+    public OAuthUserInfo getUserInfoByCode(String code,boolean isLocal) {
         // 1. code로 access_token 발급
-        String accessToken = getAccessToken(code);
+        String accessToken = getAccessToken(code, isLocal);
 
         // 2. access_token으로 사용자 정보 조회
         return getUserInfo(accessToken);
