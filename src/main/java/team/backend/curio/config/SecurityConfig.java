@@ -57,6 +57,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
+                "http://localhost:8080",
                 "https://www.curi-o.site",
                 "https://port-0-curio-be-mar0zdvm42447885.sel4.cloudtype.app"
 
