@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import team.backend.curio.domain.News;
 import team.backend.curio.domain.users;
 import team.backend.curio.repository.UserRepository;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import java.util.List; // List 추가
 import java.util.stream.Collectors;
@@ -51,6 +53,8 @@ public class EmailService {
                     .append("\n\n");
         }
 
+        System.out.println("🔎 최종 메일 내용:\n" + content);
+
         message.setText(content.toString());
         emailSender.send(message);
 
@@ -62,10 +66,11 @@ public class EmailService {
     }
 
     // 자동 발송 스케줄링: 매일 아침 7시
-    @Scheduled(cron = "0 0 7 * * *")
+    @Scheduled(cron = "0 0 7 * * *", zone = "Asia/Seoul")
     public void scheduleDailyNewsletter() {
         System.out.println("🕒 자동 뉴스레터 발송 시작");
-
+        System.out.println("서버 현재 시각: " + LocalDateTime.now());
+        System.out.println("서버 시간대: " + ZoneId.systemDefault());
         List<News> trendingNews = getTrendingNews(); // 트렌드 뉴스 4개
 
         List<users> newsletterUsers = userRepository.findByNewsletterStatusAndNewsletterEmailNotNull(1); // 수신 동의자
