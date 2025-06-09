@@ -1,6 +1,7 @@
 package team.backend.curio.dto.NewsDTO;
 
 import lombok.Getter;
+import team.backend.curio.domain.News;
 
 @Getter
 public class SearchNewsResponseDto {
@@ -9,10 +10,10 @@ public class SearchNewsResponseDto {
     private String content;
     private String imageUrl;
 
-    public SearchNewsResponseDto(Long newsId, String title, String content, String imageUrl) {
-        this.newsId = newsId;
-        this.title = title;
-        this.content = content;
-        this.imageUrl = imageUrl;
+    public SearchNewsResponseDto(News news) {
+        this.newsId = news.getNewsId();
+        this.title = news.getTitle();
+        this.content = news.getContent();
+        this.imageUrl = news.getImageUrl();
     }
 }
