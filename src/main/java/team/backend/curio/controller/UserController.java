@@ -10,6 +10,7 @@ import team.backend.curio.dto.BookmarkDTO.MessageResponse;
 import team.backend.curio.dto.CommonResponseDto;
 import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsResponseDto;
+import team.backend.curio.dto.NewsDTO.SearchNewsResponseDto;
 import team.backend.curio.dto.UserCreateDto;
 import team.backend.curio.dto.CustomSettingDto;
 import team.backend.curio.dto.UserDTO.NewsletterRequestDto;
@@ -102,13 +103,13 @@ public class UserController {
     // 유저의 관심사별 뉴스 목록 GET -> 유저아이디랑 관심사 이름 두개 필요
     @Operation(summary = "사용자의 특정 관심사 뉴스 목록 불러오기")
     @GetMapping("/interests/{interestName}/news")
-    public ResponseEntity<List<NewsResponseDto>> getNewsByInterest(
+    public ResponseEntity<List<SearchNewsResponseDto>> getNewsByInterest(
             @PathVariable String interestName,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        List<NewsResponseDto> newsList = newsService.getNewsByInterestSortedByRecent(interestName)
+        List<SearchNewsResponseDto> newsList = newsService.getNewsByInterestSortedByRecent(interestName)
                 .stream()
-                .map(NewsResponseDto::new)
+                .map(SearchNewsResponseDto::new)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(newsList);
