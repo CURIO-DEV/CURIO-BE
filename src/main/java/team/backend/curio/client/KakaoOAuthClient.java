@@ -33,10 +33,9 @@ public class KakaoOAuthClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        // ✅ isLocal 여부에 따라 redirect_uri 분기
-        String finalRedirectUri = isLocal
-                ? "http://localhost:8080/curio/api/auth/kakao/callback"
-                : redirectUri; // 배포용은 application.yml에서 주입받은 값
+
+        // 🔥 env=local 처리된 redirect_uriAdd commentMore actions
+        String finalRedirectUri = redirectUri;
 
         System.out.println("🟡 [카카오 토큰 요청] redirect_uri = " + finalRedirectUri);
 
