@@ -34,9 +34,7 @@ public class KakaoOAuthClient {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         // 🔥 env=local 처리된 redirect_uri
-        String finalRedirectUri = isLocal
-                ? redirectUri + "?env=local"
-                : redirectUri;
+        String finalRedirectUri = redirectUri; // 항상 동일한 값
 
         System.out.println("🟡 [카카오 토큰 요청] redirect_uri = " + finalRedirectUri);
 

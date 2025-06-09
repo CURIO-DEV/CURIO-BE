@@ -86,12 +86,12 @@ public class AuthController {
     */
     @Operation(summary = "카카오 소셜로그인 callback - 쿠키 방식")
     @GetMapping("/kakao/callback")
-    public void kakaoCallback(@RequestParam String code, @RequestParam(required = false) String env, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void kakaoCallback(@RequestParam String code, @RequestParam(required = false) String state, HttpServletRequest request, HttpServletResponse response) throws IOException {
         // ✅ 콜백 주소 기준으로 로컬/배포 환경 판단More actions
-        boolean isLocal = "local".equals(env);
+        boolean isLocal = "local".equals(state);
 
         // ✅ isLocal 로그 출력
-        System.out.println("[KakaoCallback] env = " + env);
+        System.out.println("[KakaoCallback] state = " + state);
         System.out.println("[KakaoCallback] isLocal = " + isLocal);
 
         String accessToken = kakaoOAuthClient.getAccessToken(code, isLocal);
@@ -101,11 +101,6 @@ public class AuthController {
         String accessJwt = jwtUtil.createAccessToken(user);
         String refreshJwt = jwtUtil.createRefreshToken(user);
 
-
-
-        // ✅ isLocal 로그 출력
-        System.out.println("[KakaoCallback] env = " + env);
-        System.out.println("[KakaoCallback] isLocal = " + isLocal);
 
         // access token 쿠키
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
