@@ -17,7 +17,9 @@ import java.util.Arrays;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class NewsService {
@@ -177,12 +179,18 @@ public class NewsService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         // 2. 관심사 리스트 생성
-        List<String> interests = List.of(
+        List<String> interests = Stream.of(
                 user.getInterest1(),
                 user.getInterest2(),
                 user.getInterest3(),
                 user.getInterest4()
-        );
+                ).filter(Objects::nonNull)  //null 제거
+                .collect(Collectors.toList());
+
+        if (interests.isEmpty()) {
+            // 기본 관심사로 대체
+            interests = List.of("사회", "정치", "경제", "연예");
+        }
 
         // 3. 관심사 리스트에 해당하는 뉴스 중 좋아요 순으로 상위 5개만 조회
         List<News> top5News = newsRepository.findTop5ByCategoryInOrderByLikeCountDesc(interests);
@@ -195,5 +203,6 @@ public class NewsService {
                         news.getSummaryMedium()
                 ))
                 .collect(Collectors.toList());
+
     }
 }
