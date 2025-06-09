@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team.backend.curio.dto.NewsDTO.CurioGoNewsResponseDto;
 import team.backend.curio.service.NewsService;
+import team.backend.curio.security.CustomUserDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
 
@@ -18,7 +20,9 @@ public class CurioGoController {
     // [CurioGo] 사용자의 관심 카테고리를 기반으로 인기 뉴스 5개 조회
     @Operation(summary = "큑 보러가기")
     @GetMapping("/curio-go")
-    public ResponseEntity<List<CurioGoNewsResponseDto>> getCurioGoNews(@RequestParam Long userId) {
+    public ResponseEntity<List<CurioGoNewsResponseDto>> getCurioGoNews(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUserId();
         List<CurioGoNewsResponseDto> newsList = newsService.getCurioGoNewsByUserId(userId);
         return ResponseEntity.ok(newsList);
     }
