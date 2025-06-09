@@ -105,7 +105,7 @@ public class AuthController {
         // access token 쿠키
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
                 .httpOnly(true)
-                .secure(!isLocal) // HTTPS 환경
+                .secure(true) // HTTPS 환경
                 .path("/")
                 .maxAge(60 * 60) //60분
                 .sameSite(isLocal ? "Lax" : "None")
