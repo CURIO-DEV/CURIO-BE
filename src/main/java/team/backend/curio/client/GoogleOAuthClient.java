@@ -43,7 +43,7 @@ public class GoogleOAuthClient {
                 ? redirectUri + "?env=local"
                 : redirectUri;
 
-        System.out.println("🟡 [카카오 토큰 요청] redirect_uri = " + finalRedirectUri);
+        System.out.println("🟡 [구글 토큰 요청] redirect_uri = " + finalRedirectUri);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("code", code);
