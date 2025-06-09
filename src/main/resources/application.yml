@@ -42,7 +42,7 @@ openai:
 
 website:
   domain:
-    url: http://www.curi-o.site
+    url: https://www.curi-o.site
 
 springdoc:
   api-docs:
