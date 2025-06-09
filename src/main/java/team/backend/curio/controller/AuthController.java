@@ -109,7 +109,6 @@ public class AuthController {
                 .path("/")
                 .maxAge(60 * 60) //60분
                 .sameSite(isLocal ? "Lax" : "None")
-                .domain(isLocal ? "localhost" : "curi-o.site")
                 .build();
 
         // refresh token 쿠키
@@ -189,7 +188,7 @@ public class AuthController {
         // 5. access token 쿠키 설정
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
                 .httpOnly(true)
-                .secure(!isLocal)
+                .secure(true)
                 .path("/")
                 .maxAge(60 * 60) // 1시간
                 .sameSite(isLocal ? "Lax" : "None")

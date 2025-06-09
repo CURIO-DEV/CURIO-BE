@@ -71,11 +71,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
     private String resolveToken(HttpServletRequest request) {
-        if (request.getCookies() == null) return null;
-
-        for (Cookie cookie : request.getCookies()) {
-            if ("accessToken".equals(cookie.getName())) {
-                return cookie.getValue();
+        if (request.getCookies() == null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
             }
         }
         return null;
