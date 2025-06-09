@@ -18,7 +18,7 @@ frontend:
 
 kakao:
   client-id: ${KAKAO_CLIENT_ID}
-  redirect-uri: http://localhost:8080/curio/api/auth/kakao/callback?env=local
+  redirect-uri: http://localhost:8080/curio/api/auth/kakao/callback
 
 oauth:
   google:
