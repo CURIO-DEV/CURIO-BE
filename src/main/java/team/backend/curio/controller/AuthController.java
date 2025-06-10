@@ -90,12 +90,17 @@ public class AuthController {
     public void kakaoCallback(@RequestParam String code, @RequestParam(required = false) String state, HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("인가 코드 받음: {}", code); // ← 이 로그 뜨나요?
 
+        String host = request.getServerName();
+        int port = request.getServerPort();
         // ✅ 콜백 주소 기준으로 로컬/배포 환경 판단More actions
-        boolean isLocal = "local".equals(state);
+        boolean isLocal = "local".equals(state)
+                || host.contains("localhost")
+                || host.contains("127.0.0.1")
+                || (port != 80 && port != 443);
 
         // ✅ isLocal 로그 출력
-        System.out.println("[KakaoCallback] state = " + state);
-        System.out.println("[KakaoCallback] isLocal = " + isLocal);
+        log.info("[KakaoCallback] state = {}", state);
+        log.info("[Callback] host = {}, port = {}, isLocal = {}", host, port, isLocal);
 
         String accessToken = kakaoOAuthClient.getAccessToken(code, isLocal);
         OAuthUserInfo userInfo = kakaoOAuthClient.getUserInfo(accessToken);
@@ -107,7 +112,7 @@ public class AuthController {
 
         // access token 쿠키
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
-                /*.httpOnly(true)*/
+                .httpOnly(true)
                 .secure(!isLocal) // HTTPS 환경 local에서는 secure(false)
                 .path("/")
                 .maxAge(60 * 60) //60분
@@ -116,8 +121,8 @@ public class AuthController {
 
         // refresh token 쿠키
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshJwt)
-                /*.httpOnly(true)*/
-                .secure(true)
+                .httpOnly(true)
+                .secure(!isLocal)
                 .path("/")
                 .maxAge(60 * 60 * 24 * 7)
                 .sameSite(isLocal ? "Lax" : "None")
