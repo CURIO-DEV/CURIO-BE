@@ -27,6 +27,7 @@ public class TrendsService {
     private final UserRepository userRepository;
     private String cachedKeywords = null;
     private LocalDate lastCacheDate = null;
+    private int lastNewsCount = -1;
 
     @Autowired
     public TrendsService(NewsRepository newsRepository,RestTemplate restTemplate,GptSummaryService gptSummaryService, UserRepository userRepository) {
@@ -47,18 +48,18 @@ public class TrendsService {
     public List<PopularKeywordDto> getPopularKeywords() {
         LocalDate today = LocalDate.now();
 
-        // 오늘 요청이 이미 처리된 경우, 캐시된 결과 사용
-        if (lastCacheDate != null && lastCacheDate.equals(today) && cachedKeywords != null) {
-            return parseKeywordResponse(cachedKeywords);
-        }
-
-        // 1. 오늘 날짜 뉴스 조회
         List<News> todayNews = newsRepository.findAllByCreatedAtBetween(
                 today.atStartOfDay(),
                 today.plusDays(1).atStartOfDay()
         );
 
-        // 2. 뉴스 요약 이어붙이기
+        // 뉴스 개수가 이전과 같으면 캐시 사용
+        if (lastCacheDate != null && lastCacheDate.equals(today) &&
+                cachedKeywords != null && lastNewsCount == todayNews.size()) {
+            return parseKeywordResponse(cachedKeywords);
+        }
+
+        // 요약 이어붙이기
         StringBuilder contentBuilder = new StringBuilder();
         for (News news : todayNews) {
             if (news.getSummaryShort() != null) {
@@ -66,18 +67,16 @@ public class TrendsService {
             }
         }
 
-        // 3. GPT 프롬프트 구성
         String prompt = "다음 뉴스 요약들을 참고해서, 지금 이슈가 되는 키워드 8개를 많이 나온 거 같은 키워드 우선으로 순위 매겨서 반환해줘. " +
                 "형식은 쉼표(,)로 구분해서 한 줄로 알려줘.\n\n" + contentBuilder;
 
-        // 4. GPT 호출
         String gptResponse = gptSummaryService.callGptApi(prompt);
 
-        // 5. 캐시 저장
+        // 캐시 갱신
         cachedKeywords = gptResponse;
         lastCacheDate = today;
+        lastNewsCount = todayNews.size();
 
-        // 6. 결과 파싱 및 반환
         return parseKeywordResponse(gptResponse);
     }
 
