@@ -72,6 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String resolveToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
+      
         if (cookies == null) {
             System.out.println("🪙 [resolveToken] 쿠키 없음 (null)");
             return null;
@@ -89,4 +90,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("❌ accessToken 쿠키 없음");
         return null;
     }
+
 }
