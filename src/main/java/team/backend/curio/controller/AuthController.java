@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team.backend.curio.client.KakaoOAuthClient;
@@ -25,7 +26,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -87,6 +88,8 @@ public class AuthController {
     @Operation(summary = "카카오 소셜로그인 callback - 쿠키 방식")
     @GetMapping("/kakao/callback")
     public void kakaoCallback(@RequestParam String code, @RequestParam(required = false) String state, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        log.info("인가 코드 받음: {}", code); // ← 이 로그 뜨나요?
+
         // ✅ 콜백 주소 기준으로 로컬/배포 환경 판단More actions
         boolean isLocal = "local".equals(state);
 
