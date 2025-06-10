@@ -117,7 +117,7 @@ public class AuthController {
         // refresh token 쿠키
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshJwt)
                 .httpOnly(true)
-                .secure(true)
+                .secure(!isLocal)
                 .path("/")
                 .maxAge(60 * 60 * 24 * 7)
                 .sameSite(isLocal ? "Lax" : "None")
@@ -173,10 +173,11 @@ public class AuthController {
 
     @Operation(summary = "구글 소셜로그인 callback - 쿠키 + 리다이렉트")
     @GetMapping("/google/callback")
-    public void googleCallback(@RequestParam String code, @RequestParam(required = false) String env, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        boolean isLocal = "local".equals(env); // ✅ 로컬 여부 판단
+    public void googleCallback(@RequestParam String code, @RequestParam(required = false) String state, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // ✅ 콜백 주소 기준으로 로컬/배포 환경 판단More actions
+        boolean isLocal = "local".equals(state);
 
-        System.out.println("[GoogleCallback] env = " + env);
+        System.out.println("[GoogleCallback] env = " + state);
         System.out.println("[GoogleCallback] isLocal = " + isLocal);
 
         // 1. 구글에서 accessToken 받아오기
@@ -191,7 +192,7 @@ public class AuthController {
         // 5. access token 쿠키 설정
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessJwt)
                 .httpOnly(true)
-                .secure(true)
+                .secure(!isLocal)
                 .path("/")
                 .maxAge(60 * 60) // 1시간
                 .sameSite(isLocal ? "Lax" : "None")
@@ -200,7 +201,7 @@ public class AuthController {
         // 6. refresh token 쿠키 설정
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshJwt)
                 .httpOnly(true)
-                .secure(true)
+                .secure(!isLocal)
                 .path("/")
                 .maxAge(60 * 60 * 24 * 7) // 7일
                 .sameSite(isLocal ? "Lax" : "None")
