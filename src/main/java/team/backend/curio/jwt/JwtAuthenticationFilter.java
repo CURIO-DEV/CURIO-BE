@@ -20,6 +20,7 @@ import jakarta.servlet.http.Cookie;
 
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 @RequiredArgsConstructor
 @Component
@@ -72,7 +73,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String resolveToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-      
+        System.out.println("👉 요청 Origin: " + request.getHeader("Origin"));
+        System.out.println("👉 요청 쿠키: " + Arrays.toString(cookies));
+
         if (cookies == null) {
             System.out.println("🪙 [resolveToken] 쿠키 없음 (null)");
             return null;
