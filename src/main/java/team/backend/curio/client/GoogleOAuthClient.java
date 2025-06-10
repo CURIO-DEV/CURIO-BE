@@ -38,11 +38,8 @@ public class GoogleOAuthClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        // 🔥 env=local 처리된 redirect_uri
-        String finalRedirectUri = isLocal
-                ? redirectUri + "?env=local"
-                : redirectUri;
-
+        // 🔥 env=local 처리된 redirect_uriAdd commentMore actions
+        String finalRedirectUri = redirectUri;
         System.out.println("🟡 [구글 토큰 요청] redirect_uri = " + finalRedirectUri);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
