@@ -109,7 +109,12 @@ public class UserController {
     ) {
         List<SearchNewsResponseDto> newsList = newsService.getNewsByInterestSortedByRecent(interestName)
                 .stream()
-                .map(SearchNewsResponseDto::new)
+                .map(news -> new SearchNewsResponseDto(
+                        news.getNewsId(),
+                        news.getTitle(),
+                        news.getContent(),
+                        news.getImageUrl()
+                ))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(newsList);
