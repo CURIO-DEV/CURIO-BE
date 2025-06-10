@@ -20,6 +20,7 @@ import jakarta.servlet.http.Cookie;
 
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 @RequiredArgsConstructor
 @Component
@@ -72,13 +73,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String resolveToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
+        System.out.println("👉 요청 Origin: " + request.getHeader("Origin"));
+        System.out.println("👉 요청 쿠키: " + Arrays.toString(cookies));
+
+        if (cookies == null) {
+            System.out.println("🪙 [resolveToken] 쿠키 없음 (null)");
+            return null;
+        }
+
+        System.out.println("🪙 [resolveToken] 쿠키 수: " + cookies.length);
+        for (Cookie cookie : cookies) {
+
+            System.out.println("🍪 쿠키 이름: " + cookie.getName() + ", 값: " + cookie.getValue());
+            if ("accessToken".equals(cookie.getName())) {
+                System.out.println("✅ accessToken 쿠키 발견!");
+                return cookie.getValue();
             }
         }
+        System.out.println("❌ accessToken 쿠키 없음");
         return null;
     }
 
