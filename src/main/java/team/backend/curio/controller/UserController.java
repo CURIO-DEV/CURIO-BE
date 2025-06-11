@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import team.backend.curio.domain.users;
 import team.backend.curio.domain.News;
 import team.backend.curio.dto.BookmarkDTO.MessageResponse;
@@ -264,13 +265,18 @@ public class UserController {
 
     @Operation(summary = "토큰 로그인 판별")
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("isLogin", "false"));
+    public ResponseEntity<?> getCurrentUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 인증이 안 된 상태 (비로그인)
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                authentication.getPrincipal().equals("anonymousUser")) {
+
+            return ResponseEntity.ok(Map.of("isLogin", false));
         }
 
-        return ResponseEntity.ok(Map.of("isLogin","true"));
+        return ResponseEntity.ok(Map.of("isLogin",true));
     }
 }
 
