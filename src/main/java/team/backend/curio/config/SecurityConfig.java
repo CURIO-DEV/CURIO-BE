@@ -43,7 +43,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/curio/api/swagger-ui-custom.html",
                                 "/curio/api/custom-api-docs/**",
-                                "/auth/**"
+                                "/auth/**",
+                                "/users/me"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

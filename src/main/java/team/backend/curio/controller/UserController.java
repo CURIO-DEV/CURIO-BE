@@ -261,5 +261,16 @@ public class UserController {
         String newsletterEmail = userService.getNewsletterEmailByUserId(userId);
         return ResponseEntity.ok(newsletterEmail);
     }*/
+
+    @Operation(summary = "토큰 로그인 판별")
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("isLogin", "false"));
+        }
+
+        return ResponseEntity.ok(Map.of("isLogin","true"));
+    }
 }
 
