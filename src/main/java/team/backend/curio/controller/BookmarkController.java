@@ -201,9 +201,11 @@ public class BookmarkController {
                         .body(Map.of("message", "본인의 북마크가 아닙니다."));
             }
 
-            // 4. 권한 확인 통과 시 뉴스 리스트 반환
-            List<News> newsList = bookmark.getNewsList();
-            return ResponseEntity.ok(newsList);
+            // 4. 뉴스 리스트를 DTO로 변환
+            List<BookmarkNewsDto> newsDtoList = bookmark.getNewsList().stream()
+                    .map(BookmarkNewsDto::new)
+                    .toList();
+            return ResponseEntity.ok(newsDtoList);
 
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
