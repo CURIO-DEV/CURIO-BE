@@ -73,7 +73,7 @@ public class Bookmark {
             if (!user.getBookmarks().contains(this)) {
                 user.getBookmarks().add(this);
             }
-        }
+        }//북마크 수정
     }
 
     // 멤버 삭제 메소드

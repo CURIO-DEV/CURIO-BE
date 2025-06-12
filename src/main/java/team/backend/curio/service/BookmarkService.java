@@ -97,7 +97,7 @@ public class BookmarkService {
                 bookmark.addMember(member);
             }
         }
-
+//북마크 수정
         return bookmark; // Bookmark 객체 반환
     }
 
