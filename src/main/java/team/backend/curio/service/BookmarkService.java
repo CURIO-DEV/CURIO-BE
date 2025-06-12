@@ -15,6 +15,7 @@ import team.backend.curio.repository.BookmarkRepository;
 import team.backend.curio.repository.NewsRepository;
 import team.backend.curio.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -84,7 +85,9 @@ public class BookmarkService {
         users currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        bookmark.getMembers().clear();
+        for (users member : new ArrayList<>(bookmark.getMembers())) {
+            bookmark.removeMember(member); //  양방향 모두에서 제거
+        }
         bookmark.addMember(currentUser);
 
         if (updateDto.getMembers() != null && !updateDto.getMembers().isEmpty()) {
@@ -95,7 +98,7 @@ public class BookmarkService {
             }
         }
 
-        return bookmarkRepository.save(bookmark); // Bookmark 객체 반환
+        return bookmark; // Bookmark 객체 반환
     }
 
     // 북마크에서 해당 사용자만 삭제
