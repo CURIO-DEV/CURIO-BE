@@ -5,7 +5,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 public class CurioGoNewsResponseDto {
-    private Long newsId;
+    private Long articleId;
     private String imageUrl;
     private String summaryMedium;
 }
