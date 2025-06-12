@@ -130,7 +130,7 @@ public class UserController {
     }*/
 
     @Operation(summary = "사용자의 커스텀 설정 조회 (요약 선호도)")
-    @GetMapping("/custom")
+    @GetMapping("/settings")
     public ResponseEntity<CustomSettingDto> getUserCustomSettings(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
