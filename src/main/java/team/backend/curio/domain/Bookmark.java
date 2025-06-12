@@ -67,17 +67,20 @@ public class Bookmark {
     }
 
     // 멤버 추가 메소드
-    public void addMember(users users) {
-        if (this.members.size() < 4) {
-            this.members.add(users);
-        }
+    public void addMember(users user) {
+        if (!this.members.contains(user)) {
+            this.members.add(user);
+            if (!user.getBookmarks().contains(this)) {
+                user.getBookmarks().add(this);
+            }
+        }//북마크 수정
     }
 
     // 멤버 삭제 메소드
-    public void removeMember(users users) {
-        this.members.remove(users);
+    public void removeMember(users user) {
+        this.members.remove(user);
+        user.getBookmarks().remove(this);
     }
-
 }
 
 
