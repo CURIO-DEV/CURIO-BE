@@ -1,6 +1,7 @@
 package team.backend.curio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,6 +17,7 @@ import team.backend.curio.dto.UserCreateDto;
 import team.backend.curio.dto.CustomSettingDto;
 import team.backend.curio.dto.UserDTO.NewsletterRequestDto;
 import team.backend.curio.dto.UserDTO.UserInterestResponse;
+import team.backend.curio.jwt.JwtUtil;
 import team.backend.curio.security.CustomUserDetails;
 import team.backend.curio.service.UserService;
 import team.backend.curio.service.NewsService;
@@ -26,10 +28,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -37,11 +41,14 @@ public class UserController {
     private final UserService userService;
     private final TrendsService trendsService;
     private final EmailService emailService;
+    private final JwtUtil jwtUtil;  // 여기에 JwtUtil 주입
 
-    public UserController(UserService userService, TrendsService trendsService, EmailService emailService) {
+
+    public UserController(UserService userService, TrendsService trendsService, EmailService emailService,JwtUtil jwtUtil) {
         this.userService = userService;
         this.trendsService = trendsService;
         this.emailService = emailService;
+        this.jwtUtil = jwtUtil;
     }
 
     // 회원 가입
@@ -101,13 +108,20 @@ public class UserController {
     @Autowired
     private NewsService newsService;
 
-    // 유저의 관심사별 뉴스 목록 GET -> 유저아이디랑 관심사 이름 두개 필요
-    @Operation(summary = "사용자의 특정 관심사 뉴스 목록 불러오기")
+    // 유저의 관심사별 뉴스 목록 GET
     @GetMapping("/interests/{interestName}/news")
     public ResponseEntity<List<SearchNewsResponseDto>> getNewsByInterest(
             @PathVariable String interestName,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @CookieValue(value = "accessToken", required = false) String accessToken
     ) {
+        if (accessToken != null && jwtUtil.validateToken(accessToken)) {
+            String email = jwtUtil.getEmail(accessToken);
+            // 사용자 인증 처리 또는 로그
+            log.info("로그인 유저 이메일: {}", email);
+        } else {
+            log.info("비로그인 유저");
+        }
+
         List<SearchNewsResponseDto> newsList = newsService.getNewsByInterestSortedByRecent(interestName)
                 .stream()
                 .map(news -> new SearchNewsResponseDto(
@@ -120,6 +134,8 @@ public class UserController {
 
         return ResponseEntity.ok(newsList);
     }
+
+
 
     // 유저의 관심사별 뉴스 목록 GET -> 유저아이디만 있으므로 4개 다 각각 출력
     /*@Operation(summary = "사용자별 뉴스 목록 불러오기")

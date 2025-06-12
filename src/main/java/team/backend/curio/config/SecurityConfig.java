@@ -35,6 +35,7 @@ public class SecurityConfig {
                                 "/trends/popular-articles",
                                 "/users/interests",
                                 "/curio/api/users/interests",
+                                "/curio/api/users/interests/**",
                                 "/search/**",
                                 "/articles/**",
                                 "/swagger-ui/**",
