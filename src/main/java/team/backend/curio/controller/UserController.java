@@ -105,8 +105,7 @@ public class UserController {
     @Operation(summary = "사용자의 특정 관심사 뉴스 목록 불러오기")
     @GetMapping("/interests/{interestName}/news")
     public ResponseEntity<List<SearchNewsResponseDto>> getNewsByInterest(
-            @PathVariable String interestName,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @PathVariable String interestName
     ) {
         List<SearchNewsResponseDto> newsList = newsService.getNewsByInterestSortedByRecent(interestName)
                 .stream()
