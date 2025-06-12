@@ -5,13 +5,13 @@ import team.backend.curio.domain.News;
 
 @Getter
 public class SearchNewsResponseDto {
-    private Long newsId;
+    private Long articleId;
     private String title;
     private String content;
     private String imageUrl;
 
-    public SearchNewsResponseDto(Long newsId, String title, String content, String imageUrl) {
-        this.newsId = newsId;
+    public SearchNewsResponseDto(Long articleId, String title, String content, String imageUrl) {
+        this.articleId = articleId;
         this.title = title;
         this.content = content;
         this.imageUrl = imageUrl;
