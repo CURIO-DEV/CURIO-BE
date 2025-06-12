@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum BookmarkColor {
-    RED, ORANGE, YELLOW, GREEN, BLUE, NAVY, PURPLE;
+    RED, ORANGE, YELLOW, GREEN, BLUE, INDIGO, PURPLE;
 
     @JsonCreator
     public static BookmarkColor from(String value) {
