@@ -77,9 +77,13 @@ public class BookmarkController {
         Long userId = userDetails.getUserId();
         Bookmark updatedBookmark = bookmarkService.updateBookmark(bookmarkId, updateDto, userId);
 
+        String currentUserEmail = userDetails.getEmail();
+
         // 공동작업자 이메일 리스트 생성
         List<String> memberEmails = updatedBookmark.getMembers().stream()
-                .map(users::getEmail).toList();
+                .map(users::getEmail)
+                .filter(email -> !email.equals(currentUserEmail))  // 현재 유저 이메일 제외
+                .toList();
 
         BookmarkResponseDto response = new BookmarkResponseDto(
                 updatedBookmark.getId(),
