@@ -1,5 +1,6 @@
 package team.backend.curio.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,13 @@ public class UserActionService {
     private final UserActionRepository userActionRepository;
     private final NewsRepository newsRepository;
 
+    @Transactional(readOnly = true)
+    public boolean isLiked(Long userId, Long articleId) {
+        return userActionRepository.findByUserIdAndNewsId(userId, articleId)
+                .map(UserAction::isLike)
+                .orElse(false);
+    }
+
     // 좋아요 등록 / 취소
     @Transactional
     public int likeNews(Long userId, Long newsId) {
@@ -27,7 +35,8 @@ public class UserActionService {
                         .like(false)
                         .build());
 
-        News news=newsRepository.findById(newsId).orElseThrow();
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 뉴스가 존재하지 않습니다. id=" + newsId));
 
         if (userAction.isLike()) {
             userAction.setLike(false);
@@ -48,6 +57,12 @@ public class UserActionService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public int getVote(Long userId, Long articleId) {
+        return userActionRepository.findByUserIdAndNewsId(userId, articleId)
+                .map(UserAction::getVote)
+                .orElse(0);  // 아무 행동 안 했으면 0으로 반환
+    }
 
     // 추천 등록 / 취소
     @Transactional
@@ -57,6 +72,7 @@ public class UserActionService {
                         .userId(userId)
                         .newsId(newsId)
                         .build());
+
 
         if (userAction.getVote() != 1) {
             userAction.setVote(1); //추천

@@ -35,6 +35,7 @@ public class UserAction implements Serializable {
     @Column(name="liked",nullable=false) //like는 SQL 예약어라 백틱으로 감싸줌
     private boolean like;
 
+
     /* 추천 상태 (vote 필드)
      *  1 → 추천
      * -1 → 비추천
@@ -67,4 +68,5 @@ public class UserAction implements Serializable {
             updateAt=LocalDateTime.now();
         }
     }
+
 }
