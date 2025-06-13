@@ -10,8 +10,8 @@ import java.util.List;
 @Setter
 
 public class CustomSettingDto {
+    private Integer socialType;
 
-    private int summaryPreference; // 요약 선호도 (1=짧음, 2=보통, 3=김)
     private String summaryType;    // 요약 타입 (short, medium, long)
     private boolean receiveNewsletter;
     private String newsletterEmail;
@@ -19,32 +19,31 @@ public class CustomSettingDto {
     private String fontSize;           // 글자 크기 (SMALL, MEDIUM, LARGE)
 
     // 생성자 수정: summaryPreference 값에 따라 summaryType을 설정
-    public CustomSettingDto(int summaryPreference) {
-        this.summaryPreference = summaryPreference;
-        this.summaryType = mapSummaryType(summaryPreference);  // summaryType을 매핑
+    public CustomSettingDto(String summaryType) {
+        this.summaryType = "medium";  // summaryType을 매핑
     }
 
-    public CustomSettingDto()
-    {
 
-    }
     // 오버로드 생성자
-    public CustomSettingDto(int summaryPreference, String newsletterEmail, boolean receiveNewsletter, List<String> categories, String fontSize) {
-        this.summaryPreference = summaryPreference;
-        this.summaryType = mapSummaryType(summaryPreference);
+    public CustomSettingDto(String summaryType, String newsletterEmail, boolean receiveNewsletter, List<String> categories, String fontSize,int socialType) {
+        this.summaryType = summaryType != null ? summaryType : "medium";  // null 방어
         this.newsletterEmail = newsletterEmail;
         this.receiveNewsletter = receiveNewsletter;
         this.categories = categories;
         this.fontSize = fontSize;
+        this.socialType = socialType;
     }
 
     // summaryPreference 값을 받아 summaryType을 반환하는 메서드
-    private String mapSummaryType(int summaryPreference) {
-        switch (summaryPreference) {
-            case 1: return "short";  // 짧음
-            case 2: return "medium"; // 보통
-            case 3: return "long";   // 길음
-            default: return "medium"; // 기본값은 "medium"
-        }
+    private int mapSummaryPreference(String summaryType) {
+        if (summaryType == null) return 2;
+        return switch (summaryType.toLowerCase()) {
+            case "short" -> 1;
+            case "medium" -> 2;
+            case "long" -> 3;
+            default -> 2;
+        };
     }
+
+
 }
