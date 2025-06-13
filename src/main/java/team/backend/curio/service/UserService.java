@@ -8,8 +8,11 @@ import team.backend.curio.dto.UserCreateDto;
 import team.backend.curio.dto.UserDTO.UserInterestResponse;
 import team.backend.curio.dto.UserResponseDto;
 import team.backend.curio.repository.UserRepository;
-
+import team.backend.curio.dto.setting.CustomSettingPatchResponseDto;
+import team.backend.curio.dto.setting.CustomSettingRequestDto;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -24,6 +27,17 @@ public class UserService {
         this.emailService = emailService;
         this.newsService = newsService;
     }
+
+    private int mapSummaryPreference(String summaryType) {
+        if (summaryType == null) return 2; // 기본값: medium
+        return switch (summaryType.toLowerCase()) {
+            case "short" -> 1;
+            case "medium" -> 2;
+            case "long" -> 3;
+            default -> 2;
+        };
+    }
+
 
     // 회원 가입 처리
     public UserResponseDto createUser(UserCreateDto userCreateDto) {
@@ -50,17 +64,18 @@ public class UserService {
         users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
-        if (user.getInterest1() == null || user.getInterest2() == null ||
-                user.getInterest3() == null || user.getInterest4() == null) {
-            return new UserInterestResponse(List.of("사회", "정치", "경제", "연예")); // 기본값
-        }
+        //기본카테고리
+        List<String> defaults = List.of("사회", "정치", "경제", "연예");
+        List<String> interests = new ArrayList<>();
 
-        return new UserInterestResponse(List.of(
-                user.getInterest1(),
-                user.getInterest2(),
-                user.getInterest3(),
-                user.getInterest4()
-        ));
+        // 각 관심사가 null이면 기본값으로 대체
+        interests.add(user.getInterest1() != null ? user.getInterest1() : defaults.get(0));
+        interests.add(user.getInterest2() != null ? user.getInterest2() : defaults.get(1));
+        interests.add(user.getInterest3() != null ? user.getInterest3() : defaults.get(2));
+        interests.add(user.getInterest4() != null ? user.getInterest4() : defaults.get(3));
+
+        // 기본값 적용 후 응답
+        return new UserInterestResponse(interests);
     }
 
     // 회원 관심사 수정
@@ -85,18 +100,51 @@ public class UserService {
         users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // 사용자가 설정한 요약 선호도 반환
-        return new CustomSettingDto(user.getSummaryPreference());
+        // summaryPreference → summaryType 변환
+        String summaryType = switch (user.getSummaryPreference()) {
+            case 1 -> "short";
+            case 3 -> "long";
+            default -> "medium"; // null 또는 2
+        };
+
+        // 카테고리 4개 → null일 경우 기본값
+        List<String> defaultCategories = List.of("사회", "정치", "경제", "연예");
+        List<String> responseCategories = List.of(
+                user.getInterest1() != null ? user.getInterest1() : defaultCategories.get(0),
+                user.getInterest2() != null ? user.getInterest2() : defaultCategories.get(1),
+                user.getInterest3() != null ? user.getInterest3() : defaultCategories.get(2),
+                user.getInterest4() != null ? user.getInterest4() : defaultCategories.get(3)
+        );
+
+        // fontSize 기본값 처리
+        String fontSize = user.getFontSize() != null ? user.getFontSize() : "medium";
+
+        // 뉴스레터 수신 상태 및 이메일 처리
+        boolean receiveNewsletter = user.getNewsletterStatus() == 1;
+        String newsletterEmail = user.getNewsletterEmail() != null
+                ? user.getNewsletterEmail()
+                : user.getEmail(); // 회원가입한 이메일을 기본값으로
+
+        return new CustomSettingDto(
+                summaryType,
+                newsletterEmail,
+                receiveNewsletter,
+                responseCategories,
+                fontSize,
+                user.getSocialType()
+        );
+
     }
 
 
     // 사용자의 커스텀 설정에서 요약 선호도 및 기타 설정값 수정
-    public CustomSettingDto updateUserCustomSettings(Long userId, CustomSettingDto customSettingDto) {
+    public CustomSettingPatchResponseDto updateUserCustomSettings(Long userId, CustomSettingDto customSettingDto) {
         users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // 요약 선호도 수정
-        user.setSummaryPreference(customSettingDto.getSummaryPreference());
+        // summaryType → summaryPreference 매핑
+        int preference = mapSummaryPreference(customSettingDto.getSummaryType());
+        user.setSummaryPreference(preference);
 
         // 수신 이메일 저장
         user.setNewsletterEmail(customSettingDto.getNewsletterEmail());
@@ -107,22 +155,34 @@ public class UserService {
         // 폰트 크기 저장 (String으로)
         user.setFontSize(customSettingDto.getFontSize());
 
-        // 카테고리 리스트 → interest1~4에 분배
+        // 프론트에서 넘긴 관심사 저장 (최대 4개)
         List<String> categories = customSettingDto.getCategories();
         if (categories != null) {
+            categories = categories.stream()
+                    .filter(c -> !"string".equalsIgnoreCase(c))  // 혹시 모르니 방어
+                    .collect(Collectors.toList());
             if (categories.size() > 0) user.setInterest1(categories.get(0));
             if (categories.size() > 1) user.setInterest2(categories.get(1));
             if (categories.size() > 2) user.setInterest3(categories.get(2));
             if (categories.size() > 3) user.setInterest4(categories.get(3));
         }
 
+        // 관심사 4개를 null 여부에 따라 기본값으로 대체
+        List<String> defaultCategories = List.of("사회", "정치", "경제", "연예");
+        List<String> responseCategories = new ArrayList<>();
+        responseCategories.add(user.getInterest1() != null ? user.getInterest1() : defaultCategories.get(0));
+        responseCategories.add(user.getInterest2() != null ? user.getInterest2() : defaultCategories.get(1));
+        responseCategories.add(user.getInterest3() != null ? user.getInterest3() : defaultCategories.get(2));
+        responseCategories.add(user.getInterest4() != null ? user.getInterest4() : defaultCategories.get(3));
+
+
         userRepository.save(user);
 
-        return new CustomSettingDto(
-                user.getSummaryPreference(),
+        return new CustomSettingPatchResponseDto(
+                customSettingDto.getSummaryType() != null ? customSettingDto.getSummaryType() : "medium",
                 user.getNewsletterEmail(),
                 user.getNewsletterStatus()==1,
-                List.of(user.getInterest1(), user.getInterest2(), user.getInterest3(), user.getInterest4()),
+                responseCategories,
                 user.getFontSize()
         );
     }

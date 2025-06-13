@@ -17,6 +17,7 @@ import team.backend.curio.dto.UserCreateDto;
 import team.backend.curio.dto.CustomSettingDto;
 import team.backend.curio.dto.UserDTO.NewsletterRequestDto;
 import team.backend.curio.dto.UserDTO.UserInterestResponse;
+import team.backend.curio.dto.setting.CustomSettingPatchResponseDto;
 import team.backend.curio.jwt.JwtUtil;
 import team.backend.curio.security.CustomUserDetails;
 import team.backend.curio.service.UserService;
@@ -145,7 +146,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }*/
 
-    @Operation(summary = "사용자의 커스텀 설정 조회 (요약 선호도)")
+    @Operation(summary = "사용자의 커스텀 설정 조회 ")
     @GetMapping("/settings")
     public ResponseEntity<CustomSettingDto> getUserCustomSettings(
             @AuthenticationPrincipal CustomUserDetails userDetails
@@ -162,7 +163,7 @@ public class UserController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         try {
-            CustomSettingDto updated = userService.updateUserCustomSettings(userDetails.getUserId(), customSettingDto);
+            CustomSettingPatchResponseDto updated = userService.updateUserCustomSettings(userDetails.getUserId(), customSettingDto);
             return ResponseEntity.ok(updated);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
