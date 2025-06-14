@@ -33,13 +33,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath(); //path로 수정
+        log.info("🧪 요청 path = {}", path);
 
         if (path.startsWith("/auth") || path.startsWith("/swagger")) {
             return true;
         }
 
         // "/curio/api/users/interests/"로 시작하고 "/news"로 끝나는 경로 필터 제외
-        if (path.startsWith("/curio/api/users/interests/") && path.endsWith("/news")) {
+        if (path.startsWith("/users/interests/") && path.endsWith("/news")) {
             System.out.println("✅ 필터 제외됨: " + path);
             return true;
         }

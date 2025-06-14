@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,13 +31,13 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/users/interests").permitAll()
                         .requestMatchers(
                                 "/trends/interests/keywords",
                                 "/trends/keywords",
                                 "/trends/popular-articles",
                                 "/users/interests",
-                                "/curio/api/users/interests",
-                                "/curio/api/users/interests/**",
+                                "/users/interests/*/news",
                                 "/search/**",
                                 "/articles/**",
                                 "/swagger-ui/**",
