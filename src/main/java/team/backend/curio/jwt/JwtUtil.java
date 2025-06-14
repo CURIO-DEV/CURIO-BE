@@ -57,6 +57,7 @@ public class JwtUtil {
                     .parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("❌ [validateToken] 토큰 유효성 검사 실패: " + e.getMessage());
             return false;
         }
     }
