@@ -116,7 +116,7 @@ public class AuthController {
                 .secure(!isLocal) // HTTPS 환경 local에서는 secure(false)
                 .path("/")
                 .maxAge(60 * 60) //60분
-                .sameSite("None")
+                .sameSite(isLocal ? "Lax" : "None")
                 .build();
 
         // refresh token 쿠키
