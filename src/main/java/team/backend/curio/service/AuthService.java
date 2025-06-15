@@ -39,12 +39,21 @@ public class AuthService {
     // 기존 로직 유지
     public users findOrCreateKakaoUser(OAuthUserInfo kakaoUser) {
         return userRepository.findByEmail(kakaoUser.getEmail())
+                .map(user -> {
+                    // 🔥 기존 유저인데 oauthId가 없다면 저장 (예외 대응)
+                    if (user.getOauthId() == null && kakaoUser.getOauthId() != null) {
+                        user.setOauthId(kakaoUser.getOauthId());
+                        userRepository.save(user);
+                    }
+                    return user;
+                })
                 .orElseGet(() -> {
 
                     users newUser = users.builder()
                             .email(kakaoUser.getEmail())
                             .nickname(nicknameService.generateNickname()) //자동 생성 닉네임
                             .profile_image_url(kakaoUser.getProfileImage())
+                            .oauthId(kakaoUser.getOauthId())
                             .socialType(1)
                             .build();
                     return userRepository.save(newUser);

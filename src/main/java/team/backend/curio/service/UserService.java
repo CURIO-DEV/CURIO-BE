@@ -2,6 +2,7 @@ package team.backend.curio.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import team.backend.curio.client.KakaoOAuthClient;
 import team.backend.curio.domain.users;
 import team.backend.curio.dto.CustomSettingDto;
 import team.backend.curio.dto.UserCreateDto;
@@ -20,12 +21,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final NewsService newsService; // NewsService로부터 인기 뉴스 데이터를 가져옵니다.
+    private final KakaoOAuthClient kakaoOAuthClient;
 
     @Autowired
-    public UserService(UserRepository userRepository, EmailService emailService, NewsService newsService) {
+    public UserService(UserRepository userRepository, EmailService emailService, NewsService newsService, KakaoOAuthClient kakaoOAuthClient) {
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.newsService = newsService;
+        this.kakaoOAuthClient = kakaoOAuthClient;
     }
 
     private int mapSummaryPreference(String summaryType) {
@@ -221,6 +224,16 @@ public class UserService {
         users user=userRepository.findById(userId).orElse(null);
         if(user ==null){
             return "User not found"; //유저가 없다면 메시지 반환
+        }
+
+        // ✅ 카카오 연결 끊기 (소셜 로그인인 경우만)
+        if (user.getSocialType() == 1) {
+            String oauthId = user.getOauthId();
+            if (oauthId != null) {
+                kakaoOAuthClient.unlink(oauthId);
+            } else {
+                System.err.println("❗️카카오 유저지만 oauthId가 null입니다. unlink 스킵");
+            }
         }
 
         //유저 삭제

@@ -1,11 +1,14 @@
 package team.backend.curio.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import team.backend.curio.client.KakaoOAuthClient;
 import team.backend.curio.domain.users;
 import team.backend.curio.domain.News;
 import team.backend.curio.dto.BookmarkDTO.MessageResponse;
@@ -28,6 +31,8 @@ import team.backend.curio.dto.UserResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,13 +48,16 @@ public class UserController {
     private final TrendsService trendsService;
     private final EmailService emailService;
     private final JwtUtil jwtUtil;  // 여기에 JwtUtil 주입
+    private final KakaoOAuthClient kakaoOAuthClient;
 
 
-    public UserController(UserService userService, TrendsService trendsService, EmailService emailService,JwtUtil jwtUtil) {
+    public UserController(UserService userService, TrendsService trendsService, EmailService emailService, JwtUtil jwtUtil,KakaoOAuthClient kakaoOAuthClient) {
         this.userService = userService;
         this.trendsService = trendsService;
         this.emailService = emailService;
         this.jwtUtil = jwtUtil;
+        this.kakaoOAuthClient = kakaoOAuthClient;
+
     }
 
     // 회원 가입
@@ -135,7 +143,6 @@ public class UserController {
 
         return ResponseEntity.ok(newsList);
     }
-
 
 
     // 유저의 관심사별 뉴스 목록 GET -> 유저아이디만 있으므로 4개 다 각각 출력
@@ -250,10 +257,13 @@ public class UserController {
         }
     }
 
+
     @Operation(summary = "회원 탈퇴하기")
     @DeleteMapping("/delete")
     public ResponseEntity<CommonResponseDto<String>> deleteUser(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletResponse response,
+            HttpServletRequest request
     ) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -263,7 +273,21 @@ public class UserController {
         Long authenticatedUserId = userDetails.getUserId();
 
         try {
+            users user = userService.getUserById(authenticatedUserId);
             userService.deleteUser(authenticatedUserId);
+
+
+            if (user.getSocialType() == 1) { // 🔹 소셜 타입이 카카오일 경우
+                kakaoOAuthClient.unlink(user.getOauthId()); // 🔥 카카오 연결 해제
+            }
+
+            // ✅ 로컬/배포 판단
+            boolean isLocal = request.getServerName().contains("localhost");
+
+            // ✅ 쿠키 삭제 추가
+            invalidateCookie("accessToken", response,isLocal);
+            invalidateCookie("refreshToken", response,isLocal);
+
             return ResponseEntity.ok(new CommonResponseDto<>(true, "회원 탈퇴가 완료되었습니다.", null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -282,7 +306,7 @@ public class UserController {
 
     @Operation(summary = "토큰 로그인 판별")
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(){
+    public ResponseEntity<?> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // 인증이 안 된 상태 (비로그인)
@@ -293,7 +317,20 @@ public class UserController {
             return ResponseEntity.ok(Map.of("isLogin", false));
         }
 
-        return ResponseEntity.ok(Map.of("isLogin",true));
+        return ResponseEntity.ok(Map.of("isLogin", true));
+    }
+
+    // ✅ [추가] 쿠키 삭제 메서드
+    private void invalidateCookie(String name, HttpServletResponse response, boolean isLocal) {
+        ResponseCookie cookie = ResponseCookie.from(name, "")
+                .httpOnly(!isLocal)
+                .secure(!isLocal)
+                .path("/")
+                .maxAge(0) // 즉시 만료
+                .sameSite(isLocal ? "Lax" : "None")
+                .build();
+
+        response.addHeader("Set-Cookie", cookie.toString());
     }
 }
 

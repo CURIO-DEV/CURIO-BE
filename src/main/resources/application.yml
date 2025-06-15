@@ -61,6 +61,7 @@ springdoc:
 kakao:
   client-id: ${KAKAO_CLIENT_ID}
   redirect-uri: http://localhost:8080/curio/api/auth/kakao/callback
+  admin-key: ${KAKAO_ADMIN_KEY}
 
 oauth:
   google:
@@ -74,3 +75,4 @@ frontend:
 
 jwt:
   secret: ${JWT_SECRET}
+
