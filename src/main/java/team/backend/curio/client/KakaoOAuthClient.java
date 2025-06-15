@@ -23,6 +23,8 @@ public class KakaoOAuthClient {
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
 
+    @Value("${kakao.admin-key}")
+    private String adminKey;
 
     private final RestTemplate restTemplate;
 
@@ -68,6 +70,12 @@ public class KakaoOAuthClient {
         //⬇️로그 확인
         System.out.println("카카오 사용자 정보 응답: " + response);
 
+        // ✅ 1. 카카오 고유 user_id 추출
+        Long kakaoUserId = ((Number) response.get("id")).longValue();
+
+        // ✅ [추가] 콘솔에 user_id 로그 출력
+        System.out.println("🔍 카카오 사용자 ID: " + kakaoUserId);  // ← 이게 oauthId로 저장되는 값
+
         // Null 체크 추가 (중요!)
         if (response == null) {
             throw new RuntimeException("카카오 사용자 정보 요청 실패: 응답이 null입니다.");
@@ -89,6 +97,8 @@ public class KakaoOAuthClient {
                 .email((String) kakaoAccount.get("email"))
                 .nickname((String) profile.get("nickname"))
                 .profileImage((String) profile.get("profile_image_url"))
+                .oauthId(String.valueOf(kakaoUserId))
+                .socialType(1)
                 .build();
     }
 
@@ -99,5 +109,28 @@ public class KakaoOAuthClient {
 
         // 2. access_token으로 사용자 정보 조회
         return getUserInfo(accessToken);
+    }
+
+    // 카카오 연결 끊기
+    public void unlink(String kakaoUserId) {
+        String url = "https://kapi.kakao.com/v1/user/unlink";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("Authorization", "KakaoAK " + adminKey); // ✅ Admin Key 꼭 KakaoAK 붙이기
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("target_id_type", "user_id");
+        body.add("target_id", kakaoUserId); // ← 이 값은 Long 타입이어도 문자열로 보내면 됩니다
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        try {
+            restTemplate.postForEntity(url, request, String.class);
+            System.out.println("✅ [카카오 unlink] 성공 - userId: " + kakaoUserId);
+        } catch (Exception e) {
+            System.err.println("❌ [카카오 unlink] 실패 - userId: " + kakaoUserId);
+            e.printStackTrace();
+        }
     }
 }

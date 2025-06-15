@@ -73,11 +73,19 @@ public class GoogleOAuthClient {
 
         Map<String, Object> body = response.getBody();
 
+        String oauthId = (String) body.get("id");
         String email = (String) body.get("email");
         String nickname = (String) body.get("name");  // name을 nickname으로 사용
         String picture = (String) body.get("picture");
 
-        return new OAuthUserInfo(email, nickname, picture);
+
+        return OAuthUserInfo.builder()
+                .email(email)
+                .nickname(nickname)
+                .profileImage(picture)
+                .oauthId(oauthId)   // ✅ 소셜 고유 ID
+                .socialType(2)      // ✅ 구글 = 2
+                .build();
     }
 
     // ✅ Step 3: code → accessToken → 사용자 정보까지 한번에

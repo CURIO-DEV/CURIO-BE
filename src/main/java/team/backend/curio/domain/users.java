@@ -83,4 +83,7 @@ public class users {
         this.bookmarks = new ArrayList<>();
     }
 
+    @Column(name = "oauth_id")
+    private String oauthId; // ← 어떤 플랫폼이든 공통 저장 가능
+
 }
