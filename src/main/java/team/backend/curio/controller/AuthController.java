@@ -197,6 +197,9 @@ public class AuthController {
         OAuthUserInfo userInfo = googleOAuthClient.getUserInfo(accessToken);
         users user = authService.findOrCreateGoogleUser(userInfo);
 
+        user.setAccessToken(accessToken); // ✅ accessToken 저장
+        userRepository.save(user);        // ✅ DB 반영 (UserRepository 주입 필요)
+
         // 4. JWT 토큰 생성
         String accessJwt = jwtUtil.createAccessToken(user);
         String refreshJwt = jwtUtil.createRefreshToken(user);

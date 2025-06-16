@@ -93,4 +93,16 @@ public class GoogleOAuthClient {
         String accessToken = getAccessToken(code, isLocal);
         return getUserInfo(accessToken);
     }
+
+    // ✅ Google 연결 해제 메서드
+    public void revoke(String accessToken) {
+        String revokeUrl = "https://oauth2.googleapis.com/revoke?token=" + accessToken;
+
+        try {
+            restTemplate.postForLocation(revokeUrl, null);
+            log.info("✅ [Google unlink] 성공 - token: {}", accessToken);
+        } catch (Exception e) {
+            log.error("❌ [Google unlink] 실패 - token: {}", accessToken, e);
+        }
+    }
 }

@@ -86,4 +86,6 @@ public class users {
     @Column(name = "oauth_id")
     private String oauthId; // ← 어떤 플랫폼이든 공통 저장 가능
 
+    @Column(name = "access_token")
+    private String accessToken;
 }
