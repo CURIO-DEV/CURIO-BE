@@ -8,6 +8,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import team.backend.curio.client.GoogleOAuthClient;
 import team.backend.curio.client.KakaoOAuthClient;
 import team.backend.curio.domain.users;
 import team.backend.curio.domain.News;
@@ -49,14 +50,16 @@ public class UserController {
     private final EmailService emailService;
     private final JwtUtil jwtUtil;  // 여기에 JwtUtil 주입
     private final KakaoOAuthClient kakaoOAuthClient;
+    private final GoogleOAuthClient googleOAuthClient;
 
 
-    public UserController(UserService userService, TrendsService trendsService, EmailService emailService, JwtUtil jwtUtil,KakaoOAuthClient kakaoOAuthClient) {
+    public UserController(UserService userService, TrendsService trendsService, EmailService emailService, JwtUtil jwtUtil,KakaoOAuthClient kakaoOAuthClient, GoogleOAuthClient googleOAuthClient) {
         this.userService = userService;
         this.trendsService = trendsService;
         this.emailService = emailService;
         this.jwtUtil = jwtUtil;
         this.kakaoOAuthClient = kakaoOAuthClient;
+        this.googleOAuthClient =googleOAuthClient;
 
     }
 
@@ -279,6 +282,8 @@ public class UserController {
 
             if (user.getSocialType() == 1) { // 🔹 소셜 타입이 카카오일 경우
                 kakaoOAuthClient.unlink(user.getOauthId()); // 🔥 카카오 연결 해제
+            } else if (user.getSocialType() == 2 && user.getAccessToken() != null ) { // 🔹 구글
+                googleOAuthClient.revoke(user.getAccessToken()); // ✅ 구글 연결 해제
             }
 
             // ✅ 로컬/배포 판단
