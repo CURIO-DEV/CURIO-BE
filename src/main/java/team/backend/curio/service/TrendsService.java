@@ -29,6 +29,11 @@ public class TrendsService {
     private LocalDate lastCacheDate = null;
     private int lastNewsCount = -1;
 
+    private LocalDate lastCategoryCacheDate;
+    private List<String> lastCategoryCache;
+    private int lastCategoryNewsCount;
+    private String cachedCategoryKeywordJson;
+
     @Autowired
     public TrendsService(NewsRepository newsRepository,RestTemplate restTemplate,GptSummaryService gptSummaryService, UserRepository userRepository) {
         this.newsRepository = newsRepository;
@@ -117,9 +122,10 @@ public class TrendsService {
             combinedSummaries.append(news.getSummaryShort()).append("\n");
         }
 
-        String prompt = "다음 뉴스 요약들을 기반으로, **구체적이고 의미 있는 사건/인물/조직/정책 등**을 대표하는 중요한 키워드만 최대 20개 추출해줘. \n" +
-                "'한국', '경제', '내년'처럼 너무 일반적이거나 추상적인 단어는 제외해줘. \n" +
-                "각 키워드에 대해 중요도(1~100)를 부여하고, **아래 JSON 형식**으로 정확히 반환해줘:\n" +
+        String prompt = "다음 뉴스 요약들을 기반으로, 구체적이고 의미 있는 사건/인물/조직/정책 등의 중요한 키워드만 최대 20개 추출해줘. " +
+                "‘한국’, ‘경제’, ‘내년’처럼 일반적이거나 추상적인 단어는 제외해줘. " +
+                "각 키워드에 대해 중요도(1~100)를 부여해. " +
+                "반환 형식은 순수한 JSON 배열이어야 하며, 마크다운 코드 블록(예: ```json)은 절대 포함하지 마:\n" +
                 "[{\"keyword\": \"대통령\", \"weight\": 92}, {\"keyword\": \"물가\", \"weight\": 84}, ...]\n\n" +
                 combinedSummaries;
 
