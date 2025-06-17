@@ -38,8 +38,10 @@ public class TrendsService {
     }
 
     public List<NewsWithCountsDto> getPopularArticles() {
-        LocalDateTime todayStart = LocalDate.now().atStartOfDay(); // 오늘 자정 기준
-        return newsRepository.findTop4ByCreatedAtAfterOrderByLikeCountDescCreatedAtDesc(todayStart)
+        LocalDateTime yesterdayStart = LocalDate.now().minusDays(1).atStartOfDay();
+        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+
+        return newsRepository.findTop4ByCreatedAtBetweenOrderByLikeCountDescCreatedAtDesc(yesterdayStart,todayStart)
                 .stream()
                 .map(NewsWithCountsDto::new)
                 .collect(Collectors.toList());
