@@ -1,5 +1,7 @@
 package team.backend.curio.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -150,6 +152,15 @@ public class TrendsService {
         cachedCategoryKeywordJson = gptResponse;
 
         return parseKeywordJson(gptResponse);
+    }
+
+    private List<KeywordDto> parseKeywordJson(String json) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(json, new TypeReference<List<KeywordDto>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("GPT 응답 파싱 실패: " + e.getMessage(), e);
+        }
     }
 
     public List<String> getUserInterestCategories(Long userId) {
