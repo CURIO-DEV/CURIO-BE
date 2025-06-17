@@ -117,9 +117,22 @@ public class TrendsService {
         LocalDateTime todayStart = LocalDate.now().atStartOfDay();
         List<News> newsList = newsRepository.findByCategoryInAndCreatedAtAfter(categories, todayStart);
 
+        if (lastCategoryCacheDate != null &&
+                lastCategoryCacheDate.equals(LocalDate.now()) &&
+                lastCategoryCache != null &&
+                lastCategoryCache.containsAll(categories) &&
+                categories.containsAll(lastCategoryCache) &&
+                newsList.size() == lastCategoryNewsCount &&
+                cachedCategoryKeywordJson != null) {
+
+            return parseKeywordJson(cachedCategoryKeywordJson);  // 기존 캐시 반환
+        }
+
         StringBuilder combinedSummaries = new StringBuilder();
         for (News news : newsList) {
-            combinedSummaries.append(news.getSummaryShort()).append("\n");
+            if (news.getSummaryShort() != null) {
+                combinedSummaries.append(news.getSummaryShort()).append("\n");
+            }
         }
 
         String prompt = "다음 뉴스 요약들을 기반으로, 구체적이고 의미 있는 사건/인물/조직/정책 등의 중요한 키워드만 최대 20개 추출해줘. " +
@@ -129,7 +142,14 @@ public class TrendsService {
                 "[{\"keyword\": \"대통령\", \"weight\": 92}, {\"keyword\": \"물가\", \"weight\": 84}, ...]\n\n" +
                 combinedSummaries;
 
-        return gptSummaryService.callGptForKeywordExtraction(prompt);
+        String gptResponse = gptSummaryService.callGptApi(prompt); // raw JSON string
+
+        lastCategoryCacheDate = LocalDate.now();
+        lastCategoryCache = new ArrayList<>(categories); // 리스트 복사
+        lastCategoryNewsCount = newsList.size();
+        cachedCategoryKeywordJson = gptResponse;
+
+        return parseKeywordJson(gptResponse);
     }
 
     public List<String> getUserInterestCategories(Long userId) {
