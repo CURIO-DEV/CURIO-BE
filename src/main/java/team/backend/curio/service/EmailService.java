@@ -34,6 +34,11 @@ public class EmailService {
     }
 
     public void sendNewsletter(String userEmail, List<News> trendingNews) {
+        if (userEmail == null || userEmail.isBlank()) {
+            System.out.println("⚠️ 유효하지 않은 이메일, 메일 전송 스킵 → " + userEmail);
+            return;
+        }
+
         System.out.println("📤 메일 전송 시도 중 → " + userEmail);
 
         // 이메일 내용 설정
@@ -53,6 +58,7 @@ public class EmailService {
                     .append("\n\n");
         }
 
+        System.out.println("📰 전달된 뉴스 개수: " + trendingNews.size());
         System.out.println("🔎 최종 메일 내용:\n" + content);
 
         message.setText(content.toString());
@@ -66,7 +72,7 @@ public class EmailService {
     }
 
     // 자동 발송 스케줄링: 매일 아침 7시
-    @Scheduled(cron = "0 0 7 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 40 14 * * *", zone = "Asia/Seoul")
     public void scheduleDailyNewsletter() {
         System.out.println("🕒 자동 뉴스레터 발송 시작");
         System.out.println("서버 현재 시각: " + LocalDateTime.now());

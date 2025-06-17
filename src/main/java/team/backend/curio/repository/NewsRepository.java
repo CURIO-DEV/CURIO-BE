@@ -24,7 +24,7 @@ public interface NewsRepository extends JpaRepository<News, Long>, NewsSearchRep
     //List<News> findTop4ByOrderByLikeCountDescCreatedAtDesc();
 
     // 오늘 날짜 기준 + 좋아요 수로 내림차순 정렬, 같으면 최신순으로 정렬
-    List<News> findTop4ByCreatedAtAfterOrderByLikeCountDescCreatedAtDesc(LocalDateTime todayStart);
+    List<News> findTop4ByCreatedAtBetweenOrderByLikeCountDescCreatedAtDesc(LocalDateTime start, LocalDateTime end);
 
     // 카테고리가 포함되어 있고, 날짜가 일치하는 뉴스 기사들 조회
     List<News> findByCategoryInAndCreatedAtAfter(List<String> categories, LocalDateTime dateTime);

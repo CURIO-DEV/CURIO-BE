@@ -207,6 +207,11 @@ public class UserController {
         try {
             users user = userService.getUserById(userDetails.getUserId());
 
+            // 이미 신청된 경우
+            if (user.getNewsletterStatus() == 1) {
+                return ResponseEntity.ok(new MessageResponse("이미 뉴스레터를 신청하셨습니다."));
+            }
+
             user.setNewsletterStatus(1);
 
             // 요청에서 newsletter-email이 비어 있으면 기본 이메일 사용

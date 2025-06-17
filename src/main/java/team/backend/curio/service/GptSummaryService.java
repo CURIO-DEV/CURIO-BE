@@ -86,6 +86,7 @@ public class GptSummaryService {
         List<Map<String, Object>> choices = (List<Map<String, Object>>) response.getBody().get("choices");
         String gptResponseJson = (String) ((Map<String, Object>) choices.get(0).get("message")).get("content");
 
+
         System.out.println("GPT 응답 원문: " + gptResponseJson);
 
         // JSON 파싱
