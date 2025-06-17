@@ -66,8 +66,10 @@ public class BookmarkService {
         }
 
         List<String> memberEmails = bookmark.getMembers().stream()
-                .map(user -> user.getEmail())  // 각 user 객체에서 email 추출
+                .filter(user -> !user.getUserId().equals(userId)) // 현재 로그인한 유저 제외하고 저장
+                .map(users::getEmail)
                 .collect(Collectors.toList());
+
 
 
         return new BookmarkResponseDto(savedBookmark.getId(), savedBookmark.getName(), savedBookmark.getColor(), memberEmails);

@@ -48,11 +48,6 @@ public class BookmarkController {
         this.gptSummaryService = gptSummaryService;
     }
 
-    private users getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (users) authentication.getPrincipal();
-    }
-
     // 북마크 폴더 생성
     @Operation(summary = "북마크 생성")
     @PostMapping("/create")
