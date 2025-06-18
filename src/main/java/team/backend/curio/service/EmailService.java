@@ -72,7 +72,7 @@ public class EmailService {
     }
 
     // 자동 발송 스케줄링: 매일 아침 7시
-    @Scheduled(cron = "0 40 14 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 10 * * *", zone = "Asia/Seoul")
     public void scheduleDailyNewsletter() {
         System.out.println("🕒 자동 뉴스레터 발송 시작");
         System.out.println("서버 현재 시각: " + LocalDateTime.now());
