@@ -10,6 +10,7 @@ import team.backend.curio.dto.NewsDTO.NewsResponseDto;
 import team.backend.curio.dto.NewsDTO.CurioGoNewsResponseDto;
 import team.backend.curio.dto.NewsDTO.NewsSummaryResponseDto;
 import team.backend.curio.dto.NewsDTO.SearchNewsResponseDto;
+import team.backend.curio.repository.BookmarkRepository;
 import team.backend.curio.repository.NewsRepository;
 import team.backend.curio.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -28,12 +29,14 @@ public class NewsService {
     private final NewsRepository newsRepository;
     private final UserRepository userRepository;
     private final GptSummaryService gptSummaryService;
+    private final BookmarkRepository bookmarkRepository;
 
     @Autowired
-    public NewsService(NewsRepository newsRepository, UserRepository userRepository, GptSummaryService gptSummaryService) {
+    public NewsService(NewsRepository newsRepository, UserRepository userRepository, GptSummaryService gptSummaryService, BookmarkRepository bookmarkRepository) {
         this.newsRepository = newsRepository;
         this.userRepository = userRepository;
         this.gptSummaryService = gptSummaryService;
+        this.bookmarkRepository = bookmarkRepository;
     }
 
     // 관심사에 맞는 뉴스 조회
@@ -251,9 +254,15 @@ public class NewsService {
 
             List<News> sameNews = newsRepository.findBySourceUrlOrderByCreatedAtAsc(url);
 
-            // 첫 번째만 남기고 나머지는 삭제
+            // 첫 번째 뉴스는 keep
             for (int i = 1; i < sameNews.size(); i++) {
-                newsRepository.delete(sameNews.get(i));
+                News duplicate = sameNews.get(i);
+
+                // 1) 북마크 연결 먼저 제거
+                bookmarkRepository.deleteNewsRelations(duplicate.getNewsId());
+
+                // 2) 뉴스 삭제
+                newsRepository.delete(duplicate);
                 deleteCount++;
             }
         }
