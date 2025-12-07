@@ -39,6 +39,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return true;
         }
 
+        if (path.contains("cleanup-duplicates")) {
+            return true;
+        }
+
         // "/curio/api/users/interests/"로 시작하고 "/news"로 끝나는 경로 필터 제외
         if (path.startsWith("/users/interests/") && path.endsWith("/news")) {
             System.out.println("✅ 필터 제외됨: " + path);
