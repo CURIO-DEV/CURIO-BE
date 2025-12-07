@@ -2,6 +2,7 @@ package team.backend.curio.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import team.backend.curio.domain.News;
 import team.backend.curio.domain.users;
 import team.backend.curio.dto.NewsDTO.InterestNewsResponseDto;
@@ -69,36 +70,70 @@ public class NewsService {
 
     // 크롤링된 뉴스 여러 개 저장
     public void saveAllNews(List<News> newsList) {
+
+        List<News> toSave = new ArrayList<>();
+
         for (News news : newsList) {
-            try {
-                String content = news.getContent();
-                if (content != null && !content.isBlank()) {
-                    news.setSummaryShort(gptSummaryService.summarize(content, "short"));
-                    news.setSummaryMedium(gptSummaryService.summarize(content, "medium"));
-                    news.setSummaryLong(gptSummaryService.summarize(content, "long"));
-                } else {
-                    news.setSummaryShort("");
-                    news.setSummaryMedium("");
-                    news.setSummaryLong("");
+
+            // -------------------------------
+            // 1) URL 또는 제목으로 기존 기사 검색
+            // -------------------------------
+            News existing = newsRepository.findBySourceUrl(news.getSourceUrl())
+                    .orElseGet(() -> newsRepository.findByTitle(news.getTitle()).orElse(null));
+
+            // ===============================
+            // 2) 이미 존재하던 기사라면? → 업데이트 처리
+            // ===============================
+            if (existing != null) {
+
+                // 내용이 달라진 경우에만 업데이트
+                if (!Objects.equals(existing.getContent(), news.getContent())) {
+                    existing.setContent(news.getContent());
+                    existing.setCategory(news.getCategory());
+                    existing.setImageUrl(news.getImageUrl());
+                    existing.setUpdatedAt(news.getUpdatedAt());
+
+                    // 요약 다시 생성
+                    try {
+                        existing.setSummaryShort(gptSummaryService.summarize(news.getContent(), "short"));
+                        existing.setSummaryMedium(gptSummaryService.summarize(news.getContent(), "medium"));
+                        existing.setSummaryLong(gptSummaryService.summarize(news.getContent(), "long"));
+                    } catch (Exception e) {
+                        existing.setSummaryShort("");
+                        existing.setSummaryMedium("");
+                        existing.setSummaryLong("");
+                    }
+
+                    toSave.add(existing);   // 업데이트된 기사 저장 대상에 추가
                 }
+
+                continue;  // 신규 저장 로직은 패스
+            }
+
+            // ===============================
+            // 3) 새로운 기사라면? → 요약 생성 후 저장 리스트에 추가
+            // ===============================
+            try {
+                news.setSummaryShort(gptSummaryService.summarize(news.getContent(), "short"));
+                news.setSummaryMedium(gptSummaryService.summarize(news.getContent(), "medium"));
+                news.setSummaryLong(gptSummaryService.summarize(news.getContent(), "long"));
             } catch (Exception e) {
-                System.err.println("Error summarizing news with title: " + news.getTitle());
-                e.printStackTrace();
-                // 필요 시 summary 필드를 빈 문자열 처리해서 저장할 수도 있음
                 news.setSummaryShort("");
                 news.setSummaryMedium("");
                 news.setSummaryLong("");
             }
+
+            toSave.add(news);
         }
 
-        try {
-            newsRepository.saveAll(newsList);
-        } catch (Exception e) {
-            System.err.println("Error saving news list to repository");
-            e.printStackTrace();
-            throw e;  // 다시 던져서 컨트롤러 쪽에서 처리하도록
+        // -------------------------------
+        // 4) 최종 저장 처리
+        // -------------------------------
+        if (!toSave.isEmpty()) {
+            newsRepository.saveAll(toSave);
         }
     }
+
 
 
     //특정 뉴스의 관련 뉴스 조회
@@ -205,4 +240,25 @@ public class NewsService {
                 .collect(Collectors.toList());
 
     }
+
+    @Transactional
+    public int cleanupDuplicateNews() {
+        List<Object[]> duplicates = newsRepository.findDuplicateUrls();
+        int deleteCount = 0;
+
+        for (Object[] row : duplicates) {
+            String url = (String) row[0];
+
+            List<News> sameNews = newsRepository.findBySourceUrlOrderByCreatedAtAsc(url);
+
+            // 첫 번째만 남기고 나머지는 삭제
+            for (int i = 1; i < sameNews.size(); i++) {
+                newsRepository.delete(sameNews.get(i));
+                deleteCount++;
+            }
+        }
+
+        return deleteCount;
+    }
+
 }

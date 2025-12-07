@@ -96,4 +96,11 @@ public class ArticleController {
         processor.summarizeAndSaveNews(id);
         return ResponseEntity.ok("요약 완료");
     }
+
+    @DeleteMapping("/cleanup-duplicates")
+    public ResponseEntity<String> cleanupDuplicates() {
+        int removed = newsService.cleanupDuplicateNews();
+        return ResponseEntity.ok("중복 뉴스 " + removed + "개 삭제 완료");
+    }
+
 }

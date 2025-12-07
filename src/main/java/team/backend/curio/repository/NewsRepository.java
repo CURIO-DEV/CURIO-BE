@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface NewsRepository extends JpaRepository<News, Long>, NewsSearchRepository {
 
@@ -39,5 +40,14 @@ public interface NewsRepository extends JpaRepository<News, Long>, NewsSearchRep
 
     // 관심 카테고리 안에서 좋아요 많은 뉴스 상위 5개
     List<News> findTop5ByCategoryInOrderByLikeCountDesc(List<String> categories);
+
+    Optional<News> findBySourceUrl(String sourceUrl);
+
+    Optional<News> findByTitle(String title);
+
+    @Query("SELECT n.sourceUrl, COUNT(n) FROM News n GROUP BY n.sourceUrl HAVING COUNT(n) > 1")
+    List<Object[]> findDuplicateUrls();
+
+    List<News> findBySourceUrlOrderByCreatedAtAsc(String sourceUrl);
 
 }
