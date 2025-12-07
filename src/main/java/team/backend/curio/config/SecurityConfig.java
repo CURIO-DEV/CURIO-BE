@@ -40,6 +40,7 @@ public class SecurityConfig {
                                 "/users/interests/*/news",
                                 "/search/**",
                                 "/articles/**",
+                                "/curio/api/articles/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui-custom.html",
                                 "/custom-api-docs",
