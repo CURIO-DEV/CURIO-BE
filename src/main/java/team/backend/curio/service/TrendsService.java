@@ -77,7 +77,7 @@ public class TrendsService {
         }
 
         String prompt = "다음 뉴스 요약들을 참고해서, 지금 이슈가 되는 키워드 8개를 많이 나온 거 같은 키워드 우선으로 순위 매겨서 반환해줘. " +
-                "형식은 쉼표(,)로 구분해서 한 줄로 알려줘.\n\n" + contentBuilder;
+                "형식은 번호를 제외하고 단어를 쉼표(,)로 구분해서 한 줄로 알려줘.\n\n" +contentBuilder;
 
         String gptResponse = gptSummaryService.callGptApi(prompt);
 
